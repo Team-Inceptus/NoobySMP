@@ -1,5 +1,22 @@
 package us.teaminceptus.noobysmp.recipes;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.RecipeChoice.ExactChoice;
+import org.bukkit.inventory.RecipeChoice.MaterialChoice;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.materials.SMPMaterial;
+
 public class SMPRecipe {
 
 	private static List<SMPRecipe> recipes;
@@ -13,7 +30,7 @@ public class SMPRecipe {
 	public SMPRecipe(ItemStack result, String recipeMap, Map<Character, ItemStack> ingredients) {
 		recipes.add(this);
 
-		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this)), result);
+		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this))), result);
 
 		recipe.shape(recipeMap.split("_"));
 		for (char c : ingredients.keySet()) {
@@ -29,10 +46,10 @@ public class SMPRecipe {
 		this(result.getItem(), recipeMap, ingredients);
 	}
 
-	public SMPRecipe(ItemStack result, String recipeMap, Map<Character, Material> ingredients) {
+	public SMPRecipe(ItemStack result, String recipeMap, HashMap<Character, Material> ingredients) {
 		recipes.add(this);
 
-		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this)), result);
+		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this))), result);
 
 		recipe.shape(recipeMap.split(" "));
 		for (char c : ingredients.keySet()) {
@@ -44,7 +61,7 @@ public class SMPRecipe {
 		this.eventUsed = false;
 	}
 
-	public SMPRecipe(SMPMaterial result, String recipeMap, Map<Character, Material> ingredients) {
+	public SMPRecipe(SMPMaterial result, String recipeMap, HashMap<Character, Material> ingredients) {
 		this(result.getItem(), recipeMap, ingredients);
 	}
 
@@ -83,12 +100,16 @@ public class SMPRecipe {
 	public static final Map<String, SmithingData> getSmithingRecipes() {
 		return smithingRecipes;
 	}
+	
+	public static final List<SMPRecipe> getEventRecipes() {
+		return getRecipes().stream().filter(r -> r.eventUsed).toList();
+	}
 
-	public static void registerMultiple(Material base, Map<String, ItemStack> map) {
-		for (Map.Entry<String, ItemStack> entry : map.entrySet()) {
+	public static void registerMultiple(Material base, HashMap<String, ItemStack> map) {
+		for (HashMap.Entry<String, ItemStack> entry : map.entrySet()) {
 			ItemStack result = entry.getValue();
 
-			new SMPRecipe(base, entry.getKey(), RecipeManager.vanillaShape(base));
+			new SMPRecipe(result, entry.getKey(), RecipeManager.vanillaShape(base));
 		}
 	}
 
@@ -96,7 +117,7 @@ public class SMPRecipe {
 		for (Map.Entry<String, ItemStack> entry : map.entrySet()) {
 			ItemStack result = entry.getValue();
 
-			new SMPRecipe(base, entry.getKey(), RecipeManager.vanillaShape(base));
+			new SMPRecipe(result, entry.getKey(), RecipeManager.vanillaShape(base));
 		}
 	}
 

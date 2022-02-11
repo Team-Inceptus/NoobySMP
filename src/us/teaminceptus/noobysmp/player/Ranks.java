@@ -1,5 +1,21 @@
 package us.teaminceptus.noobysmp.player;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+
+import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.util.Messages;
+import us.teaminceptus.noobysmp.util.PlayerConfig;
+
 public class Ranks implements TabExecutor, Listener {
 
 	protected SMP plugin;
@@ -17,9 +33,9 @@ public class Ranks implements TabExecutor, Listener {
 		for (int i = 20; i < 40; i++) LEVEL_COLOR.put(i, ChatColor.YELLOW);
 		for (int i = 40; i < 75; i++) LEVEL_COLOR.put(i, ChatColor.GREEN);
 		for (int i = 75; i < 100; i++) LEVEL_COLOR.put(i, ChatColor.AQUA);
-		for (int i = 100; i < 155; i++) LEVEL_COLOR.put(i, ChatColor.BOLD + "" + ChatColor.DARK_PURPLE);
-		for (int i = 155; i < 200; i++) LEVEL_COLOR.put(i, ChatColor.BOLD + ""+ ChatColor.LIGHT_PURPLE);
-		LEVEL_COLOR.put(200, ChatColor.BOLD + "" + ChatColor.GOLD);
+		for (int i = 100; i < 155; i++) LEVEL_COLOR.put(i, ChatColor.DARK_PURPLE);
+		for (int i = 155; i < 200; i++) LEVEL_COLOR.put(i, ChatColor.LIGHT_PURPLE);
+		LEVEL_COLOR.put(200, ChatColor.GOLD);
 	}
 	
 	public Ranks(SMP plugin) {
@@ -40,8 +56,12 @@ public class Ranks implements TabExecutor, Listener {
 			return true;
 		}
 		
-		
 		return true;
+	}
+
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

@@ -1,8 +1,18 @@
 package us.teaminceptus.noobysmp;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+
 public class SMP extends JavaPlugin {
 
-	private static final File playerDir;
+	private static File playerDir;
 
 	private void loadFiles() {
 		playerDir = new File(getDataFolder().getPath() + "/players");
@@ -60,7 +70,7 @@ public class SMP extends JavaPlugin {
 
 			ConfigurationSection settings = pConfig.getConfigurationSection("settings");
 
-			if (!(settings.isBoolean("notifications")) {
+			if (!(settings.isBoolean("notifications"))) {
 				settings.set("notifications", true);
 			}
 			
@@ -83,6 +93,11 @@ public class SMP extends JavaPlugin {
 	public static FileConfiguration getConfig(OfflinePlayer p) {
 		File file = new File(playerDir, p.getUniqueId().toString() + ".yml");
 		return YamlConfiguration.loadConfiguration(file);
+	}
+	
+	public static File getFile(OfflinePlayer p) {
+		File file = new File(playerDir, p.getUniqueId().toString() + ".yml");
+		return file;
 	}
 	
 }

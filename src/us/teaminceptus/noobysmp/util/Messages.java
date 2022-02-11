@@ -1,5 +1,7 @@
 package us.teaminceptus.noobysmp.util;
 
+import org.bukkit.ChatColor;
+
 public class Messages {
 
 	public static final String NO_PERMISSION_CMD = ChatColor.RED + "You do not have permission to use this command!";

@@ -1,5 +1,19 @@
 package us.teaminceptus.noobysmp.materials;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+
 public enum SMPMaterial {
 	
 	RUBY(0, Material.DIAMOND, "Ruby"),
@@ -10,7 +24,7 @@ public enum SMPMaterial {
 	RUBY_PICKAXE(0, Material.DIAMOND_PICKAXE, "Ruby Pickaxe"),
 	RUBY_HELMET(0, Material.DIAMOND_HELMET, "Ruby Helmet", genArmor(2.5, 1.5, 1)),
 	RUBY_CHESTPLATE(0, Material.DIAMOND_CHESTPLATE, "Ruby Chestplate", genArmor(7, 1.5, 1)),
-	RUBY_LEGGINS(0, Material.DIAMOND_LEGGINGS, "Ruby Leggings", genArmor(5, 1.5, 1)),
+	RUBY_LEGGINGS(0, Material.DIAMOND_LEGGINGS, "Ruby Leggings", genArmor(5, 1.5, 1)),
 	RUBY_BOOTS(0, Material.DIAMOND_BOOTS, "Ruby Boots", genArmor(2, 1.5, 1)),
 	RUBY_ORE(0, Material.DIAMOND_ORE, "Ruby Ore", true),
 	DEEPSLATE_RUBY_ORE(0, Material.DEEPSLATE_DIAMOND_ORE, "Deepslate Ruby Ore", true),
@@ -58,8 +72,8 @@ public enum SMPMaterial {
 	private final ItemStack item;
 	private final int levelUnlocked;
 
-	private static final Map<Attribute, AttributeModifier> genAttack(double attack, double knockback, double speed) {
-		Map<Attribute, AttributeModifier> map = new HashMap<>();
+	private static final HashMap<Attribute, AttributeModifier> genAttack(double attack, double knockback, double speed) {
+		HashMap<Attribute, AttributeModifier> map = new HashMap<>();
 
 		if (attack > 0) map.put(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("", attack, Operation.ADD_NUMBER));
 		if (knockback > 0) map.put(Attribute.GENERIC_ATTACK_KNOCKBACK, new AttributeModifier("", knockback, Operation.ADD_NUMBER));
@@ -74,8 +88,8 @@ public enum SMPMaterial {
 												 Integer.valueOf(hex.substring(4, 6), 16));
 	}
 
-	private static final Map<Enchantment, Integer> genTool(int unbreaking, int efficiency) {
-		Map<Enchantment, Integer> map = new HashMap<>();
+	private static final HashMap<Enchantment, Integer> genTool(int unbreaking, int efficiency) {
+		HashMap<Enchantment, Integer> map = new HashMap<>();
 
 		if (unbreaking > 0) map.put(Enchantment.DURABILITY, unbreaking);
 		if (efficiency > 0) map.put(Enchantment.DIG_SPEED, efficiency);
@@ -83,8 +97,8 @@ public enum SMPMaterial {
 		return map;
 	}
 
-	private static final Map<Attribute, AttributeModifier> genArmor(double armor, double toughness, double knockback) {
-		Map<Attribute, AttributeModifier> map = new HashMap<>();
+	private static final HashMap<Attribute, AttributeModifier> genArmor(double armor, double toughness, double knockback) {
+		HashMap<Attribute, AttributeModifier> map = new HashMap<>();
 
 		if (armor > 0) map.put(Attribute.GENERIC_ARMOR, new AttributeModifier("", armor, Operation.ADD_NUMBER));
 		if (toughness > 0) map.put(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier("", toughness, Operation.ADD_NUMBER));
@@ -93,19 +107,19 @@ public enum SMPMaterial {
 		return map;
 	}
 
-	private static final Map<Enchantment, Integer> genBow(int power, int punch, boolean infinity, boolean flame) {
-		Map<Enchantment, Integer> map = new HashMap<>();
+	private static final HashMap<Enchantment, Integer> genBow(int power, int punch, boolean infinity, boolean flame) {
+		HashMap<Enchantment, Integer> map = new HashMap<>();
 
 		if (power > 0) map.put(Enchantment.ARROW_DAMAGE, power);
 		if (punch > 0) map.put(Enchantment.ARROW_KNOCKBACK, punch);
-		if (infinity) map.put(Enchantment.ARROW_INFINITY, 1);
+		if (infinity) map.put(Enchantment.ARROW_INFINITE, 1);
 		if (flame) map.put(Enchantment.ARROW_FIRE, 1);
 		
 		return map;
 	}
 	
 	private SMPMaterial(int level, Material original, String name, boolean block) {
-		this.level = levelUnlocked;
+		this.levelUnlocked = level;
 		this.localization = name.toLowerCase().replace(" ", "_");
 		
 		ItemStack item = new ItemStack(original);
@@ -123,7 +137,7 @@ public enum SMPMaterial {
 	}
 
 	private SMPMaterial(int level, Material original, String name, Map<Attribute, AttributeModifier> modifiers, Map<Enchantment, Integer> enchants) {
-		this.level = levelUnlocked;
+		this.levelUnlocked = level;
 		this.localization = name.toLowerCase().replace(" ", "_");
 		
 		ItemStack item = new ItemStack(original);
@@ -136,7 +150,7 @@ public enum SMPMaterial {
 			}
 		if (enchants != null)
 			for (Enchantment e : enchants.keySet()) {
-				meta.addEnchant(e, enchants.get(e), true));
+				meta.addEnchant(e, enchants.get(e), true);
 			}
 		
 		item.setItemMeta(meta);
@@ -157,15 +171,15 @@ public enum SMPMaterial {
 		this(level, original, name, modifiers, null, clr);
 	}
 
-	private SMPMaterial(int level, Material original, String name, Map<Enchantment, Integer> enchants, Color clr) {
+	private SMPMaterial(int level, Material original, String name, HashMap<Enchantment, Integer> enchants, Color clr) {
 		this(level, original, name, null, enchants, clr);
 	}
 
 	private SMPMaterial(int level, Material original, String name, Map<Attribute, AttributeModifier> modifiers) {
-		this(level, original, name, modifiers, null);
+		this(level, original, name, modifiers, (Map<Enchantment, Integer>) null);
 	}
 
-	private SMPMaterial(int level, Material original, String name, Map<Enchantment, Integer> enchants) {
+	private SMPMaterial(int level, Material original, String name, HashMap<Enchantment, Integer> enchants) {
 		this(level, original, name, null, enchants);
 	}
 
@@ -181,8 +195,12 @@ public enum SMPMaterial {
 		return null;
 	}
 
+	public final String getName() {
+		return this.name;
+	}
+	
 	public final ItemStack getItem() {
-		return getAmount(1);
+		return getItem(1);
 	}
 
 	public final int getLevelUnlocked() {

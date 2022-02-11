@@ -1,5 +1,32 @@
 package us.teaminceptus.noobysmp.recipes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockCookEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.inventory.PrepareSmithingEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.SmithingInventory;
+
+import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.materials.SMPMaterial;
+import us.teaminceptus.noobysmp.recipes.SMPRecipe.FurnaceData;
+import us.teaminceptus.noobysmp.recipes.SMPRecipe.SmithingData;
+import us.teaminceptus.noobysmp.util.Generator;
+import us.teaminceptus.noobysmp.util.Items;
+
 public class RecipeManager implements Listener {
 
 	protected SMP plugin;
@@ -39,8 +66,8 @@ public class RecipeManager implements Listener {
 	public static final String BLOCK_9 = "III_III_III";
 	public static final String BLOCK_4 = "II _II ";
 	
-	public static final Map<Character, ItemStack> vanillaShape(ItemStack item) {
-		Map<Character, ItemStack> map = new HashMap<>();
+	public static final HashMap<Character, ItemStack> vanillaShape(ItemStack item) {
+		HashMap<Character, ItemStack> map = new HashMap<>();
 		// TODO after all vanilla variations, substitute other items
 
 		map.put('I', item);
@@ -50,8 +77,8 @@ public class RecipeManager implements Listener {
 		return map;
 	}
 
-	public static final Map<Character, Material> vanillaShape(Material mat) {
-		Map<Character, Material> map = new HashMap<>();
+	public static final HashMap<Character, Material> vanillaShape(Material mat) {
+		HashMap<Character, Material> map = new HashMap<>();
 
 		map.put('I', mat);
 		map.put('S', Material.STICK);
@@ -60,12 +87,12 @@ public class RecipeManager implements Listener {
 		return map;
 	}
 
-	public static final Map<Character, ItemStack> vanillaShape(SMPMaterial item) {
+	public static final HashMap<Character, ItemStack> vanillaShape(SMPMaterial item) {
 		return vanillaShape(item.getItem());
 	}
 
-	private static final Map<String, ItemStack> getRegisterMap(SMPMaterial... items) {
-		Map<String, ItemStack> map = new HashMap<>();
+	private static final HashMap<String, ItemStack> getRegisterMap(SMPMaterial... items) {
+		HashMap<String, ItemStack> map = new HashMap<>();
 		for (SMPMaterial m : items) {
 			for (String s : ALL_NAMES) if (m.name().startsWith(s)) {
 				try {
@@ -76,11 +103,11 @@ public class RecipeManager implements Listener {
 			}
 
 			if (m.name().startsWith("AXE")) {
-				map.put(AXE_2, m);
+				map.put(AXE_2, m.getItem());
 			}
 
 			if (m.name().startsWith("HOE")) {
-				map.put(HOE_2, m);
+				map.put(HOE_2, m.getItem());
 			}
 		}
 
@@ -106,7 +133,7 @@ public class RecipeManager implements Listener {
 		plugin.getLogger().info("Loading recipes...");
 		createRecipes();
 		plugin.getLogger().info("Successfully loaded " + Integer.toString(SMPRecipe.getRecipes().size()) + " custom recipes for NoobySMP. Loading other event recipes...");
-		Bukkit.getPluginManager().registerEvents(this);
+		Bukkit.getPluginManager().registerEvents(this, plugin);
 		plugin.getLogger().info("Successfully loaded events!");
 	}
 
@@ -123,9 +150,9 @@ public class RecipeManager implements Listener {
 
 				int index = 0;
 				for (String s : sh.getShape()) {
-					for (char c : s.charSet()) {
-						ItemStack item = (sh.getIngredientMap().get(c) == null ? new ItemStack(Material.AIR) : sh.getIngredientMap().get(c));
-						ingredients.put(index, item);
+					for (char c : s.toCharArray()) {
+						ItemStack it = (sh.getIngredientMap().get(c) == null ? new ItemStack(Material.AIR) : sh.getIngredientMap().get(c));
+						ingredients.put(index, it);
 						index++;
 					}
 				}
@@ -178,7 +205,7 @@ public class RecipeManager implements Listener {
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		if (!(e.getWhoClicked() instanceof Player p)) return;
-		InventoryView view = e.getView();
+		// InventoryView view = e.getView();
 		
 		
 	}
@@ -198,7 +225,7 @@ public class RecipeManager implements Listener {
 	}
 
 	@EventHandler
-	public void onCraft(PrepareItemCraftingEvent e) {
+	public void onCraft(PrepareItemCraftEvent e) {
 		
 	}
 }

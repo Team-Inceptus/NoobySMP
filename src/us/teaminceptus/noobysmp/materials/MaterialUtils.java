@@ -1,5 +1,13 @@
 package us.teaminceptus.noobysmp.materials;
 
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
+
+import us.teaminceptus.noobysmp.SMP;
+
 public class MaterialUtils implements Listener {
 
 	protected SMP plugin;
@@ -13,7 +21,7 @@ public class MaterialUtils implements Listener {
 
 	@EventHandler
 	public void onPlace(BlockPlaceEvent e) {
-		Player p = e.getPlayer();
+		// Player p = e.getPlayer();
 		ItemStack item = e.getItemInHand();
 
 		if (!(item.hasItemMeta())) return;

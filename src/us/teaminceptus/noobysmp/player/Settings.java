@@ -1,5 +1,28 @@
 package us.teaminceptus.noobysmp.player;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.util.Generator;
+import us.teaminceptus.noobysmp.util.Messages;
+import us.teaminceptus.noobysmp.util.PlayerConfig;
+
 public class Settings implements Listener, CommandExecutor {
 
 	protected SMP plugin;
@@ -14,10 +37,10 @@ public class Settings implements Listener, CommandExecutor {
 
 	public static final String[] SETTINGS = {
 		NOTIFICATIONS,
-	}
+	};
 	
 	public static Inventory getSettings(Player p) {
-		Inventory settings = Generater.genGUI(36, p.getDisplayName() + ChatColor.DARK_GRAY + "'s Settings");
+		Inventory settings = Generator.genGUI(36, p.getDisplayName() + ChatColor.DARK_GRAY + "'s Settings");
 		PlayerConfig config = new PlayerConfig(p);
 
 		for (String s : SETTINGS) {
@@ -27,7 +50,7 @@ public class Settings implements Listener, CommandExecutor {
 			meta.setDisplayName(ChatColor.YELLOW + s + ": " + (on ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
 			if (on) {
 				meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
-				meta.addItemFlag(ItemFlag.HIDE_ENCHANTS);
+				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 			}
 			setting.setItemMeta(meta);
 
@@ -59,7 +82,7 @@ public class Settings implements Listener, CommandExecutor {
 		meta.setDisplayName(ChatColor.YELLOW + settingName + ": " + (setting ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
 		if (setting) {
 			meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
-			meta.addItemFlag(ItemFlag.HIDE_ENCHANTS);
+			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		}
 		settingItem.setItemMeta(meta);
 		

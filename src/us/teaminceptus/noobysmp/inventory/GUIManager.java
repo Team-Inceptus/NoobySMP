@@ -1,5 +1,17 @@
 package us.teaminceptus.noobysmp.inventory;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
+
+import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.util.Items;
+
 public class GUIManager implements Listener {
 
 	protected SMP plugin;

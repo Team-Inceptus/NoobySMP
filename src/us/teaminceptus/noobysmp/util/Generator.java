@@ -1,5 +1,9 @@
 package us.teaminceptus.noobysmp.util;
 
+import org.bukkit.Bukkit;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
 public class Generator {
 
 	public static final Inventory genGUI(int size, String name) {

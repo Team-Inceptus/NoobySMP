@@ -1,5 +1,14 @@
 package us.teaminceptus.noobysmp.util;
 
+import java.io.IOException;
+
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.materials.SMPMaterial;
+
 public class PlayerConfig {
 
 	private final OfflinePlayer p;
@@ -13,10 +22,10 @@ public class PlayerConfig {
 	}
 
 	public static int toLevel(double exp) {
-		return Math.pow(exp / 800, 1 / EXP_POWER);
+		return (int) Math.floor(Math.pow(exp / 800, 1 / EXP_POWER));
 	}
 
-	public static double toMinExperiene(int level) {
+	public static double toMinExperience(int level) {
 		return Math.floor(800 * Math.pow(level, EXP_POWER));
 	}
 
@@ -27,7 +36,7 @@ public class PlayerConfig {
 	public void setSetting(String setting, boolean value) {
 		pConfig.getConfigurationSection("settings").set(ChatColor.stripColor(setting).toLowerCase(), value);
 		try {
-			pConfig.save()
+			pConfig.save(SMP.getFile(p));
 		}	catch (IOException e) {
 			e.printStackTrace();
 		}

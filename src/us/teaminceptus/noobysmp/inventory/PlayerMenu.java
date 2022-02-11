@@ -1,5 +1,21 @@
 package us.teaminceptus.noobysmp.inventory;
 
+import java.util.Arrays;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+
+import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.util.Generator;
+import us.teaminceptus.noobysmp.util.PlayerConfig;
+
 public class PlayerMenu implements Listener {
 
 	protected SMP plugin;
@@ -20,17 +36,15 @@ public class PlayerMenu implements Listener {
 		SkullMeta meta = (SkullMeta) head.getItemMeta();
 		meta.setOwningPlayer(p);
 		meta.setDisplayName(p.getDisplayName());
-		meta.setLore(Arrays.asList(ChatColor.GREEN + "Level: " + ChatColor.GOLD + config.getLevel(),
-															 ChatColor.GREEN + "Expereince: " + ChatColor.GOLD + Double.toString(Math.floor(config.getExperience() * 100) / 100),
-															 ChatColor.GREEN + "XP to Next Level: " + ChatColor.GOLD + Double.toString(Math.floor(config.getExpToNextLevel() * 100) / 100)));
+		meta.setLore(Arrays.asList(ChatColor.GREEN + "Level: " + ChatColor.GOLD + config.getLevel(), ChatColor.GREEN + "Expereince: " + ChatColor.GOLD + Double.toString(Math.floor(config.getExperience() * 100) / 100),								 ChatColor.GREEN + "XP to Next Level: " + ChatColor.GOLD + Double.toString(Math.floor(config.getExpToNextLevel() * 100) / 100)));
 		head.setItemMeta(meta);
-		inv.setItem(head, 13);
+		menu.setItem(20, head);
 
 		ItemStack settings = new ItemStack(Material.BEDROCK);
-		ItemMeta meta = settings.getItemMeta();
-		meta.setDisplayName(ChatColor.DARK_PURPLE + "Settings");
-		settings.setItemMeta(meta);
-		inv.setItem(settings, 20);
+		ItemMeta sMeta = settings.getItemMeta();
+		sMeta.setDisplayName(ChatColor.DARK_PURPLE + "Settings");
+		settings.setItemMeta(sMeta);
+		menu.setItem(20, settings);
 
 		
 		return menu;
