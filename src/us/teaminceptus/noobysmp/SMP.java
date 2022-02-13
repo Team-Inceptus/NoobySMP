@@ -10,6 +10,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import us.teaminceptus.noobysmp.commands.Help;
+import us.teaminceptus.noobysmp.commands.Settings;
+import us.teaminceptus.noobysmp.commands.admin.Ranks;
+
 public class SMP extends JavaPlugin {
 
 	private static File playerDir;
@@ -60,8 +64,12 @@ public class SMP extends JavaPlugin {
 				statistics.set("experience", 0.0D);
 			}
 
-			if (!(statistics.isInt("farming-count"))) {
-				statistics.set("farming-count", 0);
+			if (!(statistics.isInt("farming-level"))) {
+				statistics.set("farming-level", 0);
+			}
+			
+			if (!(statistics.isInt("fletching-level"))) {
+				statistics.set("flecting-level", 0);
 			}
 
 			if (!(pConfig.isConfigurationSection("settings"))) {
@@ -87,7 +95,12 @@ public class SMP extends JavaPlugin {
 		getLogger().info("Loading files...");
 		loadFiles();
 		getLogger().info("Files successfully loaded! Loading classes...");
-		// TODO add all command + listener classes
+		
+		// User Commands
+		new Help(this);
+		new Settings(this);
+		// Admin Commands
+		new Ranks(this);
 	}
 
 	public static FileConfiguration getConfig(OfflinePlayer p) {
