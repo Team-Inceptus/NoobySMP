@@ -4,14 +4,33 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
+
 public class Items {
 
 	public static final ItemStack LOCKED_ITEM = itemBuilder(Material.BARRIER).setName(ChatColor.RED + "Locked!").build();
+	public static final ItemStack COMING_SOON = itemBuilder(Material.BEDROCK).setName(ChatColor.DARK_PURPLE + "Coming Soon!").build();
+	
+	public static final ItemStack fromNBT(String nbtStr) {
+		try {
+			CompoundTag nbt =  TagParser.parseTag(nbtStr);
+			net.minecraft.world.item.ItemStack nmsItem = net.minecraft.world.item.ItemStack.of(nbt);
+			org.bukkit.inventory.ItemStack item = CraftItemStack.asBukkitCopy(nmsItem);
+			return item;
+		} catch (CommandSyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	public static class Builder {
 
