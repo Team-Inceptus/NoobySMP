@@ -12,14 +12,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockCookEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.SmithingInventory;
 
+import net.md_5.bungee.api.ChatColor;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 import us.teaminceptus.noobysmp.recipes.SMPRecipe.FurnaceData;
@@ -122,6 +123,8 @@ public class RecipeManager implements Listener {
 		SMPRecipe.registerMultiple(Material.COPPER_INGOT, getRegisterMap(SMPMaterial.COPPER_SWORD, SMPMaterial.COPPER_PICKAXE, SMPMaterial.COPPER_AXE, SMPMaterial.COPPER_HOE, SMPMaterial.COPPER_SHOVEL));
 		
 		SMPRecipe.registerMultiple(Material.BLACKSTONE, getRegisterMap(SMPMaterial.BLACKSTONE_HELMET, SMPMaterial.BLACKSTONE_CHESTPLATE, SMPMaterial.BLACKSTONE_LEGGINGS, SMPMaterial.BLACKSTONE_BOOTS));
+		
+		SMPRecipe.registerMultiple(Material.QUARTZ, getRegisterMap(SMPMaterial.QUARTZ_HELMET, SMPMaterial.QUARTZ_CHESTPLATE, SMPMaterial.QUARTZ_LEGGINGS, SMPMaterial.QUARTZ_BOOTS));
 		// Furnace Recipes
 		new SMPRecipe(SMPMaterial.RUBY_ORE.getItem(), SMPMaterial.RUBY.getItem(), 10, 100);
 		new SMPRecipe(SMPMaterial.DEEPSLATE_RUBY_ORE.getItem(), SMPMaterial.RUBY.getItem(), 10, 100);
@@ -165,9 +168,13 @@ public class RecipeManager implements Listener {
 				inv.setItem(20, ingredients.get(4));
 				inv.setItem(21, ingredients.get(5));
 
-				inv.setItem(22, ingredients.get(6));
-				inv.setItem(23, ingredients.get(7));
-				inv.setItem(24, ingredients.get(8));
+				inv.setItem(30, ingredients.get(6));
+				inv.setItem(31, ingredients.get(7));
+				inv.setItem(32, ingredients.get(8));
+				
+				inv.setItem(22, new ItemStack(Material.CRAFTING_TABLE));
+				inv.setItem(23, item);
+				
 
 				inventories.add(inv);
 			}
@@ -205,7 +212,31 @@ public class RecipeManager implements Listener {
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		if (!(e.getWhoClicked() instanceof Player p)) return;
-		// InventoryView view = e.getView();
+		InventoryView view = e.getView();
+		ItemStack clickedItem = e.getCurrentItem();
+		if (clickedItem == null) return;
+		if (!(clickedItem.hasItemMeta())) return;
+		if (!(clickedItem.getItemMeta().hasDisplayName())) return;
+		String display = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()).toLowerCase();
+		Inventory recipeInv = view.getTopInventory();
+		
+		// Title Checks
+		if (view.getTitle().contains("Recipe - ")) {
+			ItemStack chosen = recipeInv.getItem(23);
+			if (chosen == null) return;
+			
+			// Turn Page
+			if (display.equalsIgnoreCase("next") || display.equalsIgnoreCase("back")) {
+				List<Inventory> invs = getRecipeMenus(chosen);
+				
+				int nextInvIndex = invs.indexOf(recipeInv) + (display.equalsIgnoreCase("next") ? 1 : -1);
+				
+				Inventory nextInv = invs.get(nextInvIndex);
+				if (nextInv == null) return;
+				
+				p.openInventory(nextInv);
+			}
+		}
 		
 		
 	}
@@ -222,10 +253,5 @@ public class RecipeManager implements Listener {
 				break;
 			}
 		}
-	}
-
-	@EventHandler
-	public void onCraft(PrepareItemCraftEvent e) {
-		
 	}
 }
