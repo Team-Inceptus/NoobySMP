@@ -14,6 +14,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
+import com.google.common.collect.ImmutableMap;
+
+import us.teaminceptus.noobysmp.materials.SMPMaterial.CleanOutput.MaterialOutput;
+import us.teaminceptus.noobysmp.util.Items;
+
+/**
+ * Class used for Custom Materials inside the SMP.
+ * Utility Items (i.e. tables, items with inventory) are not included.
+ * 
+ * 
+ */
 public enum SMPMaterial {
 	
 	RUBY(0, Material.DIAMOND, "Ruby"),
@@ -26,9 +37,9 @@ public enum SMPMaterial {
 	RUBY_CHESTPLATE(0, Material.DIAMOND_CHESTPLATE, "Ruby Chestplate", genArmor(7, 1.5, 1)),
 	RUBY_LEGGINGS(0, Material.DIAMOND_LEGGINGS, "Ruby Leggings", genArmor(5, 1.5, 1)),
 	RUBY_BOOTS(0, Material.DIAMOND_BOOTS, "Ruby Boots", genArmor(2, 1.5, 1)),
-	RUBY_ORE(0, Material.DIAMOND_ORE, "Ruby Ore", true),
-	DEEPSLATE_RUBY_ORE(0, Material.DEEPSLATE_DIAMOND_ORE, "Deepslate Ruby Ore", true),
-	RUBY_BLOCK(0, Material.DIAMOND_BLOCK, "Ruby Block", true),
+	RUBY_ORE(0, Material.DIAMOND_ORE, "Ruby Ore"),
+	DEEPSLATE_RUBY_ORE(0, Material.DEEPSLATE_DIAMOND_ORE, "Deepslate Ruby Ore"),
+	RUBY_BLOCK(0, Material.DIAMOND_BLOCK, "Ruby Block"),
 
 	COPPER_PICKAXE(0, Material.GOLDEN_PICKAXE, "Copper Pickaxe", genTool(3, 0)),
 	COPPER_SWORD(0, Material.GOLDEN_SWORD, "Copper Sword", genAttack(5, 0, 0.5), genTool(3, 0)),
@@ -44,7 +55,14 @@ public enum SMPMaterial {
 	BLACKSTONE_CHESTPLATE(0, Material.LEATHER_CHESTPLATE, "Blackstone Chestplate", genArmor(6, 0.5, 0), genTool(3, 0), rgb("121212")),
 	BLACKSTONE_LEGGINGS(0, Material.LEATHER_LEGGINGS, "Blackstone Leggings", genArmor(4.5, 0.5, 0), genTool(3, 0), rgb("121212")),
 	BLACKSTONE_BOOTS(0, Material.LEATHER_BOOTS, "Blackstone Boots", genArmor(3, 0.5, 0), genTool(3, 0), rgb("121212")),
+	
+	QUARTZ_HELMET(0, Material.IRON_HELMET, "Quartz Helmet", genArmor(4.5, 0.5, 0.5), genTool(1, 0)),
+	QUARTZ_CHESTPLATE(0, Material.IRON_CHESTPLATE, "Quartz Boots", genArmor(4.5, 0.5, 0.5), genTool(1, 0)),
+	QUARTZ_LEGGINGS(0, Material.IRON_LEGGINGS, "Quartz Boots", genArmor(4.5, 0.5, 0.5), genTool(1, 0)),
+	QUARTZ_BOOTS(0, Material.IRON_BOOTS, "Quartz Boots", genArmor(4.5, 0.5, 0.5), genTool(1, 0)),
+	
 	// Level 1
+	ENDERITE_ORE(1, Material.IRON_BLOCK, "Enderite Ore"),
 	ENDER_FRAGMENT(1, Material.IRON_NUGGET, "Ender Fragment"),
 	ENDERITE(1, Material.IRON_INGOT, "Enderite"),
 	ENDERITE_SWORD(1, Material.NETHERITE_SWORD, "Enderite Sword", genAttack(10, 0.2, 0.5)),
@@ -58,11 +76,70 @@ public enum SMPMaterial {
 	ENDERITE_CHESTPLATE(1, Material.NETHERITE_CHESTPLATE, "Enderite Chestplate", genArmor(8, 2, 2)),
 	ENDERITE_LEGGINGS(1, Material.NETHERITE_LEGGINGS, "Enderite Leggings", genArmor(7, 2, 2)),
 	ENDERITE_BOOTS(1, Material.NETHERITE_BOOTS, "Enderite Boots", genArmor(4, 2, 2)),
-	// Level 2 - 5
+	ENDERITE_ELYTRA(1, Material.ELYTRA, "Enderite Elytra", genArmor(6, 2, 2), genTool(2, 0)),
 	
+	RAW_ENCHANT(1, Material.LIGHT_GRAY_DYE, "Raw Enchant", glint()),
+	// Level 2 - 4
+	ENCHANTED_GOLD(2, Material.GOLD_INGOT, "Enchanted Gold", glint()),
+	ENCHANTED_GOLD_NUGGET(2, Material.GOLD_NUGGET, "Enchanted Gold Nugget", glint()),
+	ENCHANTED_GOLD_BLOCK(2, Material.GOLD_BLOCK, "Enchanted Gold Block", glint()),
+	GOLDEN_ENCHANT(2, Material.YELLOW_DYE, "Golden Enchant", glint()),
 	
-	// Level 5 - 15
+	ENCHANTED_DIAMOND(3, Material.DIAMOND, "Enchanted Diamond", glint()),
+	ENCHANTED_DIAMOND_BLOCK(3, Material.DIAMOND_BLOCK, "Enchanted Diamond Block", glint()),
+	DIAMOND_ENCHANT(3, Material.LIGHT_BLUE_DYE, "Diamond Enchant", glint()),
+	
+	NETHERITE_STAR(4, Material.NETHER_STAR, "Netherite Star"),
+	
+	AMETHYST_HELMET(4, Material.LEATHER_HELMET, "Amethyst Helmet", genArmor(6, 1, 0.5), genTool(4, 0), rgb("6909a0")),
+	AMETHYST_CHESTPLATE(4, Material.LEATHER_CHESTPLATE, "Amethyst Chestplate", genArmor(9, 1, 0.5), genTool(4, 0), rgb("6909a0")),
+	AMETHYST_LEGGINGS(4, Material.LEATHER_LEGGINGS, "Amethyst Leggings", genArmor(8, 1, 0.5), genTool(4, 0), rgb("6909a0")),
+	AMETHYST_BOOTS(4, Material.LEATHER_BOOTS, "Amethyst Boots", genArmor(5, 1, 0.5), genTool(4, 0), rgb("6909a0")),
+	
+	// Level 5 - 14
+	UNCHARGED_ESSENCE(5, Material.GRAY_DYE, "Uncharged Essence"),
+	CHARGED_ESSENCE(5, Material.WHITE_DYE, "Charged Essence"),
+	
+	SUPER_NETHERITE_HELMET(6, Material.NETHERITE_HELMET, "Super Netherite Helmet", genArmor(11, 3, 3), genTool(7, 0)),
+	SUPER_NETHERITE_CHESTPLATE(6, Material.NETHERITE_CHESTPLATE, "Super Netherite Chestplate", genArmor(14, 3, 3), genTool(7, 0)),
+	SUPER_NETHERITE_LEGGINGS(6, Material.NETHERITE_LEGGINGS, "Super Netherite Leggings", genArmor(13, 3, 3), genTool(7, 0)),
+	SUPER_NETHERITE_BOOTS(6, Material.NETHERITE_BOOTS, "Super Netherite Boots", genArmor(10, 3, 3), genTool(7, 0)),
+	SUPER_NETHERITE_SWORD(6, Material.NETHERITE_SWORD, "Super Netherite Sword", genAttack(12, 0.4, 0.5), genTool(7, 0)),
+	
+	ENCHANTED_AMETHYST_SHARD(7, Material.AMETHYST_SHARD, "Enchanted Amethyst Shard"),
+	ENCHANTED_AMETHYST_BLOCK(7, Material.AMETHYST_BLOCK, "Enchanted Amethyst Block"),
+	AMETHYST_ENCHANT(7, Material.PURPLE_DYE, "Amethyst Enchant", glint()),
+	
+	EMERALD_INGOT(8, Material.EMERALD, "Emerald Ingot", glint()),
+	EMERALD_NUGGET(8, Material.GOLD_NUGGET, "Emerald Nugget", glint()),
+	
+	EMERALD_HELMET(9, Material.LEATHER_HELMET, "Emerald Helmet", genArmor(20, 5, 4), genTool(10, 0), Color.LIME),
+	EMERALD_CHESTPLATE(9, Material.LEATHER_CHESTPLATE, "Emerald Chestplate", genArmor(32, 5, 4), genTool(10, 0), Color.LIME),
+	EMERALD_LEGGINGS(9, Material.LEATHER_LEGGINGS, "Emerald Leggings", genArmor(28, 5, 4), genTool(10, 0), Color.LIME),
+	EMERALD_BOOTS(9, Material.LEATHER_BOOTS, "Emerald Boots", genArmor(16, 5, 4), genTool(10, 0), Color.LIME),
+	
+	EMERALD_CROSSBOW(10, Material.CROSSBOW, "Emerald Crossbow", genCrossbow(10, 3, true)),
+	
+	// TODO make energy core with heads using NBT constructor
+	
+	REDSTONE_HELMET(12, Material.LEATHER_HELMET, "Redstone Helmet", genArmor(25, 6, 4), genTool(12, 0), Color.RED),
+	REDSTONE_CHESTPLATE(12, Material.LEATHER_CHESTPLATE, "Redstone Chestplate", genArmor(40, 6, 4), genTool(12, 0), Color.RED),
+	REDSTONE_LEGGINGS(12, Material.LEATHER_LEGGINGS, "Redstone Leggings", genArmor(35, 6, 4), genTool(12, 0), Color.RED),
+	REDSTONE_BOOTS(12, Material.LEATHER_BOOTS, "Redstone Boots", genArmor(20, 6, 4), genTool(12, 0), Color.RED),
+	REDSTONE_AXE(12, Material.DIAMOND_AXE, "Redstone Axe", genAttack(15, 0.6, 0.6), genTool(12, 5)),
+	REDSTONE_PICKAXE(12, Material.DIAMOND_PICKAXE, "Redstone Pickaxe", genTool(12, 5)),
+	REDSTONE_SHOVEL(12, Material.DIAMOND_SHOVEL, "Redstone Shovel", genTool(12, 5)),
+	REDSTONE_HOE(12, Material.DIAMOND_HOE, "Redstone Hoe", genTool(12, 5)),
+	
+	STAR_HELMET(14, Material.LEATHER_HELMET, "Star Helmet", genArmor(27, 6.5, 4), genTool(13, 0), Color.WHITE),
+	STAR_CHESTPLATE(14, Material.LEATHER_CHESTPLATE, "Star Chestplate", genArmor(42, 6.5, 4), genTool(13, 0), Color.WHITE),
+	STAR_LEGGINGS(14, Material.LEATHER_LEGGINGS, "Star Leggings", genArmor(22, 6.5, 4), genTool(13, 0), Color.WHITE),
+	STAR_BOOTS(14, Material.LEATHER_BOOTS, "Star Boots", genArmor(22, 6.5, 4), genTool(13, 0), Color.WHITE),
 	// Level 15 - 30
+	STAR_SCYTHE(15, Material.IRON_HOE, "Star Scythe", genAttack(25, 0.8, 0.65), genTool(14, 6)),
+	STAR_PICKAXE(15, Material.IRON_PICKAXE, "Star Pickaxe", genTool(14, 6)),
+	STAR_AXE(15, Material.IRON_AXE, "Star Axe", genTool(14, 6)),
+	STAR_SHOVEL(15, Material.IRON_SHOVEL, "Star Shovel", genTool(14, 6)),
 	// Level 30+
 	;
 	
@@ -71,7 +148,9 @@ public enum SMPMaterial {
 	private final String name;
 	private final ItemStack item;
 	private final int levelUnlocked;
-
+	
+	private final ChatColor cc;
+	
 	private static final HashMap<Attribute, AttributeModifier> genAttack(double attack, double knockback, double speed) {
 		HashMap<Attribute, AttributeModifier> map = new HashMap<>();
 
@@ -86,6 +165,10 @@ public enum SMPMaterial {
 		return Color.fromRGB(Integer.valueOf(hex.substring(0, 2), 16), 
 												 Integer.valueOf(hex.substring(2, 4), 16), 
 												 Integer.valueOf(hex.substring(4, 6), 16));
+	}
+	
+	private static final HashMap<Enchantment, Integer> glint() {
+		return new HashMap<Enchantment, Integer>(ImmutableMap.<Enchantment, Integer>builder().put(Enchantment.PROTECTION_ENVIRONMENTAL, 1).build());
 	}
 
 	private static final HashMap<Enchantment, Integer> genTool(int unbreaking, int efficiency) {
@@ -118,13 +201,29 @@ public enum SMPMaterial {
 		return map;
 	}
 	
-	private SMPMaterial(int level, Material original, String name, boolean block) {
+	private static final HashMap<Enchantment, Integer> genCrossbow(int piercing, int quickCharge, boolean multishot) {
+		HashMap<Enchantment, Integer> map = new HashMap<>();
+
+		if (quickCharge > 0) map.put(Enchantment.ARROW_DAMAGE, quickCharge);
+		if (piercing > 0) map.put(Enchantment.ARROW_KNOCKBACK, piercing);
+		if (multishot) map.put(Enchantment.MULTISHOT, 1);
+		
+		return map;
+	}
+	
+	private SMPMaterial(int level, Material original, String name) {
+		if (level < 5) this.cc = ChatColor.WHITE;
+		else if (level >= 5 && level < 15) this.cc = ChatColor.AQUA;
+		else if (level >= 15 && level < 30) this.cc = ChatColor.LIGHT_PURPLE;
+		else if (level > 30) this.cc = ChatColor.GOLD;
+		else this.cc = ChatColor.WHITE;
+		
 		this.levelUnlocked = level;
 		this.localization = name.toLowerCase().replace(" ", "_");
 		
 		ItemStack item = new ItemStack(original);
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.WHITE + name);
+		meta.setDisplayName(cc + name);
 		meta.setLocalizedName(name.toLowerCase().replace(" ", "_"));
 		item.setItemMeta(meta);
 		this.item = item;
@@ -132,17 +231,19 @@ public enum SMPMaterial {
 		this.name = name;
 	}
 
-	private SMPMaterial(int level, Material original, String name) {
-		this(level, original, name, false);
-	}
-
 	private SMPMaterial(int level, Material original, String name, Map<Attribute, AttributeModifier> modifiers, Map<Enchantment, Integer> enchants) {
+		if (level < 5) this.cc = ChatColor.WHITE;
+		else if (level >= 5 && level < 15) this.cc = ChatColor.AQUA;
+		else if (level >= 15 && level < 30) this.cc = ChatColor.LIGHT_PURPLE;
+		else if (level > 30) this.cc = ChatColor.GOLD;
+		else this.cc = ChatColor.WHITE;
+		
 		this.levelUnlocked = level;
 		this.localization = name.toLowerCase().replace(" ", "_");
 		
 		ItemStack item = new ItemStack(original);
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.WHITE + name);
+		meta.setDisplayName(cc + name);
 		meta.setLocalizedName(name.toLowerCase().replace(" ", "_"));
 		if (modifiers != null)
 			for (Attribute a : modifiers.keySet()) {
@@ -152,6 +253,11 @@ public enum SMPMaterial {
 			for (Enchantment e : enchants.keySet()) {
 				meta.addEnchant(e, enchants.get(e), true);
 			}
+		
+		if (meta.getEnchantLevel(Enchantment.DURABILITY) > 100) {
+			meta.removeEnchant(Enchantment.DURABILITY);
+			meta.setUnbreakable(true);
+		}
 		
 		item.setItemMeta(meta);
 		this.item = item;
@@ -182,6 +288,19 @@ public enum SMPMaterial {
 	private SMPMaterial(int level, Material original, String name, HashMap<Enchantment, Integer> enchants) {
 		this(level, original, name, null, enchants);
 	}
+	
+	private SMPMaterial(int level, String name, String nbt) {
+		if (level < 5) this.cc = ChatColor.WHITE;
+		else if (level >= 5 && level < 15) this.cc = ChatColor.AQUA;
+		else if (level >= 15 && level < 30) this.cc = ChatColor.LIGHT_PURPLE;
+		else if (level > 30) this.cc = ChatColor.GOLD;
+		else this.cc = ChatColor.WHITE;
+		
+		this.item = Items.fromNBT(nbt);
+		this.levelUnlocked = level;
+		this.localization = name.toLowerCase().replace(" ", "_");
+		this.name = name;
+	}
 
 	public static final ItemStack getItem(String localization) {
 		return getByLocalization(localization).getItem();
@@ -193,6 +312,50 @@ public enum SMPMaterial {
 		}
 
 		return null;
+	}
+	
+	public static interface CleanOutput {
+		
+		Material getMaterial();
+		
+		int getAmount();
+		
+		public static class MaterialOutput implements CleanOutput {
+			
+			private int amount;
+			private Material m;
+			
+			public MaterialOutput(Material m, int amount) {
+				this.amount = amount;
+				this.m = m;
+			}
+			
+			public MaterialOutput(Material m) {
+				this.m = m;
+				this.amount = 1;
+			}
+			
+			@Override
+			public Material getMaterial() {
+				return this.m;
+			}
+
+			@Override
+			public int getAmount() {
+				return this.amount;
+			}
+			
+		}
+	}
+	
+	public static Map<Material, CleanOutput> getMaterialCleanables() {
+		return ImmutableMap.<Material, CleanOutput>builder()
+				.put(Material.GOLD_INGOT, new MaterialOutput(Material.RAW_GOLD))
+				.put(Material.IRON_INGOT, new MaterialOutput(Material.RAW_IRON))
+				.put(Material.COPPER_INGOT, new MaterialOutput(Material.RAW_COPPER))
+				.put(Material.NETHERITE_INGOT, new MaterialOutput(Material.NETHERITE_SCRAP, 4))
+				
+				.build();
 	}
 
 	public final String getName() {
