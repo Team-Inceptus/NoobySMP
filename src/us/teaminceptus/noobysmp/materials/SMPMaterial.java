@@ -140,6 +140,8 @@ public enum SMPMaterial {
 	STAR_PICKAXE(15, Material.IRON_PICKAXE, "Star Pickaxe", genTool(14, 6)),
 	STAR_AXE(15, Material.IRON_AXE, "Star Axe", genTool(14, 6)),
 	STAR_SHOVEL(15, Material.IRON_SHOVEL, "Star Shovel", genTool(14, 6)),
+	
+	
 	// Level 30+
 	;
 	
