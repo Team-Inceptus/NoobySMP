@@ -19,10 +19,58 @@ import us.teaminceptus.noobysmp.util.PlayerConfig;
 public class Ranks implements TabExecutor, Listener {
 
 	protected SMP plugin;
-
+	
 	// Admin
-	public static final String OWNER_TAB = ChatColor.DARK_RED + "" + ChatColor.BOLD + "[OWNER] " + ChatColor.GOLD;
-	public static final String OWNER_CHAT = ChatColor.DARK_RED + "" + ChatColor.BOLD + "Owner " + ChatColor.GOLD;
+	public static final RankData OWNER = new RankData(
+		ChatColor.DARK_RED + "" + ChatColor.BOLD + "[OWNER] " + ChatColor.GOLD,
+		ChatColor.DARK_RED + "" + ChatColor.BOLD + "Owner " + ChatColor.GOLD	
+	);
+
+	public static final RankData ADMIN = new RankData(
+		ChatColor.RED + "" + ChatColor.BOLD + "[ADMIN] " + ChatColor.YELLOW,
+		ChatColor.RED + "" + ChatColor.BOLD + "Admin " + ChatColor.YELLOW
+	);
+
+	public static final RankData MOD = new RankData(
+		ChatColor.AQUA + "[MOD] " + ChatColor.DARK_AQUA,
+		ChatColot.AQUA + "Mod " + ChatColor.DARK_AQUA
+	);
+
+	public static final RankData JRMOD = new RankData(
+		ChatColor.BLUE + "[JRMOD] " + ChatColor.DARK_BLUE,
+		ChatColor.BLUE + "JrMod " + ChatColor.DARK_BLUE
+	);
+
+	public static final RankData TRIALMOD = new RankData(
+		ChatColor.RED + "[TMOD] " + ChatColor.LIGHT_PURPLE,
+		ChatColor.RED + "Trial Mod " + ChatColor.LIGHT_PURPLE
+	);
+
+	public static final Map<String, RankData> RANK_MAP = ImmutableMap.<String, RankData>builder()
+	.put("owner", OWNER)
+	.put("admin", ADMIN)
+	.put("mod", MOD)
+	.put("jrmod", JRMOD)
+	.put("trialmod", TRIALMOD)
+	.build();
+
+	public static class RankData {
+		private final String tab;
+		private final String chat;
+		
+		public RankData(String tab, String chat) {
+			this.tab = tab;
+			this.chat = chat;
+		}
+
+		public String getTab() {
+			return this.tab;
+		}
+
+		public String getChat() {
+			return this.chat;
+		}
+	}
 
 	public static final Map<Integer, ChatColor> LEVEL_COLOR = new HashMap<>();
 
@@ -42,6 +90,7 @@ public class Ranks implements TabExecutor, Listener {
 		this.plugin = plugin;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		plugin.getCommand("setrank").setExecutor(this);
+		plugin.getCommand("setrank").setTabCompleter(this);
 	}
 
 	public static void setRank(Player p, String chat, String tab) {
@@ -55,13 +104,47 @@ public class Ranks implements TabExecutor, Listener {
 			sender.sendMessage(Messages.NO_PERMISSION_CMD);
 			return true;
 		}
+
+		if (args.length < 1) {
+			sender.sendMessage(Messages.ARGUMENT_PLAYER);
+			return true;
+		}
+
+		if (Bukkit.getPlayer(args[0]) == null) {
+			sender.sendMessage(Messages.ARGUMENT_PLAYER);
+			return true;
+		}
+
+		Player p = Bukkit.getPlayer(args[0]);
+
+		if (args.length < 2) {
+			sender.sendMessage("Please provide a valid rank.");
+			return true;
+		}
+
+		String rank = args[1].toLowerCase();
+
+		if (RANK_MAP.get(rank) == null) {
+			sender.sendMessage("Please provide a valid rank.");
+			return true;
+		}
+
+		RankData data = RANK_MAP.get(rank);
+
+		p.setPlayerListName(data.getTab() + p.getName());
+		p.setDisplayName(data.getChat() + p.getName());
+
+		new PlayerConfig(p).setRank(rank);
 		
 		return true;
 	}
 
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> suggestions = new ArrayList<>();
+		if (args.length == 1) for (Player p : Bukkit.getOnlinePlayers()) suggestions.add(p.getName());
+		else if (args.length == 2) suggestions.addAll(RANK_MAP.keySet());
+		
+		return suggestions;
 	}
 	
 }

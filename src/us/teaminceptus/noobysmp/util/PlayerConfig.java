@@ -61,5 +61,9 @@ public class PlayerConfig {
 	public final boolean hasUnlocked(SMPMaterial item) {
 		return getLevel() >= item.getLevelUnlocked();
 	}
+
+	public boolean isMember() {
+		return pConfig.getString("rank").equalsIgnoreCase("member");	
+	}
 	
 }
