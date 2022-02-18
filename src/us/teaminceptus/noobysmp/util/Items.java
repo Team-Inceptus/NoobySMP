@@ -42,7 +42,7 @@ public class Items implements Listener {
 		if (e.getCurrentItem() == null) return;
 		ItemStack item = e.getCurrentItem();
 		
-		for (ItemStack non : NON_COLLECTIBLES) if (item.isSimilar(non)) e.setCancelled(true);
+		for (ItemStack non : NON_COLLECTIBLES) if (compareLocalization(item, non)) e.setCancelled(true);
 	}
 	
 	public static final ItemStack LOCKED_ITEM = itemBuilder(Material.BARRIER).setName(ChatColor.RED + "Locked!").build();
