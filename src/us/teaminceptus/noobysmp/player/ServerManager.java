@@ -1,5 +1,17 @@
 package us.teaminceptus.noobysmp.player;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+
+import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.commands.admin.Ranks;
+import us.teaminceptus.noobysmp.util.PlayerConfig;
+
 public class ServerManager implements Listener {
 
 	protected SMP plugin;
@@ -27,10 +39,7 @@ public class ServerManager implements Listener {
 
 	@EventHandler
 	public void onChat(AsyncPlayerChatEvent e) {
-		Player p = e.getPlayer();
-		PlayerConfig config = new PlayerConfig(p);
-
-		e.setFormat("%s " + ChatColor.GRAY + "⇒ " + ChatColor.RESET + "%s");
+		e.setFormat("%s " + ChatColor.GRAY + ">" + ChatColor.RESET + "%s");
 	}
 	
 }
