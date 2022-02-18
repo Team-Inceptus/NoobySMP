@@ -1,9 +1,34 @@
 package us.teaminceptus.noobysmp.generation.biomes;
 
+import java.lang.reflect.Field;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biome.BiomeBuilder;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import net.minecraft.world.level.biome.BiomeSpecialEffects.GrassColorModifier;
+import net.minecraft.world.level.biome.MobSpawnSettings;
+import us.teaminceptus.noobysmp.SMP;
+
 public enum TitanBiome {
 
 	// TODO create titan biomes
-	SOUL_GRASSLANDS("Soul Grasslands");
 	
 	;
 	
@@ -36,7 +61,7 @@ public enum TitanBiome {
 	}
 
 	private static final Color fromHex(String hex) {
-		return new Color(
+		return Color.fromRGB(
 			Integer.parseInt(hex.substring(0, 2), 16),
 			Integer.parseInt(hex.substring(2, 4), 16),
 			Integer.parseInt(hex.substring(4, 6), 16)
@@ -77,19 +102,19 @@ public enum TitanBiome {
 
 	// Registry & Setting Methods
 	
-	private static void registerBiomes() {
+	public static void registerBiomes() throws Exception {
 		SMP plugin = JavaPlugin.getPlugin(SMP.class);
 
-		RegistryKey REGISTRY_KEY = Registry.CONFIGURED_STRUCTURE_FEATURE_REGISTRY;
+		ResourceKey<Registry<Biome>> REGISTRY_KEY = Registry.BIOME_REGISTRY;
 		DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
 		
 		for (TitanBiome biome : values()) { 
-			ResourceKey<Biome> key = ResourceKey.create(REGISTRY_KEY, new ResourceLocation("noobysmp", biome.name.toLowerCase().replace(' ', '_')));
+			ResourceKey<Biome> key = ResourceKey.<Biome>create(REGISTRY_KEY, new ResourceLocation("noobysmp", biome.name.toLowerCase().replace(' ', '_')));
 			biome.resourceKey = key;
 	
-			ResourceKey<Biome> oldKey = ResourceKey.create(REGISTRY_KEY, new ResourceLocation("minecraft", "forest"));
+			ResourceKey<Biome> oldKey = ResourceKey.<Biome>create(REGISTRY_KEY, new ResourceLocation("minecraft", "forest"));
 			WritableRegistry<Biome> registrywritable = server.registryAccess().ownedRegistryOrThrow(REGISTRY_KEY);
-			Biome forestbiome = registrywritable.register(oldKey);
+			Biome forestbiome = registrywritable.get(oldKey);
 			
 			BiomeBuilder builder = new Biome.BiomeBuilder();
 			builder.biomeCategory(forestbiome.getBiomeCategory());
@@ -125,11 +150,11 @@ public enum TitanBiome {
 			biome.nmsBiome = builder.build();
 		}
 
-		plugin.getLogger().info("Registered " + Integer.toString(TitamBiome.values()) + " Titan Biomes");
+		plugin.getLogger().info("Registered " + Integer.toString(TitanBiome.values().length) + " Titan Biomes");
 	}
 
 	public void setBiome(Chunk c) {
-		World w = ((CraftWorld) c.getWorld()).getHandle();
+		Level w = ((CraftWorld) c.getWorld()).getHandle();
 		
 		for (int x = 0; x <= 15; x++) {
 			for (int z = 0; z <= 15; z++) {
@@ -142,7 +167,7 @@ public enum TitanBiome {
 	}
 
 	public void setBiome(Location loc) {
-		World w = ((CraftWorld) loc.getWorld()).getHandle();
+		Level w = ((CraftWorld) loc.getWorld()).getHandle();
 
 		setBiome(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), w, nmsBiome);
 		updateChunksForAll(loc.getChunk());
@@ -150,31 +175,29 @@ public enum TitanBiome {
 
 	public static void setBiome(Chunk c, TitanBiome biome) {
 		biome.setBiome(c);
-	}
+	}	
 
 	public static void setBiome(Location loc, TitanBiome biome) {
 		biome.setBiome(loc);
 	}
 
-	private void setBiome(int x, int y, int z, World w, Biome biome) {
+	private void setBiome(int x, int y, int z, Level w, Biome biome) {
 		BlockPos pos = new BlockPos(x, 0, z);
 
 		if (w.isLoaded(pos)) {
-		 net.minecraft.world.level.chunk.LevelChunk chunk = w.getChunkAtWorldCoords(pos);
-		 if (chunk != null) {
-	 
-				chunk.getBiomeIndex().setBiome(x >> 2, y >> 2, z >> 2, biome);
-				chunk.markDirty();
-		 }
+			net.minecraft.world.level.chunk.LevelChunk chunk = w.getChunkAt(pos);
+			if (chunk != null) { 	
+				chunk.setBiome(x >> 2, y >> 2, z >> 2, biome);
+			}
 		}
 	}
 
 	private static void updateChunksForAll(Chunk chunk) {
-		net.minecraft.world.level.chunk.LevelChunk c = ((CraftChunk)chunk).getHandle();
+		// net.minecraft.world.level.chunk.LevelChunk c = ((CraftChunk)chunk).getHandle();
 		for (Player player : chunk.getWorld().getPlayers()) {
 				if (player.isOnline()) {
 						if((player.getLocation().distance(chunk.getBlock(0, 0, 0).getLocation()) < (Bukkit.getServer().getViewDistance() * 16))) {
-								((CraftPlayer) player).getHandle().playerConnection.sendPacket(new ClientboundLevelChunkPacketData(c));
+								// FIXME why ((CraftPlayer) player).getHandle().connection.send(new ClientboundLevelChunkWithLightPacket(c, , null, null, true));
 						}
 				}
 		}
