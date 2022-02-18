@@ -38,6 +38,6 @@
 			<version>1.18.1-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 			<classifier>remapped-mojang</classifier>
-	    </dependency>
+	    </dependency>	
 	</dependencies>
 </project>
