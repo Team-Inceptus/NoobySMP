@@ -23,6 +23,7 @@ public class SMPRecipe {
 
 	private static Map<String, FurnaceData> furnaceRecipes;
 	private static Map<String, SmithingData> smithingRecipes;
+	private static Map<String, AnvilData> anvilRecipes;
 	
 	private final Recipe recipe;
 	private final boolean eventUsed;
@@ -84,6 +85,16 @@ public class SMPRecipe {
 
 		smithingRecipes.put(identifier, new SmithingData(input, addition, result));
 	}
+	
+	public SMPRecipe(ItemStack input, ItemStack combination, ItemStack result, float exp) {
+		recipes.add(this);
+		this.recipe = null;
+		this.eventUsed = true;
+		
+		String identifier = result.getItemMeta().getLocalizedName();
+		
+		anvilRecipes.put(identifier, new AnvilData(input, combination, result, exp));
+	}
 
 	public final Recipe getRecipe() {
 		return this.recipe;
@@ -99,6 +110,10 @@ public class SMPRecipe {
 
 	public static final Map<String, SmithingData> getSmithingRecipes() {
 		return smithingRecipes;
+	}
+	
+	public static final Map<String, AnvilData> getAnvilRecipes() {
+		return anvilRecipes;
 	}
 	
 	public static final List<SMPRecipe> getEventRecipes() {
@@ -152,7 +167,7 @@ public class SMPRecipe {
 		}
 		
 	}
-
+	
 	public static class SmithingData {
 
 		ItemStack input;
@@ -164,19 +179,32 @@ public class SMPRecipe {
 			this.addition = addition;
 			this.result = result;
 		}
-
-		public ItemStack getInput() {
-			return this.input;
-		}
-
-		public ItemStack getAddition() {
-			return this.addition;
-		}
-
-		public ItemStack getResult() {
-			return this.result;
-		}
+		
+		public ItemStack getInput() { return this.input; }
+		public ItemStack getAddition() { return this.addition; }
+		public ItemStack getResult() { return this.result; }
 		
 	}
+	
+	public static class AnvilData {
+		
+		ItemStack input;
+		ItemStack combination;
+		ItemStack result;
+		float exp;
+		
+		protected AnvilData(ItemStack input, ItemStack combination, ItemStack result, float exp) {
+			this.input = input;
+			this.combination = combination;
+			this.result = result;
+			this.exp = exp;
+		}
+		
+		public ItemStack getInput() { return this.input; }
+		public ItemStack getCombination() { return this.combination; }
+		public ItemStack getResult() { return this.result; }
+		public float getExp() {	return this.exp; }
+	}
+	
 	
 }
