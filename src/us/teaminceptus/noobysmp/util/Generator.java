@@ -2,15 +2,20 @@ package us.teaminceptus.noobysmp.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 public class Generator {
-
+	
 	public static final Inventory genGUI(int size, String name) {
+		return genGUI(size, name, null);
+	}
+	
+	public static final Inventory genGUI(int size, String name, InventoryHolder holder) {
 		if (size < 9 || size > 54) return null;
 		if (size % 9 > 0) return null;
 		
-		Inventory inv = Bukkit.createInventory(null, size, name);
+		Inventory inv = Bukkit.createInventory(holder, size, name);
 
 		ItemStack guiBG = Items.Inventory.GUI_PANE;
 		

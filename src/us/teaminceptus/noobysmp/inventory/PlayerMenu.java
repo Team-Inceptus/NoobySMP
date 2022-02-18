@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.util.Generator;
 import us.teaminceptus.noobysmp.util.PlayerConfig;
+import us.teaminceptus.noobysmp.util.inventoryholder.PlayerHolder;
 
 public class PlayerMenu implements Listener {
 
@@ -30,7 +31,7 @@ public class PlayerMenu implements Listener {
 
 		if (config.getLevel() < 1) return null;
 
-		Inventory menu = Generator.genGUI(45, p.getDisplayName());
+		Inventory menu = Generator.genGUI(45, p.getDisplayName(), new PlayerHolder(p));
 
 		ItemStack head = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta meta = (SkullMeta) head.getItemMeta();

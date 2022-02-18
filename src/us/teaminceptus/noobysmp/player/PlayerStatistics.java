@@ -3,6 +3,7 @@ package us.teaminceptus.noobysmp.player;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.util.Generator;
 import us.teaminceptus.noobysmp.util.Items;
+import us.teaminceptus.noobysmp.util.inventoryholder.PlayerHolder;
 
 public class PlayerStatistics implements CommandExecutor, Listener {
 	
@@ -25,8 +27,8 @@ public class PlayerStatistics implements CommandExecutor, Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
-	public static Inventory getStatisticsMenu() {
-		Inventory inv = Generator.genGUI(45, "Player Skills & Statistics");
+	public static Inventory getStatisticsMenu(OfflinePlayer p) {
+		Inventory inv = Generator.genGUI(45, "Player Skills & Statistics", new PlayerHolder(p));
 		
 		ItemStack level = Items.itemBuilder(Material.EMERALD_BLOCK).setName(ChatColor.YELLOW + "Leveling").build();
 		inv.setItem(12, level);
