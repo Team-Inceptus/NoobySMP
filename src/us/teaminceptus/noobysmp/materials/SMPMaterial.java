@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.materials.SMPMaterial.CleanOutput.MaterialOutput;
 import us.teaminceptus.noobysmp.util.Items;
+import us.teaminceptus.noobysmp.util.SMPColor;
 
 /**
  * Class used for Custom Materials inside the SMP.
@@ -61,6 +62,7 @@ public enum SMPMaterial {
 	QUARTZ_LEGGINGS(0, Material.IRON_LEGGINGS, "Quartz Boots", genArmor(4.5, 0.5, 0.5), genTool(1, 0)),
 	QUARTZ_BOOTS(0, Material.IRON_BOOTS, "Quartz Boots", genArmor(4.5, 0.5, 0.5), genTool(1, 0)),
 	
+	TINY_EXPERIENCE_BAG(0, "Tiny Experience Bag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmMwODNmNjk3NDkzZmViNDZiMjQ0NDQ2OWU5OGU1MzE1YzQ3ZGI0YjM0YTdjZGJjNjJhNjUwNjI1Mzk3YWI1ZSJ9fX0="),
 	// Level 1
 	ENDERITE_ORE(1, Material.IRON_BLOCK, "Enderite Ore"),
 	ENDER_FRAGMENT(1, Material.IRON_NUGGET, "Ender Fragment"),
@@ -90,6 +92,7 @@ public enum SMPMaterial {
 	DIAMOND_ENCHANT(3, Material.LIGHT_BLUE_DYE, "Diamond Enchant", glint()),
 	
 	NETHERITE_STAR(4, Material.NETHER_STAR, "Netherite Star"),
+	NETHERITE_BEACON(4, Material.BEACON, "Netherite Beacon"),
 	
 	AMETHYST_HELMET(4, Material.LEATHER_HELMET, "Amethyst Helmet", genArmor(6, 1, 0.5), genTool(4, 0), rgb("6909a0")),
 	AMETHYST_CHESTPLATE(4, Material.LEATHER_CHESTPLATE, "Amethyst Chestplate", genArmor(9, 1, 0.5), genTool(4, 0), rgb("6909a0")),
@@ -97,6 +100,7 @@ public enum SMPMaterial {
 	AMETHYST_BOOTS(4, Material.LEATHER_BOOTS, "Amethyst Boots", genArmor(5, 1, 0.5), genTool(4, 0), rgb("6909a0")),
 	
 	// Level 5 - 14
+	SMALL_EXPERIENCE_BAG(5, "Small Experience Bag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmQxMGFkODhjOTZjZmFmM2Q3Y2I4ZmViODlkZTQ2ZTIxMzg4MmEyZjFlYjRiMjIyODg0YzZlNWRkMjY0ZjE3NyJ9fX0="),
 	UNCHARGED_ESSENCE(5, Material.GRAY_DYE, "Uncharged Essence"),
 	CHARGED_ESSENCE(5, Material.WHITE_DYE, "Charged Essence"),
 	
@@ -142,6 +146,8 @@ public enum SMPMaterial {
 	STAR_SHOVEL(15, Material.IRON_SHOVEL, "Star Shovel", genTool(14, 6)),
 	STAR_TRIDENT(15, Material.TRIDENT, "Star Trident", genAttack(25, 0.9, 0.65), genTool(14, 6)),
 	STAR_BEACON(15, Material.BEACON, "Star Beacon"),
+	
+	MEDIUM_EXPERIENCE_BAG(16, "Medium Experience Bag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjkzYmUxODE1YjZjMmExODQ2NDRiYTgzYmQ1ODdjNzc4YTUwMDU3Y2ZjODdkNjdkZTIyZjY2NDQxNTY4ZTA4YyJ9fX0="),
 
 	ENCHANTED_OBSIDIAN(17, Material.OBSIDIAN, "Enchanted Obsidian", glint()),
 	OBSIDIAN_AXE(17, Material.NETHERITE_AXE, "Obsidian Axe", genAttack(29, 0.8, 0.7), genTool(18, 8)),
@@ -167,11 +173,13 @@ public enum SMPMaterial {
 	BEDROCK_INGOT(22, Material.NETHERITE_INGOT, "Bedrock Ingot", glint()),
 	COMPRESSED_BEDROCK(22, Material.BEDROCK, "Compressed Bedrock", glint()),
 	
-	BEDROCK_HELMET(22, Material.LEATHER_HELMET, "Bedrock Helmet", genArmor(60, 10, 7), geTool(45, 0), Color.DARK_GRAY),
-	BEDROCK_CHESTPLATE(22, Material.LEATHER_CHESTPLATE, "Bedrock Chestplate", genArmor(96, 10, 7), geTool(45, 0), Color.DARK_GRAY),
-	BEDROCK_LEGGINGS(22, Material.LEATHER_LEGGINGS, "Bedrock Leggings", genArmor(84, 10, 7), geTool(45, 0), Color.DARK_GRAY),
-	BEDROCK_BOOTS(22, Material.LEATHER_BOOTS, "Bedrock Boots", genArmor(48, 10, 7), genTool(45, 0), Color.DARK_GRAY),
-
+	BEDROCK_HELMET(22, Material.LEATHER_HELMET, "Bedrock Helmet", genArmor(60, 10, 7), genTool(45, 0), SMPColor.DARK_GRAY),
+	BEDROCK_CHESTPLATE(22, Material.LEATHER_CHESTPLATE, "Bedrock Chestplate", genArmor(96, 10, 7), genTool(45, 0), SMPColor.DARK_GRAY),
+	BEDROCK_LEGGINGS(22, Material.LEATHER_LEGGINGS, "Bedrock Leggings", genArmor(84, 10, 7), genTool(45, 0), SMPColor.DARK_GRAY),
+	BEDROCK_BOOTS(22, Material.LEATHER_BOOTS, "Bedrock Boots", genArmor(48, 10, 7), genTool(45, 0), SMPColor.DARK_GRAY),
+	
+	LARGE_EXPERIENCE_BAG(23, "Large Experience Bag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWY1YzFhNjc4YmZhMTViOTBiNmE4YjgzZGEzMzlmZmZmNTY3YWMyYWI0MTljMjhmMDQyMjc1OWIxY2Q1NDIwOCJ9fX0="),
+	
 	// Natural Items beyond Level 25 are collected from the Titan Dimension and its counterparts
 	TITAN_STONE(25, Material.STONE, "Titan Stone", glint()),
 	TITAN_DEEPSLATE(25, Material.DEEPSLATE, "Titan Deepslate", glint()),
@@ -192,7 +200,13 @@ public enum SMPMaterial {
 	
 	BEDROCK_ORE(25, Material.COAL_ORE, "Bedrock Ore", glint()),
 	DEEPSLATE_BEDROCK_ORE(25, Material.DEEPSLATE_COAL_ORE, "Deepslate Bedrock Ore", glint()),
-
+	
+	GOLDEN_ANVIL(25, Material.ANVIL, "Golden Anvil"),
+	
+	STRENGTH_ESSENCE(25, "Strength Essence", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2M3ZWZkNmMxZTVjMzc0MDhiNzlhZjVlOWJmZWJkN2E1NmNhNWM5NzBlN2Y4NjFmMWU1NTVmNGI1ZWYwZjdjNiJ9fX0="),
+	AGILE_ESSENCE(25, "Agile Essence", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTMxYTRmYWIyZjg3ZGI1NDMzMDEzNjUxN2I0NTNhYWNiOWQ3YzBmZTc4NDMwMDcwOWU5YjEwOWNiYzUxNGYwMCJ9fX0="),
+	PROTECTIVE_ESSENCE(25, "Protective Essence", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTAxZTA0MGNiMDFjZjJjY2U0NDI4MzU4YWUzMWQyZTI2NjIwN2M0N2NiM2FkMTM5NzA5YzYyMDEzMGRjOGFkNCJ9fX0="),
+	
 	AMBER_ORE(26, Material.COPPER_ORE, "Amber Ore", glint()),
 	DEEPSLATE_AMBER_ORE(26, Material.DEEPSLATE_COPPER_ORE, "Deepslate Amber Ore", glint()),
 	AMBER(26, Material.RAW_COPPER, "Amber", glint()),
@@ -217,6 +231,8 @@ public enum SMPMaterial {
 	APATITE_SHOVEL(28, Material.IRON_SHOVEL, "Apatite Shovel", genTool(53, 14)),
 	APATITE_HOE(28, Material.IRON_HOE, "Apatite Hoe", genTool(53, 14)),
 	
+	HUGE_EXPERIENCE_BAG(29, "Huge Experience Bag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzFmZTdhYzJlNWEzNzYyMDE0YzY4NDA3ZTdiZGM3OGY0N2I1ZjM5OTU5ZWM3MzkwNzA0ZTQ2ZGI4MGRjYzNhNCJ9fX0="),
+	
 	// Level 30+
 	APATITE_AMBER_SCYTHE(30, Material.GOLDEN_HOE, "Apatite-Amber Scythe", genAttack(55, 1.3, 0.9), genTool(58, 17)),
 
@@ -233,11 +249,11 @@ public enum SMPMaterial {
 	TOPAZ_BLOCK(35, Material.RAW_GOLD_BLOCK, "Block of Topaz", glint()),
 	CUT_TOPAZ(35, Material.GOLD_INGOT, "Cut Topaz", glint()),
 	CUT_TOPAZ_BLOCK(35, Material.GOLD_BLOCK, "Block of Cut Topaz", glint()),
-	TOPAZ_HELMET(35, Material.GOLD_HELMET, "Topaz Helmet", genArmor(75, 15, 9), genTool(70, 0)),
-	TOPAZ_CHESTPLATE(35, Material.GOLD_CHESTPLAATE, "Topaz Chestplate", genArmor(120, 15, 9), genTool(70, 0)),
-	TOPAZ_LEGGINGS(35, Material.GOLD_LEGGINGS, "Topaz Leggings", genArmor(105, 15, 9), genTool(70, 0)),
-	TOPAZ_BOOTS(35, Material.GOLD_BOOTS, "Topaz Boots", genArmor(60, 15, 9), genTool(70, 0)),
-	TOPAZ_CROSSBOW(35, Material.CROSSBOW, "Topaz Crossbow", getCrossbow(20, 4, true)),
+	TOPAZ_HELMET(35, Material.GOLDEN_HELMET, "Topaz Helmet", genArmor(75, 15, 9), genTool(70, 0)),
+	TOPAZ_CHESTPLATE(35, Material.GOLDEN_CHESTPLATE, "Topaz Chestplate", genArmor(120, 15, 9), genTool(70, 0)),
+	TOPAZ_LEGGINGS(35, Material.GOLDEN_LEGGINGS, "Topaz Leggings", genArmor(105, 15, 9), genTool(70, 0)),
+	TOPAZ_BOOTS(35, Material.GOLDEN_BOOTS, "Topaz Boots", genArmor(60, 15, 9), genTool(70, 0)),
+	TOPAZ_CROSSBOW(35, Material.CROSSBOW, "Topaz Crossbow", genCrossbow(20, 4, true)),
 	TOPAZ_BEACON(35, Material.BEACON, "Topaz Beacon"),
 
 	TOPAZ_JADE_SWORD(36, Material.DIAMOND_SWORD, "Topaz-Jade Sword", genAttack(67, 1.6, 1), genTool(82, 0)),
@@ -249,7 +265,7 @@ public enum SMPMaterial {
 	
 	SAPPHIRE(40, Material.DIAMOND, "Sapphire", glint()),
 	SAPPHIRE_ORE(40, Material.DIAMOND_ORE, "Sapphire Ore", glint()),
-	DEEPSLATE_SAPPHIRE_ORE(40, Material.DEEPSLATE_SAPPHIRE_ORE, "Deepslate Sapphire Ore", glint()),
+	DEEPSLATE_SAPPHIRE_ORE(40, Material.DEEPSLATE_DIAMOND_ORE, "Deepslate Sapphire Ore", glint()),
 	SAPPHIRE_HELMET(40, Material.DIAMOND_HELMET, "Sapphire Helmet", genArmor(92, 17, 11), genTool(87, 0)),
 	SAPPHIRE_CHESTPLATE(40, Material.DIAMOND_CHESTPLATE, "Sapphire Chestplate", genArmor(146, 17, 11), genTool(87, 0)),
 	SAPPHIRE_LEGGINGS(40, Material.DIAMOND_LEGGINGS, "Sapphire Leggings", genArmor(128, 17, 11), genTool(87, 0)),
@@ -260,8 +276,8 @@ public enum SMPMaterial {
 	QARDITE_ORE(44, Material.EMERALD_ORE, "Qardite Ore", glint()),
 	DEEPSLATE_QARDITE_ORE(44, Material.DEEPSLATE_EMERALD_ORE, "Deepslate Qardite Ore", glint()),
 	QARDITE_BLOCK(44, Material.EMERALD_BLOCK, "Block of Qardite", glint()),
-	QARDITE_BOW(44, Material.BOW, "Qardite Bow", genBow(91, 23, true, true), genTool(100, 0)), // 100 is unbreakable
-	QARDITE_HELMET(44, Material.LEATHER_HELMT)
+	QARDITE_BOW(44, Material.BOW, "Qardite Bow", genBow(91, 23, true, true), unbreak()),
+	
 	
 	;
 	
@@ -283,7 +299,7 @@ public enum SMPMaterial {
 		return map;
 	}
 
-	private static final Color rgb(String hex) {
+	public static final Color rgb(String hex) {
 		return Color.fromRGB(Integer.valueOf(hex.substring(0, 2), 16), 
 												 Integer.valueOf(hex.substring(2, 4), 16), 
 												 Integer.valueOf(hex.substring(4, 6), 16));
@@ -300,6 +316,10 @@ public enum SMPMaterial {
 		if (efficiency > 0) map.put(Enchantment.DIG_SPEED, efficiency);
 		
 		return map;
+	}
+	
+	private static final HashMap<Enchantment, Integer> unbreak() {
+		return genTool(100, 0);
 	}
 
 	private static final HashMap<Attribute, AttributeModifier> genArmor(double armor, double toughness, double knockback) {
@@ -323,7 +343,7 @@ public enum SMPMaterial {
 		return map;
 	}
 	
-	private static final HashMa.p<Enchantment, Integer> genCrossbow(int piercing, int quickCharge, boolean multishot) {
+	private static final HashMap<Enchantment, Integer> genCrossbow(int piercing, int quickCharge, boolean multishot) {
 		HashMap<Enchantment, Integer> map = new HashMap<>();
 
 		if (quickCharge > 0) map.put(Enchantment.ARROW_DAMAGE, quickCharge);
@@ -411,6 +431,15 @@ public enum SMPMaterial {
 		this(level, original, name, null, enchants);
 	}
 	
+	@SafeVarargs
+	private SMPMaterial(int level, Material original, String name, HashMap<Enchantment, Integer>... enchants) {
+		this(level, original, name, enchants[0]);
+		
+		for (int i = 1; i < enchants.length; i++) {
+			this.item.addUnsafeEnchantments(enchants[i]);
+		}
+	}
+	
 	private SMPMaterial(int level, String name, String value) {
 		if (level < 5) this.cc = ChatColor.WHITE;
 		else if (level >= 5 && level < 15) this.cc = ChatColor.AQUA;
@@ -428,6 +457,8 @@ public enum SMPMaterial {
 		meta.setDisplayName(cc + name);
 		meta.setLocalizedName(this.localization);
 		item.setItemMeta(meta);
+		
+		this.item = item;
 	}
 
 	public static final ItemStack getItem(String localization) {
