@@ -22,6 +22,7 @@ import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.util.Generator;
 import us.teaminceptus.noobysmp.util.Messages;
 import us.teaminceptus.noobysmp.util.PlayerConfig;
+import us.teaminceptus.noobysmp.util.inventoryholder.PlayerHolder;
 
 public class Settings implements Listener, CommandExecutor {
 
@@ -40,7 +41,7 @@ public class Settings implements Listener, CommandExecutor {
 	};
 	
 	public static Inventory getSettings(Player p) {
-		Inventory settings = Generator.genGUI(36, p.getDisplayName() + ChatColor.DARK_GRAY + "'s Settings");
+		Inventory settings = Generator.genGUI(36, p.getDisplayName() + ChatColor.DARK_GRAY + "'s Settings", new PlayerHolder(p));
 		PlayerConfig config = new PlayerConfig(p);
 
 		for (String s : SETTINGS) {
