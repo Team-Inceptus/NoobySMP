@@ -1,5 +1,6 @@
 package us.teaminceptus.noobysmp.commands.admin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+
+import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.util.Messages;
@@ -33,7 +36,7 @@ public class Ranks implements TabExecutor, Listener {
 
 	public static final RankData MOD = new RankData(
 		ChatColor.AQUA + "[MOD] " + ChatColor.DARK_AQUA,
-		ChatColot.AQUA + "Mod " + ChatColor.DARK_AQUA
+		ChatColor.AQUA + "Mod " + ChatColor.DARK_AQUA
 	);
 
 	public static final RankData JRMOD = new RankData(
