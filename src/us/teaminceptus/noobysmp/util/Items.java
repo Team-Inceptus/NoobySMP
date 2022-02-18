@@ -1,22 +1,50 @@
 package us.teaminceptus.noobysmp.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
+import us.teaminceptus.noobysmp.SMP;
 
-public class Items {
-
+public class Items implements Listener {
+	
+	protected SMP plugin;
+	
+	public Items(SMP plugin) {
+		this.plugin = plugin;
+		Bukkit.getPluginManager().registerEvents(this, plugin);
+	}
+	
+	@EventHandler
+	public void onClick(InventoryClickEvent e) {
+		if (e.isCancelled()) return;
+		
+		if (e.getCurrentItem() == null) return;
+		ItemStack item = e.getCurrentItem();
+		
+		for (ItemStack non : NON_COLLECTIBLES) if (item.isSimilar(non)) e.setCancelled(true);
+	}
+	
 	public static final ItemStack LOCKED_ITEM = itemBuilder(Material.BARRIER).setName(ChatColor.RED + "Locked!").build();
 	public static final ItemStack COMING_SOON = itemBuilder(Material.BEDROCK).setName(ChatColor.DARK_PURPLE + "Coming Soon!").build();
 	
@@ -31,8 +59,17 @@ public class Items {
 		}
 		return null;
 	}
+	
+	public static final String getLocalization(ItemStack input) {
+		if (!(input.hasItemMeta())) return null;
+		return (input.getItemMeta().getLocalizedName());
+	}
+	
+	public static final boolean compareLocalization(ItemStack first, ItemStack second) {
+		return getLocalization(first).equals(getLocalization(second));
+	}
 
-	public ItemStack getHead(String texture) {
+	public static ItemStack getHead(String texture) {
 	  ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
 	  SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
 	  GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
@@ -95,5 +132,13 @@ public class Items {
 		public static final ItemStack NEXT_ARROW = itemBuilder(Material.ARROW).setName(ChatColor.GREEN + "Next").build();
 		public static final ItemStack BACK_ARROW = itemBuilder(Material.ARROW).setName(ChatColor.RED + "Back").build();
 	}
+	
+	public static final ItemStack[] NON_COLLECTIBLES = {
+		LOCKED_ITEM,
+		COMING_SOON,
+		Inventory.BACK_ARROW,
+		Inventory.GUI_PANE,
+		Inventory.NEXT_ARROW
+	};
 	
 }
