@@ -28,7 +28,7 @@ public class Help implements CommandExecutor {
 		this.plugin = plugin;
 		plugin.getCommand("help").setExecutor(this);
 	}
-
+	
 	public static ItemStack getHelpBook() {
 		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 		BookMeta meta = (BookMeta) book.getItemMeta();
@@ -43,7 +43,7 @@ public class Help implements CommandExecutor {
 				+ "And More!\n\n"
 				+ "We hope you enjoy the content we have provided!")
 				});
-		
+			
 		TextComponent discordLink = new TextComponent(ChatColor.BLUE + "https://discord.io/thenoobygods");
 		discordLink.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new Text(ChatColor.AQUA + "Click here to join")));
 		discordLink.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.io/thenoobygods"));
@@ -67,12 +67,11 @@ public class Help implements CommandExecutor {
 		return book;
 	}
 	
-	
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (!(sender instanceof Player p)) return false;
 		
 		p.openBook(getHelpBook());
 		return true;
 	}
-
+	
 }
