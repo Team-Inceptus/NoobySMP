@@ -28,6 +28,8 @@ import us.teaminceptus.noobysmp.SMP;
 
 public class Items implements Listener {
 	
+	private static final String REMOVE_STRS = "!,.?/\\[]{}()*&^%$#@-=+";
+	
 	protected SMP plugin;
 	
 	public Items(SMP plugin) {
@@ -47,6 +49,8 @@ public class Items implements Listener {
 	
 	public static final ItemStack LOCKED_ITEM = itemBuilder(Material.BARRIER).setName(ChatColor.RED + "Locked!").build();
 	public static final ItemStack COMING_SOON = itemBuilder(Material.BEDROCK).setName(ChatColor.DARK_PURPLE + "Coming Soon!").build();
+	public static final ItemStack NOT_ENOUGH_XP = itemBuilder(Material.BARRIER).setName(ChatColor.RED + "Not Enough Experience!").build();
+	
 	
 	public static final ItemStack fromNBT(String nbtStr) {
 		try {
@@ -97,7 +101,11 @@ public class Items implements Listener {
 		public Builder setName(String display) {
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName(display);
-			meta.setLocalizedName(ChatColor.stripColor(display).toLowerCase().replace(" ", "_"));
+			String localizedName = ChatColor.stripColor(display).toLowerCase().replace(' ', '_');
+			
+			for (Character c : REMOVE_STRS.toCharArray()) localizedName.replace(c.toString(), "");
+			
+			meta.setLocalizedName(localizedName);
 			item.setItemMeta(meta);
 			return this;
 		}
