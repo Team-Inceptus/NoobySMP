@@ -4,7 +4,7 @@ import org.bukkit.Color;
 
 public class SMPColor {
 	
-	private static final Color fromHex(String hex) {
+	private static Color fromHex(String hex) {
 		return Color.fromRGB(
 					Integer.parseInt(hex.substring(0, 2), 16),
 					Integer.parseInt(hex.substring(2, 4), 16),
