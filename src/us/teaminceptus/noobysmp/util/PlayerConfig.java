@@ -57,6 +57,14 @@ public class PlayerConfig {
 	public void setRank(String value) {
 		pConfig.set("rank", value);
 	}
+	
+	public int getFletchingLevel() {
+		return pConfig.getConfigurationSection("statistics").getInt("fletching-level");
+	}
+	
+	public int getFarmingLevel() {
+		return pConfig.getConfigurationSection("statistics").getInt("farming-level");
+	}
 
 	public final boolean hasUnlocked(SMPMaterial item) {
 		return getLevel() >= item.getLevelUnlocked();
