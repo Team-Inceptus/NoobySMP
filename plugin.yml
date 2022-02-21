@@ -2,7 +2,47 @@ name: NoobySMP
 main: us.teaminceptus.noobysmp.SMP
 version: 1.0.0
 api-version: 1.18
+load: STARTUP
 commands:
   help:
     description: Open the help book.
     aliases: [hlp, ?]
+  settings:
+    description: Opens up the settings menu.
+    aliases: [options, smpsettings, smpoptions]
+  
+  # Admin
+  catalogue:
+    description: Open up the SMP Catalogue for fetching stuff.
+    alias: catal
+  setrank:
+    description: Set another player's rank.
+    alias: setr
+    
+permissions:
+  smp.*:
+    description: All NoobySMP Permissions
+    default: op
+    children:
+      smp.admin: true
+      smp.user: true
+  # User
+  smp.user:
+    description: All NoobySMP User Permissions
+    default: true
+  # Admin
+  smp.admin:
+    description: All NoobySMP Admin Permissions
+    default: op
+  
+  smp.admin.catalogue:
+    description: Access to /catalogue
+    default: op
+    children:
+      smp.admin: true
+  smp.admin.setrank:
+    description: Access to /setrank
+    default: op
+    children:
+      smp.admin: true
+    
