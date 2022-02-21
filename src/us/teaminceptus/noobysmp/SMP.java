@@ -10,9 +10,17 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import us.teaminceptus.noobysmp.ability.AbilityManager;
 import us.teaminceptus.noobysmp.commands.Help;
 import us.teaminceptus.noobysmp.commands.Settings;
+import us.teaminceptus.noobysmp.commands.admin.Catalogue;
 import us.teaminceptus.noobysmp.commands.admin.Ranks;
+import us.teaminceptus.noobysmp.conquest.ConquestManager;
+import us.teaminceptus.noobysmp.entities.EntityManager;
+import us.teaminceptus.noobysmp.generation.BlockManager;
+import us.teaminceptus.noobysmp.generation.ItemManager;
+import us.teaminceptus.noobysmp.player.ServerManager;
+import us.teaminceptus.noobysmp.recipes.RecipeManager;
 
 public class SMP extends JavaPlugin {
 
@@ -22,7 +30,7 @@ public class SMP extends JavaPlugin {
 		playerDir = new File(getDataFolder().getPath() + "/players");
 
 		if (!(playerDir.exists())) playerDir.mkdir();
-
+		
 		for (OfflinePlayer p : Bukkit.getOfflinePlayers()) {
 			File pFile = new File(playerDir, p.getUniqueId().toString() + ".yml");
 			if (!(pFile.exists())) {
@@ -94,13 +102,29 @@ public class SMP extends JavaPlugin {
 	public void onEnable() {
 		getLogger().info("Loading files...");
 		loadFiles();
-		getLogger().info("Files successfully loaded! Loading classes...");
+		getLogger().info("Files successfully loaded! Loading Commands...");
 		
 		// User Commands
 		new Help(this);
 		new Settings(this);
 		// Admin Commands
 		new Ranks(this);
+		new Catalogue(this);
+		
+		getLogger().info("Loading Managers...");
+		// Managers
+		new EntityManager(this);
+		new ServerManager(this);
+		new BlockManager(this);
+		new ConquestManager(this);
+		new RecipeManager(this);
+		new AbilityManager(this);
+		new ItemManager(this);
+		
+		getLogger().info("Successfully loaded Classes!");
+		
+		
+		getLogger().info("Done!");
 	}
 
 	public static FileConfiguration getConfig(OfflinePlayer p) {
