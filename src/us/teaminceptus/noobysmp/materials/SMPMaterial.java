@@ -10,6 +10,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -23,7 +24,7 @@ import us.teaminceptus.noobysmp.util.SMPColor;
 /**
  * Class used for Custom Materials inside the SMP.
  * Utility Items (i.e. tables, items with inventory) are not included.
- * 
+ * Items with Abilities are used in {@link AbilityItem}
  * 
  */
 public enum SMPMaterial {
@@ -367,6 +368,7 @@ public enum SMPMaterial {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(cc + name);
 		meta.setLocalizedName(name.toLowerCase().replace(" ", "_"));
+		meta.addItemFlags(ItemFlag.HIDE_DYE);
 		item.setItemMeta(meta);
 		this.item = item;
 
@@ -401,6 +403,7 @@ public enum SMPMaterial {
 			meta.setUnbreakable(true);
 		}
 		
+		meta.addItemFlags(ItemFlag.HIDE_DYE);
 		item.setItemMeta(meta);
 		this.item = item;
 
@@ -456,6 +459,7 @@ public enum SMPMaterial {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(cc + name);
 		meta.setLocalizedName(this.localization);
+		meta.addItemFlags(ItemFlag.HIDE_DYE);
 		item.setItemMeta(meta);
 		
 		this.item = item;
@@ -523,6 +527,10 @@ public enum SMPMaterial {
 	
 	public final ItemStack getItem() {
 		return getItem(1);
+	}
+	
+	public final String getLocalization() {
+		return this.localization;
 	}
 
 	public final int getLevelUnlocked() {
