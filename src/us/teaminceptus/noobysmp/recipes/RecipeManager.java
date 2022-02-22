@@ -67,29 +67,28 @@ public class RecipeManager implements Listener {
 	public static final String BLOCK_9 = "III_III_III";
 	public static final String BLOCK_4 = "II _II ";
 	
-	public static final HashMap<Character, ItemStack> vanillaShape(ItemStack item) {
+	public static final HashMap<Character, ItemStack> vanillaShape(ItemStack item, String smap) {
 		HashMap<Character, ItemStack> map = new HashMap<>();
-		// TODO after all vanilla variations, substitute other items
-
+		
 		map.put('I', item);
-		map.put('S', new ItemStack(Material.STICK));
-		map.put('R', new ItemStack(Material.STRING));
+		if (smap.contains("S")) map.put('S', new ItemStack(Material.STICK));
+		if (smap.contains("R")) map.put('R', new ItemStack(Material.STRING));
 
 		return map;
 	}
 
-	public static final HashMap<Character, Material> vanillaShape(Material mat) {
+	public static final HashMap<Character, Material> vanillaShape(Material mat, String smap) {
 		HashMap<Character, Material> map = new HashMap<>();
 
 		map.put('I', mat);
-		map.put('S', Material.STICK);
-		map.put('R', Material.STRING);
+		if (smap.contains("S")) map.put('S', Material.STICK);
+		if (smap.contains("R")) map.put('R', Material.STRING);
 
 		return map;
 	}
 
-	public static final HashMap<Character, ItemStack> vanillaShape(SMPMaterial item) {
-		return vanillaShape(item.getItem());
+	public static final HashMap<Character, ItemStack> vanillaShape(SMPMaterial item, String smap) {
+		return vanillaShape(item.getItem(), smap);
 	}
 
 	private static final HashMap<String, ItemStack> getRegisterMap(SMPMaterial... items) {
@@ -118,7 +117,7 @@ public class RecipeManager implements Listener {
 	private void createRecipes() {
 		// Crafting Recipes
 		SMPRecipe.registerMultiple(SMPMaterial.RUBY.getItem(), getRegisterMap(SMPMaterial.RUBY_SWORD, SMPMaterial.RUBY_AXE, SMPMaterial.RUBY_PICKAXE, SMPMaterial.RUBY_SHOVEL, SMPMaterial.RUBY_HOE, SMPMaterial.RUBY_HELMET, SMPMaterial.RUBY_CHESTPLATE, SMPMaterial.RUBY_LEGGINGS, SMPMaterial.RUBY_BOOTS));
-		new SMPRecipe(SMPMaterial.RUBY_BLOCK, BLOCK_9, vanillaShape(SMPMaterial.RUBY));
+		new SMPRecipe(SMPMaterial.RUBY_BLOCK, BLOCK_9, vanillaShape(SMPMaterial.RUBY, BLOCK_9));
 		
 		SMPRecipe.registerMultiple(Material.COPPER_INGOT, getRegisterMap(SMPMaterial.COPPER_SWORD, SMPMaterial.COPPER_PICKAXE, SMPMaterial.COPPER_AXE, SMPMaterial.COPPER_HOE, SMPMaterial.COPPER_SHOVEL));
 		

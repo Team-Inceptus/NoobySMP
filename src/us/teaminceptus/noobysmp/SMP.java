@@ -27,7 +27,7 @@ public class SMP extends JavaPlugin {
 	private static File playerDir;
 
 	private void loadFiles() {
-		playerDir = new File(getDataFolder().getPath() + "/players");
+		playerDir = new File(getDataFolder(), "players");
 
 		if (!(playerDir.exists())) playerDir.mkdir();
 		

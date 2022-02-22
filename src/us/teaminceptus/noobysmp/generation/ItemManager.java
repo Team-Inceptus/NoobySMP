@@ -46,6 +46,7 @@ public class ItemManager implements Listener {
 		
 		for (ItemStack item : view.getTopInventory().getContents()) {
 			if (item == null) continue;
+			if (!(item.hasItemMeta())) continue;
 			ItemMeta meta = item.getItemMeta();
 			if (!(meta.hasLocalizedName())) {
 				meta.setLocalizedName(meta.hasDisplayName() ? ChatColor.stripColor(meta.getDisplayName()).toLowerCase().replace(' ', '_') : item.getType().name().toLowerCase());
@@ -56,6 +57,7 @@ public class ItemManager implements Listener {
 		
 		for (ItemStack item : view.getBottomInventory().getContents()) {
 			if (item == null) continue;
+			if (!(item.hasItemMeta())) continue;
 			ItemMeta meta = item.getItemMeta();
 			if (!(meta.hasLocalizedName())) {
 				meta.setLocalizedName(meta.hasDisplayName() ? ChatColor.stripColor(meta.getDisplayName()).toLowerCase().replace(' ', '_') : item.getType().name().toLowerCase());
@@ -65,6 +67,7 @@ public class ItemManager implements Listener {
 		
 		for (ItemStack item : p.getInventory().getContents()) {
 			if (item == null) continue;
+			if (!(item.hasItemMeta())) continue;
 			ItemMeta meta = item.getItemMeta();
 			if (!(meta.hasLocalizedName())) {
 				meta.setLocalizedName(meta.hasDisplayName() ? ChatColor.stripColor(meta.getDisplayName()).toLowerCase().replace(' ', '_') : item.getType().name().toLowerCase());

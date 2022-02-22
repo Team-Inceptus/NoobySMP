@@ -1,5 +1,6 @@
 package us.teaminceptus.noobysmp.recipes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,21 +20,22 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
 public class SMPRecipe {
 
-	private static List<SMPRecipe> recipes;
+	private static List<SMPRecipe> recipes = new ArrayList<>();
 
-	private static Map<String, FurnaceData> furnaceRecipes;
-	private static Map<String, SmithingData> smithingRecipes;
-	private static Map<String, AnvilData> anvilRecipes;
+	private static Map<String, FurnaceData> furnaceRecipes = new HashMap<>();
+	private static Map<String, SmithingData> smithingRecipes = new HashMap<>();
+	private static Map<String, AnvilData> anvilRecipes = new HashMap<>();
 	
 	private final Recipe recipe;
 	private final boolean eventUsed;
-	
+
 	public SMPRecipe(ItemStack result, String recipeMap, Map<Character, ItemStack> ingredients) {
 		recipes.add(this);
 
 		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this))), result);
 
 		recipe.shape(recipeMap.split("_"));
+		
 		for (char c : ingredients.keySet()) {
 			recipe.setIngredient(c, new ExactChoice(ingredients.get(c)));
 		}
@@ -52,7 +54,8 @@ public class SMPRecipe {
 
 		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this))), result);
 
-		recipe.shape(recipeMap.split(" "));
+		recipe.shape(recipeMap.split("_"));
+
 		for (char c : ingredients.keySet()) {
 			recipe.setIngredient(c, new MaterialChoice(ingredients.get(c)));
 		}
@@ -124,7 +127,7 @@ public class SMPRecipe {
 		for (HashMap.Entry<String, ItemStack> entry : map.entrySet()) {
 			ItemStack result = entry.getValue();
 
-			new SMPRecipe(result, entry.getKey(), RecipeManager.vanillaShape(base));
+			new SMPRecipe(result, entry.getKey(), RecipeManager.vanillaShape(base, entry.getKey()));
 		}
 	}
 
@@ -132,7 +135,7 @@ public class SMPRecipe {
 		for (Map.Entry<String, ItemStack> entry : map.entrySet()) {
 			ItemStack result = entry.getValue();
 
-			new SMPRecipe(result, entry.getKey(), RecipeManager.vanillaShape(base));
+			new SMPRecipe(result, entry.getKey(), RecipeManager.vanillaShape(base, entry.getKey()));
 		}
 	}
 

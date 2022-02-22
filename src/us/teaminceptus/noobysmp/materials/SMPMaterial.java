@@ -368,7 +368,7 @@ public enum SMPMaterial {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(cc + name);
 		meta.setLocalizedName(name.toLowerCase().replace(" ", "_"));
-		meta.addItemFlags(ItemFlag.HIDE_DYE);
+		meta.addItemFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(meta);
 		this.item = item;
 
@@ -403,7 +403,7 @@ public enum SMPMaterial {
 			meta.setUnbreakable(true);
 		}
 		
-		meta.addItemFlags(ItemFlag.HIDE_DYE);
+		meta.addItemFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(meta);
 		this.item = item;
 
@@ -459,7 +459,7 @@ public enum SMPMaterial {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(cc + name);
 		meta.setLocalizedName(this.localization);
-		meta.addItemFlags(ItemFlag.HIDE_DYE);
+		meta.addItemFlags(ItemFlag.HIDE_DYE, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(meta);
 		
 		this.item = item;
