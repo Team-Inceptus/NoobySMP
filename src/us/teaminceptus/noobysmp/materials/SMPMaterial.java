@@ -25,7 +25,6 @@ import us.teaminceptus.noobysmp.util.SMPColor;
  * Class used for Custom Materials inside the SMP.
  * Utility Items (i.e. tables, items with inventory) are not included.
  * Items with Abilities are used in {@link AbilityItem}
- * 
  */
 public enum SMPMaterial {
 	

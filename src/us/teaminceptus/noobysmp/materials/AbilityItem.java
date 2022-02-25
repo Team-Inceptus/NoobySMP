@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * All SMP items with abilities
- * 
+ * Items <strong>specifically</strong> dropped from Bosses are in {@link BossItem}
  */
 public enum AbilityItem {
 	
