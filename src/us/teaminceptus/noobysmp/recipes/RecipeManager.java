@@ -31,8 +31,6 @@ import us.teaminceptus.noobysmp.util.Items;
 public class RecipeManager implements Listener {
 
 	protected SMP plugin;
-
-	// TODO make shape of all vanilla variations; I = Item, S = Stick, etc.
 	// _ for separator in rows
 	
 	public static final String PICKAXE = "III_ S _ S ";
