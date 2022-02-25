@@ -10,7 +10,6 @@ public class EndChunkGenerator extends ChunkGenerator {
 	
 	public EndChunkGenerator(SMP plugin) {
 		this.plugin = plugin;
-		// TODO Auto-generated constructor stub
 	}
 
 }
