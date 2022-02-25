@@ -3,6 +3,9 @@ package us.teaminceptus.noobysmp.entities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
+
+import com.google.common.collect.ImmutableList;
 
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -10,21 +13,27 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
-import com.google.common.collect.ImmutableList;
+import us.teaminceptus.noobysmp.entities.titan.JadeZombie;
 
 public abstract class SMPEntity<T extends LivingEntity> {
 	
-	private static final List<SMPEntity<?>> entityList = new ArrayList<>(); 
+	protected static final List<SMPEntity<?>> entityList = new ArrayList<>(); 
 	
-	private final double maxHealth;
-	private final String customName;
-	private final List<ItemStack> drops;
+	protected final double maxHealth;
+	protected final String customName;
+	protected final List<ItemStack> drops;
 	
 	private final Class<T> clazz;
 	
-	// Make sure to update this as more are added!
+	// Make sure to update these as more are added!
 	public static List<Class<? extends SMPEntity<?>>> CLASS_LIST = ImmutableList.<Class<? extends SMPEntity<?>>>builder()
 			.add(JebSheep.class)
+			.add(BlackstoneSkeleton.class)
+			.add(RubySkeleton.class)
+			.build();
+	
+	public static List<Class<? extends SMPEntity<?>>> TITAN_CLASS_LIST = ImmutableList.<Class<? extends SMPEntity<?>>>builder()
+			.add(JadeZombie.class)
 			.build();
 	
 	protected final static Random r = new Random();
@@ -51,6 +60,18 @@ public abstract class SMPEntity<T extends LivingEntity> {
 			if (ent.entity.getUniqueId().equals(en.getUniqueId())) return ent;
 		}
 		
+		return null;
+	}
+
+	public UUID getUniqueId() {
+		return this.entity.getUniqueId();
+	}
+
+	public static SMPEntity<?> getByUUID(UUID uid) {
+		for (SMPEntity<?> entity : entityList) {
+			if (entity.getUniqueId().toString().equals(uid.toString())) return entity;
+		}
+
 		return null;
 	}
 	
