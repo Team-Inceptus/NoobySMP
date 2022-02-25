@@ -1,0 +1,10 @@
+
+vscode:
+  extensions:
+    - WakaTime.vscode-wakatime
+    - vscjava.vscode-java-pack
+
+tasks:
+  - init: printf "\n[settings]\napi_key = $WAKATIME_KEY\n" > ~/.wakatime.cfg
+  - init: sdk install java
+  - command: echo done
