@@ -1,6 +1,8 @@
 package us.teaminceptus.noobysmp.leveling;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -10,20 +12,32 @@ import com.google.common.collect.ImmutableMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Fire;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Ageable;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
@@ -33,7 +47,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
@@ -138,10 +154,6 @@ public class LevelingManager implements Listener {
 
                 if (level == 80) {
                     lore.add(ChatColor.GOLD + "Homing Projectiles");
-                }
-
-                if (level == 25) {
-                    lore.add(ChatColor.BLUE + "Infinity");
                 }
 
                 meta.setLore(lore);
@@ -410,5 +422,128 @@ public class LevelingManager implements Listener {
             b.getWorld().dropItemNaturally(b.getLocation(), item);
     }
 
+    @EventHandler
+    public void onDamage(EntityDamageByEntityEvent e) {
+        if (!(e.getDamager() instanceof Player p)) return;
+        PlayerConfig config = new PlayerConfig(p);
+
+        e.setDamage(config.calculateHoeDamage(p.getInventory().getItemInMainHand(), e.getDamage())); // Attacking will always be in the main hand
+    }
+
     // Fletching
+
+    @EventHandler
+    public void onShoot(ProjectileLaunchEvent e) {
+        Projectile proj = e.getEntity();
+        if (!(proj.getShooter() instanceof Player p)) return;
+        PlayerConfig config = new PlayerConfig(p);
+
+        List<Projectile> targets = new ArrayList<>();
+
+        // Projectile Shots
+        for (int i = 0; i < (int) Math.floor(config.getFletchingLevel() / 25); i++) {
+            Projectile clone = proj.getWorld().spawn(proj.getLocation(), proj.getClass());
+            targets.add(clone);
+        }
+
+        // Homing
+        if (config.getLevel() >= 80) {
+            for (Projectile projectile : targets) {
+                List<Entity> nearbyEntities = projectile.getNearbyEntities(30, 15, 30).stream().filter(en -> en instanceof LivingEntity target && !(en instanceof ArmorStand) && !(target.getUniqueId().equals(p.getUniqueId()))).toList();
+                if (nearbyEntities.size() < 1) return;
+                Map<Double, Entity> nearestEntities = new HashMap<>();
+                for (Entity en : nearbyEntities) nearestEntities.put(en.getLocation().distanceSquared(projectile.getLocation()), en);
+                Entity target = (nearestEntities.keySet().size() < 1 || Collections.min(nearestEntities.keySet()) == null ? nearbyEntities.get(0) : nearestEntities.get(Collections.min(nearestEntities.keySet())));
+                new BukkitRunnable() {
+                    public void run() {
+                        if (target.isDead()) cancel();
+                        if (target instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) cancel();
+                        if ((projectile instanceof Arrow arr && arr.isInBlock()) || projectile.isDead() || projectile.getLocation().distanceSquared(p.getLocation()) >= 2500) cancel();
+                        if (nearbyEntities.size() > 0) {
+                            moveToward(projectile, (target instanceof LivingEntity ltarget ? ltarget.getEyeLocation() : target.getLocation()), 1 + (config.getFletchingLevel() - 80 / 10));
+                        }
+                    }
+                }.runTaskTimer(plugin, 1, 1);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHit(ProjectileHitEvent e) {
+        Projectile proj = e.getEntity();
+        if (!(proj.getShooter() instanceof Player p)) return;
+        PlayerConfig config = new PlayerConfig(p);
+
+        if (e.getHitBlock() != null) {
+            // Bounce
+            double chance = Math.floor(config.getLevel() / 20) * 20;
+
+            if (r.nextInt(100) < chance ) {
+                if (proj instanceof Fireball f) {
+                    f.setDirection(f.getDirection().multiply(-1));
+                } else if (proj instanceof ThrowableProjectile || proj instanceof AbstractArrow) {
+                    Location newLoc = proj.getLocation();
+                    newLoc.setDirection(newLoc.getDirection().multiply(-1));
+                    proj.teleport(newLoc);
+
+                    proj.setVelocity(proj.getVelocity().multiply(0.8));
+                }
+            }
+
+        } else if (e.getHitEntity() != null) {
+            // Chain
+            double chance = (Math.floor(config.getFletchingLevel() / 8) / 20) * 100;
+
+            if (r.nextInt(100) < chance) {
+                Location clone1L = proj.getLocation();
+                clone1L.setYaw(clone1L.getYaw() + 30);
+                Projectile clone1 = proj.getWorld().spawn(clone1L, proj.getClass());
+                clone1.setShooter(p);
+
+                Location clone2L = proj.getLocation();
+                clone2L.setYaw(clone2L.getYaw() + 150);
+                Projectile clone2 = proj.getWorld().spawn(clone2L, proj.getClass());
+                clone2.setShooter(p);
+
+                Location clone3L = proj.getLocation();
+                clone2L.setYaw(clone3L.getYaw() + 270);
+                Projectile clone3 = proj.getWorld().spawn(clone3L, proj.getClass());
+                clone3.setShooter(p);
+
+                Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(clone1));
+                Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(clone2));
+                Bukkit.getPluginManager().callEvent(new ProjectileLaunchEvent(clone3));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onDamageProj(EntityDamageByEntityEvent e) {
+        if (!(e.getDamager() instanceof Projectile proj)) return;
+        if (!(e.getEntity() instanceof Player p)) return;
+
+        PlayerConfig config = new PlayerConfig(p);
+
+        double chance = Math.floor(config.getLevel() / 15) * 10;
+        
+        if (r.nextInt(100) < chance) {
+            e.setCancelled(true);
+            proj.remove();
+            Location reverse = proj.getLocation();
+            reverse.setDirection(reverse.getDirection().multiply(-1));
+            Projectile clone = proj.getWorld().spawn(reverse, proj.getClass());
+            clone.setVelocity(clone.getVelocity().multiply(1.25));
+
+            p.playSound(p, Sound.ITEM_SHIELD_BLOCK, 3F, 1F);
+        }
+    }
+
+	private static void moveToward(Entity entity, Location to, double speed){
+		Location loc = entity.getLocation();
+		double x = loc.getX() - to.getX();
+		double y = loc.getY() - to.getY();
+		double z = loc.getZ() - to.getZ();
+		Vector velocity = new Vector(x, y, z).normalize().multiply(-speed);
+		entity.setVelocity(velocity);   
+	}
 }
