@@ -29,6 +29,9 @@ public class BlockManager implements Listener {
 	@EventHandler
 	public void onPlace(BlockPlaceEvent e) {
 		Block b = e.getBlock();
+		if (!(e.getItemInHand().hasItemMeta())) return;
+		if (!(e.getItemInHand().getItemMeta().hasLocalizedName())) return;
+		
 		b.setMetadata("type", new FixedMetadataValue(plugin, e.getItemInHand().getItemMeta().getLocalizedName()));
 	}
 	
@@ -39,9 +42,13 @@ public class BlockManager implements Listener {
 			String type = b.getMetadata("type").stream().filter(v -> v.getOwningPlugin() instanceof SMP).toList().get(0).asString();
 			
 			if (SMPMaterial.getByLocalization(type) != null) {
-				ItemStack item = SMPMaterial.getItem(type);
+				SMPMaterial m = SMPMaterial.getByLocalization(type);
+				ItemStack item = m.getItem();
 				e.setDropItems(false);
-				b.getWorld().dropItemNaturally(b.getLocation(), item);
+				
+				if (SMPMaterial.ORE_DROPS.containsKey(m)) {
+					b.getWorld().dropItemNaturally(b.getLocation(), SMPMaterial.ORE_DROPS.get(m).getItem());
+				} else b.getWorld().dropItemNaturally(b.getLocation(), item);
 			}
 		} catch (ArrayIndexOutOfBoundsException err) {
 			// do nothing, block does not apply
