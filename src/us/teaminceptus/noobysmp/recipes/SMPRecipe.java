@@ -40,9 +40,15 @@ public class SMPRecipe {
 			recipe.setIngredient(c, new ExactChoice(ingredients.get(c)));
 		}
 		
-		Bukkit.addRecipe(recipe);
+		boolean added = Bukkit.addRecipe(recipe);
 		this.recipe = recipe;
 		this.eventUsed = false;
+		
+		if (added) {
+			JavaPlugin.getPlugin(SMP.class).getLogger().info("Successfully added recipe " + recipe.getKey().getKey());
+		} else {
+			JavaPlugin.getPlugin(SMP.class).getLogger().info("Adding recipe " + recipe.getKey().getKey() + " failed.");
+		}
 	}
 
 	public SMPRecipe(SMPMaterial result, String recipeMap, Map<Character, ItemStack> ingredients) {
@@ -60,9 +66,15 @@ public class SMPRecipe {
 			recipe.setIngredient(c, new MaterialChoice(ingredients.get(c)));
 		}
 
-		Bukkit.addRecipe(recipe);
+		boolean added = Bukkit.addRecipe(recipe);
 		this.recipe = recipe;
 		this.eventUsed = false;
+		
+		if (added) {
+			JavaPlugin.getPlugin(SMP.class).getLogger().info("Successfully added recipe " + recipe.getKey().getKey());
+		} else {
+			JavaPlugin.getPlugin(SMP.class).getLogger().info("Adding recipe " + recipe.getKey().getKey() + " failed.");
+		}
 	}
 
 	public SMPRecipe(SMPMaterial result, String recipeMap, HashMap<Character, Material> ingredients) {
@@ -121,22 +133,6 @@ public class SMPRecipe {
 	
 	public static final List<SMPRecipe> getEventRecipes() {
 		return getRecipes().stream().filter(r -> r.eventUsed).toList();
-	}
-
-	public static void registerMultiple(Material base, HashMap<String, ItemStack> map) {
-		for (HashMap.Entry<String, ItemStack> entry : map.entrySet()) {
-			ItemStack result = entry.getValue();
-
-			new SMPRecipe(result, entry.getKey(), RecipeManager.vanillaShape(base, entry.getKey()));
-		}
-	}
-
-	public static void registerMultiple(ItemStack base, Map<String, ItemStack> map) {
-		for (Map.Entry<String, ItemStack> entry : map.entrySet()) {
-			ItemStack result = entry.getValue();
-
-			new SMPRecipe(result, entry.getKey(), RecipeManager.vanillaShape(base, entry.getKey()));
-		}
 	}
 
 	public static class FurnaceData {
