@@ -17,5 +17,7 @@ public interface Messages {
 	String ARGUMENT_PLAYER = ChatColor.RED + "Please provide a valid player.";
 	String ARGUMENT_INT = ChatColor.RED + "Please provide a valid integer.";
 	String ARGUMENT_ITEM = ChatColor.RED + "Please provide a valid item.";
+	String ARGUMENT_ACTION = ChatColor.RED + "Please provide a valid action.";
+	String ARGUMENT_DOUBLE = ChatColor.RED + "Please provide a valid decimal.";
 	
 }
