@@ -56,11 +56,11 @@ public enum SMPCosmetic {
 	
 	private static Consumer<Location> createCircle(Particle part, double radius) {
 		return (loc -> {
-			int points = 10;
+			int points = 360;
 			for (int i = 0; i < points; i++) {
 				double angle = 2 * Math.PI * i / points;
 				loc.add(radius * Math.sin(angle), 0, radius * Math.cos(angle));
-				loc.getWorld().spawnParticle(part, loc, 5);
+				loc.getWorld().spawnParticle(part, loc, 1, 0, 0, 0, 0);
 				loc.subtract(radius * Math.sin(angle), 0, radius * Math.cos(angle));
 				
 			}
@@ -70,22 +70,12 @@ public enum SMPCosmetic {
 	private static Consumer<Location> createShape(Particle part, int points, double radius) {
 		return (loc -> {
 			for (int i = 0; i < points; i++) {
-				double angle = Math.toRadians(360.0 / points * i);
-				double nextAngle = Math.toRadians(360.0 / points * i);
-				
-				double x = Math.cos(angle) * radius;
-				double z = Math.sin(angle) * radius;
-				double x2 = Math.cos(nextAngle) * radius;
-				double z2 = Math.sin(nextAngle) * radius;
-				double deltaX = x2 - x;
-				double deltaZ = z2 - 2;
-				double distance = Math.sqrt((deltaX - x) * (deltaX - x) + (deltaZ - z) * (deltaZ - z));
-				
-				for (double d = 0; d < distance - 0.1; d += 0.1) {
-					loc.add(x + deltaX * d, 0, x + deltaZ * d);
-					loc.getWorld().spawnParticle(part, loc, 5, 0, 0, 0, 0);
-					loc.subtract(x + deltaX * d, 0, z + deltaZ * d);
-				}
+				  double angle = 360.0 / points * i;
+				  angle = Math.toRadians(angle);
+				  double z = Math.cos(angle);
+				  double x = Math.sin(angle);
+				  loc.add(x, 0, z);
+				  loc.getWorld().spawnParticle(part, loc, 1, 0, 0, 0, 0);
 			}
 		});
 	}
@@ -99,7 +89,7 @@ public enum SMPCosmetic {
 					double x = Math.cos(a) * sradius;
 					double z = Math.sin(a) * sradius;
 					loc.add(x, y, z);
-					loc.getWorld().spawnParticle(part, loc, 5);
+					loc.getWorld().spawnParticle(part, loc, 1, 0, 0, 0, 0);
 					loc.subtract(x, y, z);
 				}
 			}
@@ -112,6 +102,14 @@ public enum SMPCosmetic {
 	
 	public String getName() {
 		return this.name;
+	}
+	
+	public static SMPCosmetic matchCosmetic(String name) {
+		for (SMPCosmetic c : SMPCosmetic.values()) {
+			if (name.equals(c.name().toLowerCase())) return c;
+		}
+		
+		return null;
 	}
 	
 	public Consumer<Location>[] getEffects() {
