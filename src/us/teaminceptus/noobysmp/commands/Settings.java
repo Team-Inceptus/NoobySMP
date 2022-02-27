@@ -44,7 +44,6 @@ public class Settings implements Listener, CommandExecutor {
 
 		@Override
 		public Inventory getInventory() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 	}

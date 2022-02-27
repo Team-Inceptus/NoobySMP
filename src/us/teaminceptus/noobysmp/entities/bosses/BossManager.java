@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.google.common.collect.ImmutableList;
+
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,15 +30,12 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.google.common.collect.ImmutableList;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
@@ -73,7 +72,7 @@ public class BossManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    private static class BossHolder extends CancelHolder implements InventoryHolder {
+    private static class BossHolder extends CancelHolder {
 
         private BossHolder() {
         }
@@ -85,14 +84,9 @@ public class BossManager implements Listener {
         
     }
 
-    private static class BossMenuHolder extends CancelHolder implements InventoryHolder {
+    private static class BossMenuHolder extends CancelHolder {
 
         private BossMenuHolder() {
-        }
-
-        @Override
-        public Inventory getInventory() {
-            return null;
         }
     }
 
