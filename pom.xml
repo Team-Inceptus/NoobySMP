@@ -3,7 +3,7 @@
   <groupId>us.teaminceptus</groupId>
   <artifactId>NoobySMP</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>SMPCore</name>
+  <name>NoobySMP</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
