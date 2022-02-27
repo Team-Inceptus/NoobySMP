@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,10 +24,12 @@ import org.bukkit.inventory.SmithingInventory;
 import net.md_5.bungee.api.ChatColor;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
+import us.teaminceptus.noobysmp.recipes.SMPRecipe.AnvilData;
 import us.teaminceptus.noobysmp.recipes.SMPRecipe.FurnaceData;
 import us.teaminceptus.noobysmp.recipes.SMPRecipe.SmithingData;
 import us.teaminceptus.noobysmp.util.Generator;
 import us.teaminceptus.noobysmp.util.Items;
+import us.teaminceptus.noobysmp.util.inventoryholder.CancelHolder;
 
 public class RecipeManager implements Listener {
 
@@ -88,40 +91,28 @@ public class RecipeManager implements Listener {
 	public static final HashMap<Character, ItemStack> vanillaShape(SMPMaterial item, String smap) {
 		return vanillaShape(item.getItem(), smap);
 	}
-
-	private static final HashMap<String, ItemStack> getRegisterMap(SMPMaterial... items) {
-		HashMap<String, ItemStack> map = new HashMap<>();
-		for (SMPMaterial m : items) {
-			for (String s : ALL_NAMES) if (m.name().startsWith(s)) {
-				try {
-					map.put((String) RecipeManager.class.getDeclaredField(s).get(s), m.getItem());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (m.name().startsWith("AXE")) {
-				map.put(AXE_2, m.getItem());
-			}
-
-			if (m.name().startsWith("HOE")) {
-				map.put(HOE_2, m.getItem());
-			}
-		}
-
-		return map;
-	}
 	
 	private void createRecipes() {
 		// Crafting Recipes
-		SMPRecipe.registerMultiple(SMPMaterial.RUBY.getItem(), getRegisterMap(SMPMaterial.RUBY_SWORD, SMPMaterial.RUBY_AXE, SMPMaterial.RUBY_PICKAXE, SMPMaterial.RUBY_SHOVEL, SMPMaterial.RUBY_HOE, SMPMaterial.RUBY_HELMET, SMPMaterial.RUBY_CHESTPLATE, SMPMaterial.RUBY_LEGGINGS, SMPMaterial.RUBY_BOOTS));
+		new SMPRecipe(SMPMaterial.RUBY_HELMET, HELMET, vanillaShape(SMPMaterial.RUBY, HELMET));
+		new SMPRecipe(SMPMaterial.RUBY_CHESTPLATE, CHESTPLATE, vanillaShape(SMPMaterial.RUBY, CHESTPLATE));
+		new SMPRecipe(SMPMaterial.RUBY_LEGGINGS, LEGGINGS, vanillaShape(SMPMaterial.RUBY, LEGGINGS));
+		new SMPRecipe(SMPMaterial.RUBY_BOOTS, BOOTS, vanillaShape(SMPMaterial.RUBY, BOOTS));
+		
+		new SMPRecipe(SMPMaterial.RUBY_SWORD, SWORD, vanillaShape(SMPMaterial.RUBY, SWORD));
+		new SMPRecipe(SMPMaterial.RUBY_AXE, AXE, vanillaShape(SMPMaterial.RUBY, AXE));
+		new SMPRecipe(SMPMaterial.RUBY_PICKAXE, PICKAXE, vanillaShape(SMPMaterial.RUBY, PICKAXE));
+		new SMPRecipe(SMPMaterial.RUBY_SHOVEL, SHOVEL, vanillaShape(SMPMaterial.RUBY, SHOVEL));
+		new SMPRecipe(SMPMaterial.RUBY_HOE, HOE, vanillaShape(SMPMaterial.RUBY, HOE));
+		
 		new SMPRecipe(SMPMaterial.RUBY_BLOCK, BLOCK_9, vanillaShape(SMPMaterial.RUBY, BLOCK_9));
 		
-		SMPRecipe.registerMultiple(Material.COPPER_INGOT, getRegisterMap(SMPMaterial.COPPER_SWORD, SMPMaterial.COPPER_PICKAXE, SMPMaterial.COPPER_AXE, SMPMaterial.COPPER_HOE, SMPMaterial.COPPER_SHOVEL));
 		
-		SMPRecipe.registerMultiple(Material.BLACKSTONE, getRegisterMap(SMPMaterial.BLACKSTONE_HELMET, SMPMaterial.BLACKSTONE_CHESTPLATE, SMPMaterial.BLACKSTONE_LEGGINGS, SMPMaterial.BLACKSTONE_BOOTS));
+		new SMPRecipe(SMPMaterial.QUARTZ_HELMET, HELMET, vanillaShape(Material.QUARTZ, HELMET));
+		new SMPRecipe(SMPMaterial.QUARTZ_CHESTPLATE, CHESTPLATE, vanillaShape(Material.QUARTZ, CHESTPLATE));
+		new SMPRecipe(SMPMaterial.QUARTZ_LEGGINGS, LEGGINGS, vanillaShape(Material.QUARTZ, LEGGINGS));
+		new SMPRecipe(SMPMaterial.QUARTZ_BOOTS, BOOTS, vanillaShape(Material.QUARTZ, BOOTS));
 		
-		SMPRecipe.registerMultiple(Material.QUARTZ, getRegisterMap(SMPMaterial.QUARTZ_HELMET, SMPMaterial.QUARTZ_CHESTPLATE, SMPMaterial.QUARTZ_LEGGINGS, SMPMaterial.QUARTZ_BOOTS));
 		// Furnace Recipes
 		new SMPRecipe(SMPMaterial.RUBY_ORE.getItem(), SMPMaterial.RUBY.getItem(), 10, 100);
 		new SMPRecipe(SMPMaterial.DEEPSLATE_RUBY_ORE.getItem(), SMPMaterial.RUBY.getItem(), 10, 100);
@@ -136,14 +127,17 @@ public class RecipeManager implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		plugin.getLogger().info("Successfully loaded events!");
 	}
+	
+	public static class RecipeHolder extends CancelHolder {};
 
 	public static List<Inventory> getRecipeMenus(ItemStack item) {
 		List<Recipe> recipes = Bukkit.getRecipesFor(item);
-		if (recipes.size() < 1) return null;
 		List<Inventory> inventories = new ArrayList<>();
 		
+		String invName = "Recipe - " + (item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name().substring(0, 1) + item.getType().name().toLowerCase().substring(1));
+		
 		for (Recipe r : recipes) {
-			Inventory inv = Generator.genGUI(45, "Recipe - " + (item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name().substring(0, 1) + item.getType().name().toLowerCase().substring(1)));
+			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder());
 
 			if (r instanceof ShapedRecipe sh) {
 				Map<Integer, ItemStack> ingredients = new HashMap<>();
@@ -171,10 +165,75 @@ public class RecipeManager implements Listener {
 				
 				inv.setItem(22, new ItemStack(Material.CRAFTING_TABLE));
 				inv.setItem(23, item);
-				
 
 				inventories.add(inv);
 			}
+		}
+		
+		for (AnvilData data : SMPRecipe.getAnvilRecipes().values()) {
+			if (!(data.getInput().isSimilar(item))) continue;
+			
+			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder());
+			
+			inv.setItem(10, Items.Inventory.GUI_PANE);
+			inv.setItem(11, Items.Inventory.GUI_PANE);
+			inv.setItem(12, Items.Inventory.GUI_PANE);
+			inv.setItem(20, Items.Inventory.GUI_PANE);
+			inv.setItem(28, Items.Inventory.GUI_PANE);
+			inv.setItem(29, Items.Inventory.GUI_PANE);
+			inv.setItem(30, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(19, data.getInput());
+			inv.setItem(21, data.getCombination());
+			
+			inv.setItem(22, new ItemStack(Material.ANVIL));
+			inv.setItem(23, item);
+			
+			inventories.add(inv);
+		}
+		
+		for (SmithingData data : SMPRecipe.getSmithingRecipes().values()) {
+			if (!(data.getInput().isSimilar(item))) continue;
+			
+			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder());
+			
+			inv.setItem(10, Items.Inventory.GUI_PANE);
+			inv.setItem(11, Items.Inventory.GUI_PANE);
+			inv.setItem(12, Items.Inventory.GUI_PANE);
+			inv.setItem(20, Items.Inventory.GUI_PANE);
+			inv.setItem(28, Items.Inventory.GUI_PANE);
+			inv.setItem(29, Items.Inventory.GUI_PANE);
+			inv.setItem(30, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(19, data.getInput());
+			inv.setItem(21, data.getAddition());
+			
+			inv.setItem(22, new ItemStack(Material.SMITHING_TABLE));
+			inv.setItem(23, item);
+			
+			inventories.add(inv);
+		}
+		
+		for (FurnaceData data : SMPRecipe.getCookRecipes().values()) {
+			if (!(data.getInput().isSimilar(item))) continue;
+			
+			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder());
+			
+			inv.setItem(10, Items.Inventory.GUI_PANE);
+			inv.setItem(11, Items.Inventory.GUI_PANE);
+			inv.setItem(12, Items.Inventory.GUI_PANE);
+			inv.setItem(19, Items.Inventory.GUI_PANE);
+			inv.setItem(21, Items.Inventory.GUI_PANE);
+			inv.setItem(28, Items.Inventory.GUI_PANE);
+			inv.setItem(29, Items.Inventory.GUI_PANE);
+			inv.setItem(30, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(20, data.getInput());
+			
+			inv.setItem(22, new ItemStack(Material.FURNACE));
+			inv.setItem(23, item);
+			
+			inventories.add(inv);
 		}
 
 		if (inventories.size() > 1) {
@@ -217,25 +276,23 @@ public class RecipeManager implements Listener {
 		String display = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()).toLowerCase();
 		Inventory recipeInv = view.getTopInventory();
 		
-		// Title Checks
-		if (view.getTitle().contains("Recipe - ")) {
-			ItemStack chosen = recipeInv.getItem(23);
-			if (chosen == null) return;
+		if (!(recipeInv.getHolder() instanceof RecipeHolder)) return;
+		
+		ItemStack chosen = recipeInv.getItem(23);
+		if (chosen == null) return;
+		
+		// Turn Page
+		if (display.equalsIgnoreCase("next") || display.equalsIgnoreCase("back")) {
+			List<Inventory> invs = getRecipeMenus(chosen);
 			
-			// Turn Page
-			if (display.equalsIgnoreCase("next") || display.equalsIgnoreCase("back")) {
-				List<Inventory> invs = getRecipeMenus(chosen);
-				
-				int nextInvIndex = invs.indexOf(recipeInv) + (display.equalsIgnoreCase("next") ? 1 : -1);
-				
-				Inventory nextInv = invs.get(nextInvIndex);
-				if (nextInv == null) return;
-				
-				p.openInventory(nextInv);
-			}
+			int nextInvIndex = invs.indexOf(recipeInv) + (display.equalsIgnoreCase("next") ? 1 : -1);
+			
+			Inventory nextInv = invs.get(nextInvIndex);
+			if (nextInv == null) return;
+			
+			p.openInventory(nextInv);
+			p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 3F, 1F);
 		}
-		
-		
 	}
 
 	@EventHandler
