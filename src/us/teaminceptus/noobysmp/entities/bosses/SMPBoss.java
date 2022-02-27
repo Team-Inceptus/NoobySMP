@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.google.common.collect.ImmutableList;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import net.minecraft.world.entity.ai.goal.Goal;
 import us.teaminceptus.noobysmp.entities.SMPEntity;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
 
 public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
@@ -23,12 +25,17 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 	private final Map<Integer, Goal> goals;
 	private final Map<Attribute, Double> attributes;
 	
+	protected final Map<ItemStack, Integer> drops;
+	
 	public static List<UUID> bossList = new ArrayList<>();
-
+	
 	public static List<String> BOSS_NAME_LIST = new ArrayList<>();
+	
+	public final String NAMETAG = ChatColor.DARK_RED + "[" + this.customName + ChatColor.DARK_RED + "] " + ChatColor.RED;
 	
 	public static List<Class<? extends SMPBoss<? extends Mob>>> CLASS_LIST = ImmutableList.<Class<? extends SMPBoss<? extends Mob>>>builder()
 	.add(SuperSniper.class)
+	.add(NetheritePiglin.class)
 	.build();
 
 	public SMPBoss(Class<T> clazz, Location loc, double maxHealth, String name, Map<ItemStack, Integer> drops, Map<Attribute, Double> attributes) {
@@ -40,6 +47,7 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 		BOSS_NAME_LIST.add(getCustomName());
 		this.goals = goals;
 		this.attributes = attributes;
+		this.drops = drops;
 		
 		Mob en = this.entity;
 		bossList.add(en.getUniqueId());
@@ -56,8 +64,13 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 				mob.goalSelector.addGoal(i, goals.get(i));
 			}
 		}
+		
+		if (this.getClass().isAnnotationPresent(DisplayName.class)) {
+			DisplayName display = this.getClass().getAnnotation(DisplayName.class);
+			
+			this.entity.setCustomName(display.cc() + display.value());
+		}
 	}
-
 	public static Class<? extends SMPBoss<?>> getByIcon(Material icon) {
 		for (Class<? extends SMPBoss<?>> bossClass : CLASS_LIST) {
 			if (icon == bossClass.getAnnotation(Icon.class).value()) return bossClass;
@@ -65,6 +78,10 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 
 		return null;
 	} 
+	
+	public Map<ItemStack, Integer> getBossDrops() {
+		return this.drops;
+	}
 	
 	public Map<Integer, Goal> getPathfinderGoals() {
 		return this.goals;
