@@ -3,18 +3,21 @@ package us.teaminceptus.noobysmp.generation;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.generation.biomes.TitanBiome;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
 public class BlockManager implements Listener {
@@ -35,15 +38,27 @@ public class BlockManager implements Listener {
 	@EventHandler
 	public void onBreak(BlockBreakEvent e) {
 		final Block b = e.getBlock();
-		String type = b.getMetadata("type").stream().filter(v -> v.getOwningPlugin() instanceof SMP).toList().get(0).asString();
-		
-		if (SMPMaterial.getByLocalization(type) != null) {
-			ItemStack item = SMPMaterial.getItem(type);
-			e.setDropItems(false);
-			b.getWorld().dropItemNaturally(b.getLocation(), item);
+		try {
+			String type = b.getMetadata("type").stream().filter(v -> v.getOwningPlugin() instanceof SMP).toList().get(0).asString();
+			
+			if (SMPMaterial.getByLocalization(type) != null) {
+				ItemStack item = SMPMaterial.getItem(type);
+				e.setDropItems(false);
+				b.getWorld().dropItemNaturally(b.getLocation(), item);
+			}
+		} catch (ArrayIndexOutOfBoundsException err) {
+			// do nothing, block does not apply
 		}
 	}
-	
+//	
+//	@EventHandler
+//	public void onChunkLoad(ChunkLoadEvent e) {
+//		Chunk c = e.getChunk();
+//		// Set Custom Biomes
+//		
+//		TitanBiome.WITHERED_PLAINS.setBiome(c);
+//	}
+//	
 	public static final Map<Material, SMPMaterial> REPLACEABLES = ImmutableMap.<Material, SMPMaterial>builder()
 			.put(Material.END_STONE, SMPMaterial.ENDERITE_ORE)
 			.put(Material.DIAMOND_ORE, SMPMaterial.RUBY_ORE)

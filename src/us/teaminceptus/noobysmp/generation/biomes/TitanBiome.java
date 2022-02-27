@@ -28,6 +28,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.BiomeSpecialEffects.GrassColorModifier;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import us.teaminceptus.noobysmp.SMP;
@@ -64,13 +65,18 @@ public enum TitanBiome {
 	PINK_DESERT("Pink Desert", false, "ffa5de", null, null, "ff8cd4", null),
 	PURPLE_DESERT("Purple Desert", false, "c2a5ff", null, null, "da8cff", null),
 	
-	GREEN_RIVER("Green River", false, "a0f7c0", null, "bffcd6", null, null),
-	GREEN_OCEAN("Green Ocean", false, "a0f7c0", null, "bffcd6", null, null),
-	STEAMING_GREEN_OCEAN("Steaming Green Ocean", false, "02d64f", null, "bffcd6", null, null),
-	COLD_GREEN_OCEAN("Cold Green Ocean", false, "bcffd5", null, "bffcd6", null, null),
-	FROZEN_GREEN_OCEAN("Frozen Green Ocean", true, "d3ffe3", null, "bffcd6", null, null),
+	GREEN_RIVER("Green River", false, "a0f7c0", null, "bffcd6", OCEAN_GRASS(), null),
+	GREEN_OCEAN("Green Ocean", false, "a0f7c0", null, "bffcd6", OCEAN_GRASS(), null),
+	STEAMING_GREEN_OCEAN("Steaming Green Ocean", false, "02d64f", null, "bffcd6", OCEAN_GRASS(), null),
+	COLD_GREEN_OCEAN("Cold Green Ocean", false, "bcffd5", null, "bffcd6", OCEAN_GRASS(), null),
+	FROZEN_GREEN_OCEAN("Frozen Green Ocean", true, "d3ffe3", null, "bffcd6", OCEAN_GRASS(), null),
 	
 	;
+	
+	public static final String PLAINS_GRASS() { return "91BD59"; }
+	public static final String DESERT_GRASS() { return "BFB755"; }
+	public static final String JUNGLE_GRASS() { return "59C93C"; }
+	public static final String OCEAN_GRASS() { return "8EB971"; };
 	
 	private final String name;
 
@@ -212,27 +218,27 @@ public enum TitanBiome {
 	public static void registerBiomes() throws Exception {
 		SMP plugin = JavaPlugin.getPlugin(SMP.class);
 
-		ResourceKey<Registry<net.minecraft.world.level.biome.Biome>> REGISTRY_KEY = Registry.BIOME_REGISTRY;
+		ResourceKey<Registry<net.minecraft.world.level.biome.Biome>> registry = Registry.BIOME_REGISTRY;
 		DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
 		
 		for (TitanBiome biome : values()) { 
-			ResourceKey<net.minecraft.world.level.biome.Biome> key = ResourceKey.<net.minecraft.world.level.biome.Biome>create(REGISTRY_KEY, new ResourceLocation("noobysmp", biome.name.toLowerCase().replace(' ', '_')));
+			ResourceKey<net.minecraft.world.level.biome.Biome> key = ResourceKey.<net.minecraft.world.level.biome.Biome>create(registry, new ResourceLocation("noobysmp", biome.name.toLowerCase().replace(' ', '_')));
 			biome.resourceKey = key;
-	
-			ResourceKey<net.minecraft.world.level.biome.Biome> oldKey = ResourceKey.<net.minecraft.world.level.biome.Biome>create(REGISTRY_KEY, new ResourceLocation("minecraft", "forest"));
-			WritableRegistry<net.minecraft.world.level.biome.Biome> registrywritable = server.registryAccess().ownedRegistryOrThrow(REGISTRY_KEY);
+			
+			ResourceKey<net.minecraft.world.level.biome.Biome> oldKey = Biomes.FOREST;
+			WritableRegistry<net.minecraft.world.level.biome.Biome> registrywritable = server.registryAccess().ownedRegistryOrThrow(registry);
 			net.minecraft.world.level.biome.Biome forestbiome = registrywritable.get(oldKey);
 			
 			BiomeBuilder builder = new net.minecraft.world.level.biome.Biome.BiomeBuilder();
 			builder.biomeCategory(forestbiome.getBiomeCategory());
 			builder.precipitation(forestbiome.getPrecipitation());
 			
-			Field biomeSettingMobsField = net.minecraft.world.level.biome.Biome.class.getDeclaredField("mobSettings");
+			Field biomeSettingMobsField = net.minecraft.world.level.biome.Biome.class.getDeclaredField("l");
 			biomeSettingMobsField.setAccessible(true);
 			MobSpawnSettings biomeSettingMobs = (MobSpawnSettings) biomeSettingMobsField.get(forestbiome);
 			builder.mobSpawnSettings(biomeSettingMobs);	
 			
-			Field biomeSettingGenField = net.minecraft.world.level.biome.Biome.class.getDeclaredField("generationSettings");
+			Field biomeSettingGenField = net.minecraft.world.level.biome.Biome.class.getDeclaredField("k");
 			biomeSettingGenField.setAccessible(true);
 			BiomeGenerationSettings biomeSettingGen = (BiomeGenerationSettings) biomeSettingGenField.get(forestbiome);
 			builder.generationSettings(biomeSettingGen);
