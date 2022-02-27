@@ -97,7 +97,11 @@ public class Items implements Listener {
 		Builder(Material type) {
 			this.item = new ItemStack(type);
 		}
-
+		
+		Builder(ItemStack starter) {
+			this.item = starter;
+		}
+		
 		public Builder setName(String display) {
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName(display);
@@ -114,6 +118,12 @@ public class Items implements Listener {
 			ItemMeta meta = item.getItemMeta();
 			meta.setLore(lore);
 			item.setItemMeta(meta);
+			return this;
+		}
+		
+		public Builder addFlags(ItemFlag... flags) {
+			ItemMeta meta = item.getItemMeta();
+			meta.addItemFlags(flags);
 			return this;
 		}
 
@@ -133,12 +143,22 @@ public class Items implements Listener {
 	public static Builder itemBuilder(Material type) {
 		return new Builder(type);
 	}
+	
+	public static Builder itemBuilder(ItemStack starter) {
+		return new Builder(starter);
+	}
 
 	public static class Inventory {
 
 		public static final ItemStack GUI_PANE = itemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName(" ").build();
 		public static final ItemStack NEXT_ARROW = itemBuilder(Material.ARROW).setName(ChatColor.GREEN + "Next").build();
 		public static final ItemStack BACK_ARROW = itemBuilder(Material.ARROW).setName(ChatColor.RED + "Back").build();
+	
+		public static final ItemStack BACK_HEAD = itemBuilder(getHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ=="))
+				.setName(ChatColor.RED + "Back").build();
+		
+		public static final ItemStack FORWARD_HEAD = itemBuilder(getHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19"))
+				.setName(ChatColor.GREEN + "Forward").build();
 	}
 	
 	public static final ItemStack[] NON_COLLECTIBLES = {
