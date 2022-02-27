@@ -1,6 +1,7 @@
 package us.teaminceptus.noobysmp.entities.bosses.attacks;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -49,11 +50,32 @@ public interface Attacks {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.CONSTRUCTOR)
+    @Repeatable(MinionSpawns.class)
     public static @interface MinionSpawn {
 
         int chance();
 
         EntityType type();
+
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.CONSTRUCTOR)
+    public static @interface MinionSpawns {
+
+        MinionSpawn[] value();
+
+    }
+    
+    /**
+     * Put over contructor to have a chance of blocking the attack.
+     *
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.CONSTRUCTOR)
+    public static @interface CancelChance {
+
+        int value();
 
     }
 
