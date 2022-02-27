@@ -5,18 +5,24 @@ import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.collect.ImmutableMap;
 
+import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.SMPMaterial.CleanOutput.MaterialOutput;
 import us.teaminceptus.noobysmp.util.Items;
 import us.teaminceptus.noobysmp.util.SMPColor;
@@ -83,7 +89,6 @@ public enum SMPMaterial {
 	RAW_ENCHANT(1, Material.LIGHT_GRAY_DYE, "Raw Enchant", glint()),
 	// Level 2 - 4
 	ENCHANTED_GOLD(2, Material.GOLD_INGOT, "Enchanted Gold", glint()),
-	ENCHANTED_GOLD_NUGGET(2, Material.GOLD_NUGGET, "Enchanted Gold Nugget", glint()),
 	ENCHANTED_GOLD_BLOCK(2, Material.GOLD_BLOCK, "Enchanted Gold Block", glint()),
 	GOLDEN_ENCHANT(2, Material.YELLOW_DYE, "Golden Enchant", glint()),
 	
@@ -117,6 +122,7 @@ public enum SMPMaterial {
 	
 	EMERALD_INGOT(8, Material.EMERALD, "Emerald Ingot", glint()),
 	EMERALD_NUGGET(8, Material.GOLD_NUGGET, "Emerald Nugget", glint()),
+	COMPRESSED_EMERALD_BLOCK(8, Material.EMERALD_BLOCK, "Compressed Emerald Block", glint()),
 	
 	EMERALD_HELMET(9, Material.LEATHER_HELMET, "Emerald Helmet", genArmor(20, 5, 4), genTool(10, 0), Color.LIME),
 	EMERALD_CHESTPLATE(9, Material.LEATHER_CHESTPLATE, "Emerald Chestplate", genArmor(32, 5, 4), genTool(10, 0), Color.LIME),
@@ -281,7 +287,7 @@ public enum SMPMaterial {
 	
 	;
 	
-	private static final Map<SMPMaterial, SMPMaterial> ORE_DROPS = ImmutableMap.<SMPMaterial, SMPMaterial>builder()
+	public static final Map<SMPMaterial, SMPMaterial> ORE_DROPS = ImmutableMap.<SMPMaterial, SMPMaterial>builder()
 			.put(SMPMaterial.RUBY_ORE, SMPMaterial.RUBY)
 			.put(SMPMaterial.DEEPSLATE_RUBY_ORE, SMPMaterial.RUBY)
 			.build();
@@ -298,6 +304,26 @@ public enum SMPMaterial {
 		if (!(ORE_DROPS.containsKey(this))) throw new IllegalArgumentException(this.name() + " is not included in ORE_DROPS");
 		
 		return ORE_DROPS.get(this);
+	}
+	
+	public void setBlock(Block b) {
+		setBlock(b.getLocation());
+	}
+	
+	/**
+	 * This will silently fail if the material is not a block.
+	 * @param loc Location to use
+	 */
+	public void setBlock(Location loc) {
+		if (!(this.item.getType().isBlock())) return;
+		
+		Block b = loc.getWorld().getBlockAt(loc);
+		b.setType(this.item.getType());
+		b.setMetadata("type", new FixedMetadataValue(JavaPlugin.getPlugin(SMP.class), this.localization));
+	}
+	
+	public void setBlock(World w, int x, int y, int z) {
+		setBlock(new Location(w, x, y, z));
 	}
 	
 	private static final HashMap<Attribute, AttributeModifier> genAttack(double attack, double knockback, double speed) {
