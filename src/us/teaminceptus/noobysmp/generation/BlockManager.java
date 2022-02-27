@@ -3,21 +3,18 @@ package us.teaminceptus.noobysmp.generation;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.SMP;
-import us.teaminceptus.noobysmp.generation.biomes.TitanBiome;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
 public class BlockManager implements Listener {
