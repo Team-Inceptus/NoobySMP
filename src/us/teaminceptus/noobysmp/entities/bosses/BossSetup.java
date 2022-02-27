@@ -48,6 +48,14 @@ public interface BossSetup {
         String[] value();
 
     }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    public static @interface HP {
+
+        double value();
+
+    }
 
     /**
      * SpawnCost of the entity. <br></br>Separate with ID from count.<br></br> 
@@ -73,4 +81,14 @@ public interface BossSetup {
         Material value() default Material.DIAMOND_SWORD;
 
     }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.CONSTRUCTOR)
+    public static @interface Experience {
+
+        int value() default 5;
+
+    }
+    
+    
 }

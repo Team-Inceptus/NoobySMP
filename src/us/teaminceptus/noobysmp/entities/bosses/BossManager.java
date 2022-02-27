@@ -3,13 +3,13 @@ package us.teaminceptus.noobysmp.entities.bosses;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import com.google.common.collect.ImmutableList;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
@@ -24,6 +24,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -35,13 +36,18 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.common.collect.ImmutableList;
+
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.NotGeneratabele;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.SpawnCost;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Tier;
+import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.CancelChance;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Defensive;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.MinionSpawn;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Offensive;
@@ -51,6 +57,7 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 import us.teaminceptus.noobysmp.util.Generator;
 import us.teaminceptus.noobysmp.util.Items;
 import us.teaminceptus.noobysmp.util.PlayerConfig;
+import us.teaminceptus.noobysmp.util.inventoryholder.CancelHolder;
 
 public class BossManager implements Listener {
     
@@ -66,7 +73,7 @@ public class BossManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    private static class BossHolder implements InventoryHolder {
+    private static class BossHolder extends CancelHolder implements InventoryHolder {
 
         private BossHolder() {
         }
@@ -78,7 +85,7 @@ public class BossManager implements Listener {
         
     }
 
-    private static class BossMenuHolder implements InventoryHolder {
+    private static class BossMenuHolder extends CancelHolder implements InventoryHolder {
 
         private BossMenuHolder() {
         }
@@ -93,17 +100,19 @@ public class BossManager implements Listener {
 
     public static Inventory getBossMenu(Player p) {
         Inventory inv = Generator.genGUI(27, "SMP Bosses", new BossMenuHolder());
-
+        
+        
+        
         inv.setItem(10, Items.Inventory.GUI_PANE);
         inv.setItem(16, Items.Inventory.GUI_PANE);
 
         PlayerConfig config = new PlayerConfig(p);
         
-        ItemStack t1 = Items.itemBuilder(Material.WOODEN_SWORD).addGlint().setName(ChatColor.AQUA + "Tier 1").build();
-        ItemStack t2 = Items.itemBuilder(Material.STONE_SWORD).addGlint().setName(ChatColor.AQUA + "Tier 2").build();
-        ItemStack t3 = Items.itemBuilder(Material.IRON_SWORD).addGlint().setName(ChatColor.AQUA + "Tier 3").build();
-        ItemStack t4 = Items.itemBuilder(Material.DIAMOND_SWORD).addGlint().setName(ChatColor.AQUA + "Tier 4").build();
-        ItemStack t5 = Items.itemBuilder(Material.NETHERITE_SWORD).addGlint().setName(ChatColor.AQUA + "Tier 5").build();
+        ItemStack t1 = Items.itemBuilder(Material.WOODEN_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 1").build();
+        ItemStack t2 = Items.itemBuilder(Material.STONE_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 2").build();
+        ItemStack t3 = Items.itemBuilder(Material.IRON_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 3").build();
+        ItemStack t4 = Items.itemBuilder(Material.DIAMOND_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 4").build();
+        ItemStack t5 = Items.itemBuilder(Material.NETHERITE_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 5").build();
         
         ItemStack locked = Items.LOCKED_ITEM;
 
@@ -160,11 +169,19 @@ public class BossManager implements Listener {
                     spawnCostList.add((item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : ChatColor.WHITE + WordUtils.capitalize(item.getType().name().toLowerCase().replace('_', ' ')))
                     + ChatColor.GRAY + " x" + Integer.toString(entry.getValue()));
                 }
-
+                
+                HP healthA = bossClass.getAnnotation(HP.class);
+                double health = healthA.value();
+                
+                DecimalFormat df = new DecimalFormat("#.00");
+                df.setGroupingUsed(true);
+                df.setGroupingSize(3);
+                
                 ItemStack item = new ItemStack(icon);
                 ItemMeta meta = item.getItemMeta();
                 meta.setDisplayName(ChatColor.DARK_GRAY + "Tier " + Integer.toString(tier) + " Boss - " + displayName);
                 meta.setLore(ImmutableList.<String>builder()
+                .add(ChatColor.RED + df.format(health) + " HP")
                 .add(" ")
                 .addAll(description)
                 .add(" ")
@@ -175,6 +192,8 @@ public class BossManager implements Listener {
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DYE, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_ATTRIBUTES);
                 meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
                 item.setItemMeta(meta);
+                
+                inv.addItem(item);
             } catch (Exception e) {
                 JavaPlugin.getPlugin(SMP.class).getLogger().info("Error constructing entity " + bossClass.getName());
                 e.printStackTrace();
@@ -236,12 +255,37 @@ public class BossManager implements Listener {
                 bossClass.getConstructor(Location.class).newInstance(p.getLocation());
                 p.playSound(p, Sound.ENTITY_WITHER_SPAWN, 3F, 1F);
                 p.closeInventory();
+                
+                for (ItemStack item : itemRequirements.keySet()) {
+                	item.setAmount(itemRequirements.get(item));
+                	p.getInventory().removeItem(item);
+                }
+                
+                for (Material m : matRequirements.keySet()) {
+                	ItemStack stack = new ItemStack(m);
+                	stack.setAmount(matRequirements.get(m));
+                	p.getInventory().removeItem(stack);
+                }
             } catch (Exception err) {
                 plugin.getLogger().info("Error spawning entity " + bossClass.getName());
                 err.printStackTrace();
             }
+        } else if (inv.getHolder() instanceof BossMenuHolder) {
+        	if (!(Arrays.asList(BOSSES_SWORDS).contains(clickedItem.getType()))) return;
+        	
+        	int tier = Integer.parseInt(ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()).split(" ")[1]);
+        	
+        	p.openInventory(getBosses(p, tier));
         }
     }
+    
+    private static final Material[] BOSSES_SWORDS = {
+    	Material.DIAMOND_SWORD,
+    	Material.WOODEN_SWORD,
+    	Material.IRON_SWORD,
+    	Material.STONE_SWORD,
+    	Material.NETHERITE_SWORD
+    };
 
     @EventHandler
     public void onSpawn(EntitySpawnEvent e) {
@@ -301,11 +345,20 @@ public class BossManager implements Listener {
 
            for (Annotation ann : constructor.getAnnotations()) {
                if (ann.annotationType().equals(MinionSpawn.class)) {
-                   MinionSpawn spawn = constructor.getAnnotation(MinionSpawn.class);
-
-                   if (r.nextInt(100) < spawn.chance()) {
-                       m.getWorld().spawnEntity(m.getLocation(), spawn.type());
+                   MinionSpawn[] spawns = constructor.getAnnotationsByType(MinionSpawn.class);
+                   
+                   for (MinionSpawn spawn : spawns) {
+	                   if (r.nextInt(100) < spawn.chance()) {
+	                       m.getWorld().spawnEntity(m.getLocation(), spawn.type());   
+	                   }
                    }
+               } else if (ann.annotationType().equals(CancelChance.class)) {
+            	   CancelChance cancel = constructor.getAnnotation(CancelChance.class);
+            	   
+            	   if (r.nextInt(100) < cancel.value()) {
+            		   e.setCancelled(true);
+            		   p.sendMessage(m.getCustomName() + ChatColor.DARK_RED + " has blocked your attack!");
+            	   }
                }
            }
         } catch (Exception err) {
@@ -342,6 +395,28 @@ public class BossManager implements Listener {
                 }
             }
         }
+    }
+    
+    @EventHandler
+    public void onDeath(EntityDeathEvent e) {
+    	if (!(e.getEntity() instanceof Mob m)) return;
+    	
+    	SMPBoss<? extends Mob> boss = SMPBoss.getByUUID(m.getUniqueId());
+    	if (boss == null) return;
+    	
+    	try {
+    		Constructor<?> constr = boss.getClass().getConstructor(Location.class);
+    		
+    		Experience exp = constr.getAnnotation(Experience.class);
+    		
+    		e.setDroppedExp(exp.value());
+    		for (ItemStack drop : boss.getBossDrops().keySet()) {
+    			if (r.nextInt(100) < boss.getBossDrops().get(drop)) m.getWorld().dropItemNaturally(m.getLocation(), drop);
+    		}
+    	} catch (Exception err) {
+    		plugin.getLogger().info("Error dropping drops for entity " + boss.getClass().getName());
+    		err.printStackTrace();
+    	}
     }
 
 }
