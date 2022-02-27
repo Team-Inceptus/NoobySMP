@@ -55,6 +55,7 @@ public class Ranks implements TabExecutor, Listener {
 	.put("mod", MOD)
 	.put("jrmod", JRMOD)
 	.put("trialmod", TRIALMOD)
+	.put("member", RankData.member())
 	.build();
 
 	public static class RankData {
@@ -64,6 +65,14 @@ public class Ranks implements TabExecutor, Listener {
 		public RankData(String tab, String chat) {
 			this.tab = tab;
 			this.chat = chat;
+		}
+		
+		public static RankData member() {
+			return new RankData("MEMBER", "MEMBER");
+		}
+		
+		public boolean isMember() {
+			return this.chat.equals("MEMBER") && this.tab.equals("MEMBER");
 		}
 
 		public String getTab() {
@@ -133,11 +142,17 @@ public class Ranks implements TabExecutor, Listener {
 		}
 
 		RankData data = RANK_MAP.get(rank);
+		PlayerConfig config = new PlayerConfig(p);
+		if (!(data.isMember())) {
+			p.setPlayerListName(data.getTab() + p.getName());
+			p.setDisplayName(data.getChat() + p.getName());
+			config.setRank(rank);
+		} else {
+			config.setRank("member");
+			config.updateRank();
+		}
 
-		p.setPlayerListName(data.getTab() + p.getName());
-		p.setDisplayName(data.getChat() + p.getName());
 
-		new PlayerConfig(p).setRank(rank);
 		
 		return true;
 	}
