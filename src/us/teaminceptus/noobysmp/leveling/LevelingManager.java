@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -19,10 +16,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.type.Fire;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Ageable;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -38,11 +35,13 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -51,6 +50,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
@@ -58,7 +60,7 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 import us.teaminceptus.noobysmp.util.Generator;
 import us.teaminceptus.noobysmp.util.Items;
 import us.teaminceptus.noobysmp.util.PlayerConfig;
-import us.teaminceptus.noobysmp.util.SMPColor;
+import us.teaminceptus.noobysmp.util.SMPUtil;
 import us.teaminceptus.noobysmp.util.inventoryholder.CancelHolder;
 
 public class LevelingManager implements Listener {
@@ -72,23 +74,34 @@ public class LevelingManager implements Listener {
 
     public static enum LevelingType {
 
-        LEVEL(0),
-        FARMING(1),
-        FLETCHING(2)
+        LEVEL(0, Material.DIAMOND_SWORD),
+        FARMING(1, Material.IRON_HOE),
+        FLETCHING(2, Material.ARROW)
         ;
 
         private final int id;
+        private final Material m;
 
-        private LevelingType(int id) {
+        private LevelingType(int id, Material m) {
             this.id = id;
+            this.m = m;
         }
 
         public int getId() {
             return this.id;
         }
+        
+        public Material getIcon() {
+        	return this.m;
+        }
 
         public static LevelingType getById(int id) {
             for (LevelingType type : values()) if (type.id == id) return type;
+            return null;
+        }
+        
+        public static LevelingType getByIcon(Material id) {
+            for (LevelingType type : values()) if (type.m == id) return type;
             return null;
         }
     }
@@ -96,7 +109,8 @@ public class LevelingManager implements Listener {
     public static ItemStack getLevelInfo(int level, OfflinePlayer p, LevelingType type) {
         PlayerConfig config = new PlayerConfig(p);
         if (level < 0) return Items.Inventory.GUI_PANE;
-
+        if (level == 0) return new ItemStack(type.getIcon());
+        
         switch (type) {
             case FARMING: {
                 ItemStack farming = Items.itemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setName(ChatColor.YELLOW + "Farming Level " + Integer.toString(level)).build();
@@ -108,7 +122,7 @@ public class LevelingManager implements Listener {
                     lore.add(ChatColor.DARK_PURPLE + "+1 Farming Drops");
                 }
 
-                if (level % 15 == 0) {
+                if (level % 15 == 0 && level <= 90) {
                     lore.add(ChatColor.AQUA + "+10 Farming Find");
                 }
 
@@ -130,25 +144,24 @@ public class LevelingManager implements Listener {
                 ItemMeta meta = fletching.getItemMeta();
 
                 List<String> lore = new ArrayList<>();
-                lore.add(PlayerConfig.toMinExperience(level) < config.getExperience() ? ChatColor.YELLOW + Double.toString(Math.floor(config.getExperience() * 100) / 100) + " / " + Double.toString(PlayerConfig.toMinExperience(level)) : ChatColor.GREEN + Double.toString(PlayerConfig.toMinExperience(level)));
 
-                if (level % 5 == 0) {
+                if (level % 5 == 0 && level <= 100) {
                     lore.add(ChatColor.DARK_PURPLE + "+10% Projectile Velocity");
                 }
 
-                if (level % 25 == 0) {
+                if (level % 25 == 0 && level <= 100) {
                     lore.add(ChatColor.GREEN + "+1 Projectile Shot");
                 }
 
-                if (level % 20 == 0) {
+                if (level % 20 == 0 && level <= 100) {
                     lore.add(ChatColor.DARK_GREEN + "+20% Chance of Projectile Bounce");
                 }
 
-                if (level % 15 == 0) {
+                if (level % 15 == 0 && level < 100) {
                     lore.add(ChatColor.DARK_AQUA + "+10% Projectile Deflect");
                 }
 
-                if (level % 8 == 0) {
+                if (level % 8 == 0 && level <= 8 * 20) {
                     lore.add(ChatColor.RED + "+5% Projectile Chain");
                 }
 
@@ -166,12 +179,12 @@ public class LevelingManager implements Listener {
                 ItemMeta meta = levelI.getItemMeta();
 
                 List<String> lore = new ArrayList<>();
-                
+                lore.add(config.getLevel() > level ? ChatColor.GREEN + SMPUtil.withSuffix(PlayerConfig.toMinExperience(level)) : ChatColor.GOLD + SMPUtil.withSuffix(config.getExperience()) + " / " + SMPUtil.withSuffix(PlayerConfig.toMinExperience(level)));
 
                 List<String> perks = new ArrayList<>();
-                for (SMPMaterial m : SMPMaterial.values()) if (m.getLevelUnlocked() == level) perks.add(m.getName() + " Recipe");
-                for (AbilityItem m : AbilityItem.values()) if (m.getLevelUnlocked() == level) perks.add(m.getName() + " Recipe");
-                for (SMPCosmetic c : SMPCosmetic.values()) if (c.getLevelUnlocked() == level) perks.add(c.getName() + " Cosmetic");
+                for (SMPMaterial m : SMPMaterial.values()) if (m.getLevelUnlocked() == level) perks.add(m.getDisplayName() + " Recipe");
+                for (AbilityItem m : AbilityItem.values()) if (m.getLevelUnlocked() == level) perks.add(m.getDisplayName() + " Recipe");
+                for (SMPCosmetic c : SMPCosmetic.values()) if (c.getLevelUnlocked() == level) perks.add(ChatColor.AQUA + c.getName() + " Cosmetic");
 
                 if (perks.size() > 6) {
                     lore.add(perks.get(0));
@@ -195,13 +208,12 @@ public class LevelingManager implements Listener {
             
         }
     }
-
-
+    
+    
+    public static class LevelHolder extends CancelHolder {};
 
     public static Inventory getLevelingMenu(Player p, LevelingType type) {
-        Inventory inv = Generator.genGUI(45, p.getDisplayName() + ChatColor.RESET + " - Leveling", new CancelHolder());
-        PlayerConfig config = new PlayerConfig(p);
-
+    	PlayerConfig config = new PlayerConfig(p);
         final int level;
 
         switch (type) {
@@ -217,8 +229,14 @@ public class LevelingManager implements Listener {
             default:
                 level = config.getLevel();
                 break;
-            
         }
+        
+        return getLevelingMenu(p, type, level);
+    }
+    
+    public static Inventory getLevelingMenu(Player p, LevelingType type, int level) {
+        Inventory inv = Generator.genGUI(45, p.getDisplayName() + ChatColor.RESET + " - Leveling", new LevelHolder());
+        PlayerConfig config = new PlayerConfig(p);
 
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) head.getItemMeta();
@@ -227,47 +245,148 @@ public class LevelingManager implements Listener {
         meta.setLore(ImmutableList.<String>builder()
         .add(ChatColor.AQUA + "Level " + Integer.toString(config.getLevel()))
         .add(" ")
-        .add(ChatColor.GOLD + "Farming " + Integer.toString(config.getFarmingLevel()))
-        .add(ChatColor.YELLOW + "Fletching " + Integer.toString(config.getFletchingLevel()))
+        .add(ChatColor.GOLD + "Farming Level " + Integer.toString(config.getFarmingLevel()))
+        .add(ChatColor.YELLOW + "Fletching Level " + Integer.toString(config.getFletchingLevel()))
         .build());
 
         head.setItemMeta(meta);
-        inv.setItem(3, head);
+        inv.setItem(4, head);
+        
+        inv.setItem(18, (level <= 5 ? Items.Inventory.GUI_PANE : Items.Inventory.BACK_HEAD));
+        inv.setItem(26, Items.Inventory.FORWARD_HEAD);
 
         inv.setItem(9, getLevelInfo(level - 4, p, type));
         inv.setItem(10, getLevelInfo(level - 3, p,  type));
         inv.setItem(11, getLevelInfo(level - 2, p, type));
         inv.setItem(12, getLevelInfo(level - 1, p, type));
-
-        ItemStack currentLevel = getLevelInfo(level, p,  type);
-        ItemMeta cmeta = currentLevel.getItemMeta();
-        cmeta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
-        cmeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        currentLevel.setItemMeta(cmeta);
-        inv.setItem(13, currentLevel);
+        
+        inv.setItem(13, level == 0 ? new ItemStack(type.getIcon()) : getLevelInfo(level, p, type));
 
         inv.setItem(14, getLevelInfo(level + 1, p, type));
         inv.setItem(15, getLevelInfo(level + 2, p, type));
         inv.setItem(16, getLevelInfo(level + 3, p, type));
         inv.setItem(17, getLevelInfo(level + 4, p, type));
-
-        // Switch Type
-
-        ItemStack levelI = Items.itemBuilder(Material.DIAMOND_SWORD).setName(ChatColor.AQUA + "Player Level").build();
-        ItemStack farmingI = Items.itemBuilder(Material.IRON_HOE).setName(ChatColor.YELLOW + "Farming Level").build();
-        ItemStack fletchingI = Items.itemBuilder(Material.ARROW).setName(SMPColor.chatHex("#F5F5DC", "Fletching Level")).build();
-
-        inv.setItem(20, farmingI);
-        inv.setItem(21, levelI);
-        inv.setItem(22, fletchingI);
-
-        // Statistics
-
-
-
+        
+        int splitPositon = type == LevelingType.LEVEL ? 1 : 2;
+        
+        // Highlight Current Level
+        for (int i = 9; i < 18; i++) {
+        	if (inv.getItem(i) == null) continue;
+        	try {
+	        	int currentLevel = Integer.parseInt(ChatColor.stripColor(inv.getItem(i).getItemMeta().getDisplayName()).split(" ")[splitPositon]);
+	        	
+	        	if (currentLevel == config.getLevel()) {
+	        		ItemStack clone = inv.getItem(i);
+	        		ItemMeta cmeta = clone.getItemMeta();
+	        		cmeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+	        		cmeta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+	        		clone.setItemMeta(cmeta);
+	        		
+	        		inv.setItem(i, clone);
+	        		break;
+	        	}
+        	} catch (IllegalArgumentException | IndexOutOfBoundsException err) {
+        		continue;
+        	}
+        }
+        
+        // Level-Specific Perks
+        
+        switch (type) {
+			case FARMING: {
+				
+				break;
+			}
+			case FLETCHING: {
+				int velocity = (int) Math.floor(config.getFletchingLevel() / 5) * 10;
+				ItemStack velocityI = Items.itemBuilder(Material.SPECTRAL_ARROW).setName(ChatColor.GREEN + "+" + velocity + "% Arrow Velocity").build();
+				inv.setItem(20, velocityI);
+				
+				int shots = (int) Math.floor(config.getFletchingLevel() / 25);
+				ItemStack shotsI = Items.itemBuilder(Material.BOW).setName(ChatColor.GOLD + "+" + shots + " Projectile Shots").build();
+				inv.setItem(21, shotsI);
+				
+				int bounceChance = (int) Math.min(Math.floor(config.getFletchingLevel() / 20) * 20, 100);
+				ItemStack bounceI = Items.itemBuilder(Material.SLIME_BALL).setName(ChatColor.DARK_GREEN + "+" + bounceChance + "% Bounce Chance").build();
+				inv.setItem(22, bounceI);
+				
+				int deflect = (int) Math.min(Math.floor(config.getFletchingLevel() / 15) * 10, 60);
+				ItemStack deflectI = Items.itemBuilder(Material.DIAMOND_CHESTPLATE).setName(ChatColor.RED + "+" + deflect + "% Deflect Chance").build();
+				inv.setItem(23, deflectI);
+				
+				int chainChance = (int) Math.min(Math.floor(config.getFletchingLevel() / 8) * 5, 100);
+				ItemStack chainI = Items.itemBuilder(Material.CHAIN).setName(ChatColor.DARK_AQUA + "+" + chainChance + "% Chain Arrow Chance").build();
+				inv.setItem(24, chainI);
+				
+				if (config.getFletchingLevel() >= 80) {
+					inv.setItem(31, Items.itemBuilder(Material.WITHER_SKELETON_SKULL).setName(ChatColor.GOLD + "Homing Arrows").build());
+				} else inv.setItem(31, Items.LOCKED_ITEM);
+				
+				break;
+			}
+			case LEVEL: {
+				break;
+			}
+			default:
+				break;
+	        	
+        }
+        
         return inv;
     }
-
+    
+    // Inventory Management
+    
+    @EventHandler
+    public void onClick(InventoryClickEvent e) {
+    	if (!(e.getWhoClicked() instanceof Player p)) return;
+    	InventoryView view = e.getView();
+    	ItemStack clickedItem = e.getCurrentItem();
+    	
+    	Inventory inv = view.getTopInventory();
+    	
+    	if (!(inv.getHolder() instanceof LevelHolder)) return;
+    	if (clickedItem == null) return;
+    	
+    	if (clickedItem.getType() == Material.PLAYER_HEAD) {
+    		LevelingType type;
+    		
+    		switch (inv.getItem(17).getType()) {
+    			case YELLOW_STAINED_GLASS_PANE:
+    				type = LevelingType.FARMING;
+    				break;
+    			case WHITE_STAINED_GLASS_PANE: 
+    				type = LevelingType.FLETCHING;
+    				break;
+    			default:
+    				type = LevelingType.LEVEL;
+    				break;
+    		}
+    		
+    		int splitPosition = type == LevelingType.LEVEL ? 1 : 2;
+    		
+    		if (clickedItem.getItemMeta().getLocalizedName().equalsIgnoreCase("back")) {
+    			int lastLevel = Integer.parseInt(ChatColor.stripColor(inv.getItem(13).getItemMeta().getDisplayName()).split(" ")[splitPosition]);
+    			
+    			p.openInventory(getLevelingMenu(p, type, lastLevel - 1));
+    			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 3F, 0.5F);
+    		} else if (clickedItem.getItemMeta().getLocalizedName().equalsIgnoreCase("forward")) {
+    			String[] display = ChatColor.stripColor(inv.getItem(13).getItemMeta().getDisplayName()).split(" ");
+    			
+    			final int nextLevel;
+    			
+    			if (display.length == 1) nextLevel = 1;
+    			else nextLevel = Integer.parseInt(display[splitPosition]);
+    			
+    			p.openInventory(getLevelingMenu(p, type, nextLevel + 1));
+    			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 3F, 2F);
+    		}
+    		
+    		
+    	}
+    	
+    }
+    
     // Leveling a Player
 
     private static Random r = new Random();
@@ -327,9 +446,7 @@ public class LevelingManager implements Listener {
     }
 
     // Abilities Because of Level
-
-    // Normal
-
+    
     // Farming
 
     private static final Map<Material, Integer> FINDABLES = ImmutableMap.<Material, Integer>builder()
@@ -358,10 +475,6 @@ public class LevelingManager implements Listener {
     .put(Material.GRAVEL, 80)
     .put(Material.HONEYCOMB, 50)
     .put(Material.GLASS_BOTTLE, 60)
-    .put(Material.IRON_HOE, 20)
-    .put(Material.DIAMOND_HOE, 3)
-    .put(Material.NETHERITE_HOE, 1)
-    .put(Material.DIAMOND_HOE, 3)
     .put(Material.COMPASS, 10)
     .build();
 
@@ -398,7 +511,8 @@ public class LevelingManager implements Listener {
                 Block relative = b.getWorld().getBlockAt(x, y, z);
 
                 if (relative.getBlockData() instanceof Ageable && !(relative.getBlockData() instanceof Fire)) {
-                    if (relative.breakNaturally(tool)) drops.addAll(calculateFarmingDrops(p, relative));
+                	relative.breakNaturally();
+                	drops.addAll(calculateFarmingDrops(p, relative));
                 }
             }
         }
@@ -407,12 +521,11 @@ public class LevelingManager implements Listener {
             Material chosen = FINDABLES.keySet().stream().toList().get( r.nextInt(FINDABLES.size() ) );
             
             if (r.nextInt(100) < FINDABLES.get(chosen)) {
-                drops.add(new ItemStack(chosen, r.nextInt(3) + 1));
+                drops.add(new ItemStack(chosen, r.nextInt(2) + 1));
             }
         }
 
         // Farming Count
-
         for (int i = 0; i < Math.min(Math.floor(config.getFarmingLevel() / 10), 4); i++) {
             List<ItemStack> clone = new ArrayList<>(drops);
             drops.addAll(clone);
@@ -439,21 +552,34 @@ public class LevelingManager implements Listener {
         PlayerConfig config = new PlayerConfig(p);
 
         List<Projectile> targets = new ArrayList<>();
-
+        targets.add(proj);
+        
         // Projectile Shots
         for (int i = 0; i < (int) Math.floor(config.getFletchingLevel() / 25); i++) {
-            Projectile clone = proj.getWorld().spawn(proj.getLocation(), proj.getClass());
+        	Location cloneL = proj.getLocation();
+        	cloneL.setDirection(p.getLocation().getDirection());
+            Projectile clone = proj.getWorld().spawn(cloneL, proj.getClass());
             targets.add(clone);
         }
-
+        
+        // Velocity
+        double velocityBuff = Math.floor(config.getFletchingLevel() / 8) * 0.1;
+        if (velocityBuff > 0) {
+        	for (Projectile project : targets) {
+        		project.setVelocity(proj.getVelocity().multiply(1 + velocityBuff));
+        	}
+        }
+        
         // Homing
         if (config.getLevel() >= 80) {
             for (Projectile projectile : targets) {
                 List<Entity> nearbyEntities = projectile.getNearbyEntities(30, 15, 30).stream().filter(en -> en instanceof LivingEntity target && !(en instanceof ArmorStand) && !(target.getUniqueId().equals(p.getUniqueId()))).toList();
-                if (nearbyEntities.size() < 1) return;
+                if (nearbyEntities.size() < 1) continue;;
                 Map<Double, Entity> nearestEntities = new HashMap<>();
                 for (Entity en : nearbyEntities) nearestEntities.put(en.getLocation().distanceSquared(projectile.getLocation()), en);
                 Entity target = (nearestEntities.keySet().size() < 1 || Collections.min(nearestEntities.keySet()) == null ? nearbyEntities.get(0) : nearestEntities.get(Collections.min(nearestEntities.keySet())));
+                if (target.getLocation().distanceSquared(p.getLocation()) >= 100) continue;
+                if (target.getWorld().rayTraceEntities(p.getLocation(), p.getLocation().getDirection(), 10, en -> en instanceof LivingEntity ltarget && !(en instanceof ArmorStand) && !(ltarget.getUniqueId().equals(p.getUniqueId()))) == null) continue;
                 new BukkitRunnable() {
                     public void run() {
                         if (target.isDead()) cancel();
