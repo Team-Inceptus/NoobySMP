@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -22,7 +23,6 @@ import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.util.Generator;
 import us.teaminceptus.noobysmp.util.Messages;
 import us.teaminceptus.noobysmp.util.PlayerConfig;
-import us.teaminceptus.noobysmp.util.inventoryholder.PlayerHolder;
 
 public class Settings implements Listener, CommandExecutor {
 
@@ -40,8 +40,17 @@ public class Settings implements Listener, CommandExecutor {
 		NOTIFICATIONS,
 	};
 	
+	public static class SettingsHolder implements InventoryHolder {
+
+		@Override
+		public Inventory getInventory() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
+	
 	public static Inventory getSettings(Player p) {
-		Inventory settings = Generator.genGUI(36, p.getDisplayName() + ChatColor.DARK_GRAY + "'s Settings", new PlayerHolder(p));
+		Inventory settings = Generator.genGUI(36, p.getDisplayName() + ChatColor.DARK_GRAY + "'s Settings", new SettingsHolder());
 		PlayerConfig config = new PlayerConfig(p);
 
 		for (String s : SETTINGS) {
@@ -65,7 +74,7 @@ public class Settings implements Listener, CommandExecutor {
 	public void onClick(InventoryClickEvent e) {
 		if (!(e.getWhoClicked() instanceof Player p)) return;
 		InventoryView view = e.getView();
-		if (!(view.getTitle().contains(p.getDisplayName())) && !(view.getTitle().contains("Settings"))) return;
+		if (!(view.getTopInventory().getHolder() instanceof SettingsHolder)) return;
 		e.setCancelled(true);
 		
 		if (e.getCurrentItem() == null) return;
@@ -76,8 +85,10 @@ public class Settings implements Listener, CommandExecutor {
 		PlayerConfig config = new PlayerConfig(p);
 
 		String settingName = ChatColor.stripColor(i.getItemMeta().getDisplayName()).split(" ")[0].replace(":", "");
+		config.setSetting(settingName, !config.getSetting(settingName));
+		
 		boolean setting = config.getSetting(settingName);
-
+		
 		ItemStack settingItem = new ItemStack(setting ? Material.GREEN_CONCRETE : Material.RED_CONCRETE);
 		ItemMeta meta = settingItem.getItemMeta();
 		meta.setDisplayName(ChatColor.YELLOW + settingName + ": " + (setting ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
@@ -87,7 +98,6 @@ public class Settings implements Listener, CommandExecutor {
 		}
 		settingItem.setItemMeta(meta);
 		
-		config.setSetting(settingName, !setting);
 		view.setItem(e.getRawSlot(), settingItem);
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 3F, 0F);
 	}
