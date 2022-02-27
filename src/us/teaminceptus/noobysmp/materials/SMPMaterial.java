@@ -281,6 +281,11 @@ public enum SMPMaterial {
 	
 	;
 	
+	private static final Map<SMPMaterial, SMPMaterial> ORE_DROPS = ImmutableMap.<SMPMaterial, SMPMaterial>builder()
+			.put(SMPMaterial.RUBY_ORE, SMPMaterial.RUBY)
+			.put(SMPMaterial.DEEPSLATE_RUBY_ORE, SMPMaterial.RUBY)
+			.build();
+	
 	private final String localization;
 	
 	private final String name;
@@ -288,6 +293,12 @@ public enum SMPMaterial {
 	private final int levelUnlocked;
 	
 	private final ChatColor cc;
+	
+	public final SMPMaterial getOreDrops() throws IllegalArgumentException {
+		if (!(ORE_DROPS.containsKey(this))) throw new IllegalArgumentException(this.name() + " is not included in ORE_DROPS");
+		
+		return ORE_DROPS.get(this);
+	}
 	
 	private static final HashMap<Attribute, AttributeModifier> genAttack(double attack, double knockback, double speed) {
 		HashMap<Attribute, AttributeModifier> map = new HashMap<>();
@@ -417,12 +428,12 @@ public enum SMPMaterial {
 		this.item.setItemMeta(meta);
 	}
 
-	private SMPMaterial(int level, Material original, String name, Map<Attribute, AttributeModifier> modifiers, Color clr) {
-		this(level, original, name, modifiers, null, clr);
-	}
-
 	private SMPMaterial(int level, Material original, String name, HashMap<Enchantment, Integer> enchants, Color clr) {
 		this(level, original, name, null, enchants, clr);
+	}
+
+	private SMPMaterial(int level, Material original, String name, Map<Attribute, AttributeModifier> modifiers, Color clr) {
+		this(level, original, name, modifiers, null, clr);
 	}
 
 	private SMPMaterial(int level, Material original, String name, Map<Attribute, AttributeModifier> modifiers) {
@@ -522,6 +533,10 @@ public enum SMPMaterial {
 
 	public final String getName() {
 		return this.name;
+	}
+	
+	public final String getDisplayName() {
+		return this.cc + this.name;
 	}
 	
 	public final ItemStack getItem() {
