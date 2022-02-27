@@ -2,7 +2,6 @@ name: NoobySMP
 main: us.teaminceptus.noobysmp.SMP
 version: 1.0.0
 api-version: 1.18
-load: STARTUP
 commands:
   help:
     description: Open the help book.
@@ -10,7 +9,18 @@ commands:
   settings:
     description: Opens up the settings menu.
     aliases: [options, smpsettings, smpoptions]
-  
+  bosses:
+    description: Opens up a spawn boss menu.
+    aliases: [boss, bossmenu]
+  playerinfo:
+    description: Get Player Information.
+    aliases: [pinfo, playeri, pi]
+  progress:
+    description: Open GUI of current Player Progress.
+    aliases: [prgrs, prog]
+  cosmetics:
+    description: Manage your active cosmetics (based on current level)
+    aliases: [cosmetic, smpcosmetic, cosm, smpcosm]
   # Admin
   catalogue:
     description: Open up the SMP Catalogue for fetching stuff.
@@ -18,6 +28,9 @@ commands:
   setrank:
     description: Set another player's rank.
     alias: setr
+  experience:
+    description: Experience managing for Admins
+    alias: exp 
     
 permissions:
   smp.*:
@@ -42,6 +55,11 @@ permissions:
       smp.admin: true
   smp.admin.setrank:
     description: Access to /setrank
+    default: op
+    children:
+      smp.admin: true
+  smp.admin.experience:
+    description: Access to /experience
     default: op
     children:
       smp.admin: true
