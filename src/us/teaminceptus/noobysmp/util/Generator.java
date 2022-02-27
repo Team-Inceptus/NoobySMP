@@ -19,7 +19,7 @@ public class Generator {
 
 		ItemStack guiBG = Items.Inventory.GUI_PANE;
 		
-		if (size < 36) return inv;
+		if (size < 27) return inv;
 
 		for (int i = 0; i < 9; i++) {
 			inv.setItem(i, guiBG);
