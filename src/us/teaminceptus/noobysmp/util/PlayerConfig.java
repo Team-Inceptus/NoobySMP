@@ -3,24 +3,42 @@ package us.teaminceptus.noobysmp.util;
 import java.io.File;
 import java.util.Arrays;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import com.google.common.collect.ImmutableList;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
+import us.teaminceptus.noobysmp.commands.admin.Ranks;
+import us.teaminceptus.noobysmp.leveling.LevelingManager.LevelingType;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
+import us.teaminceptus.noobysmp.util.inventoryholder.CancelHolder;
 
+/**
+ * A Built-In wrapper for accessing Player Information via their Configuration File
+ * @author GamerCoder215
+ * @since 1.0.0
+ */
 public class PlayerConfig {
 
 	private final OfflinePlayer p;
 	private final FileConfiguration pConfig;
 	private final File pFile;
+	
+	private SMPCosmetic activeCosmetic;
 
 	private static final double EXP_POWER = 2.2D;
 	
@@ -77,31 +95,117 @@ public class PlayerConfig {
 	}
 
 	public void setLevel(int level) {
+		if (level == getLevel()) return;
+		
+		if (level == 0) {
+			pConfig.getConfigurationSection("statistics").set("level", 0);
+			pConfig.getConfigurationSection("statistics").set("experience", 0);
+			saveFile();
+			
+			if (p.isOnline()) {
+				Player op = p.getPlayer();
+				updateRank();
+				
+				if (getSetting("notifications")) {
+					op.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + "Reset Experience and Level"));
+				}
+			}
+			return;
+		}
+		
 		double xp = Math.floor(toMinExperience(level) * 100) / 100;
-
+		double add = xp - getExperience();
+		
 		pConfig.getConfigurationSection("statistics").set("level", level);
 		pConfig.getConfigurationSection("statistics").set("experience", xp);
 		saveFile();
-
-		if (getSetting("notifications") && p.isOnline()) {
+		
+		if (p.isOnline()) {
 			Player op = p.getPlayer();
-			op.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "+" + Double.toString(xp) + " Experience"));
+			updateRank();
+			
+			if (getSetting("notifications")) {
+				op.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((add < 0 ? ChatColor.RED + "" : ChatColor.GREEN + "+") + Double.toString(Math.floor(add * 100) / 100) + " Experience"));
+			}
 		}
 	}
 
+	/**
+	 * Will silently fail if player is offline or is not a member.
+	 */
+	public void updateRank() {
+		if (!(p.isOnline())) return;
+		if (!(isMember())) return;
+		Player op = p.getPlayer();
+		
+		ChatColor namePrefix = (getLevel() < 10 ? ChatColor.GRAY : ChatColor.WHITE);
+		ChatColor levelPrefix = (getLevel() > 200 ? ChatColor.GOLD : Ranks.LEVEL_COLOR.get(getLevel()));
+		op.setDisplayName(levelPrefix + (getLevel() > 100 ? ChatColor.BOLD + "" : "") + "[" + getLevel() + "] " + ChatColor.RESET + namePrefix + p.getName());
+		op.setPlayerListName(levelPrefix + p.getName());
+	}
+
 	public void setExperience(double exp) {
+		boolean changeRank = toLevel(exp) != getLevel();
+		
+		double add = exp - getExperience();
+		
 		pConfig.getConfigurationSection("statistics").set("experience", exp);
 		pConfig.getConfigurationSection("statistics").set("level", toLevel(exp));
 		saveFile();
-
-		if (getSetting("notifications") && p.isOnline()) {
+		
+		if (p.isOnline()) {
 			Player op = p.getPlayer();
-			op.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "+" + Double.toString(exp) + " Experience"));
+			
+			if (changeRank) updateRank();
+			
+			if (getSetting("notifications")) {
+				op.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((add < 0 ? ChatColor.RED + "" : ChatColor.GREEN + "+") + Double.toString(Math.floor(add * 100) / 100) + " Experience"));
+			}
 		}
 	}
 
 	public void addExperience(double exp) {
 		setExperience(getExperience() + exp);
+	}
+	
+	private PlayerConfig config = this;
+	
+	private BukkitRunnable cosmeticTask = new BukkitRunnable() {
+		public void run() {
+			try {
+				if (!(p.isOnline())) cancel();
+				Player op = p.getPlayer();
+				config.activeCosmetic.createEffect(op.getLocation().add(0, 0.5, 0));
+			} catch (NullPointerException e) {
+				cancel();
+			}
+		}
+	};
+	
+	public void updateCosmetic() {
+		try {
+			if (this.activeCosmetic == null) this.cosmeticTask.cancel();
+			if (!(this.cosmeticTask.isCancelled())) this.cosmeticTask.cancel();
+			else {
+				this.cosmeticTask.cancel();
+				this.cosmeticTask.runTaskTimer(JavaPlugin.getPlugin(SMP.class), 1, 1);
+			}
+		} catch (IllegalStateException e) {
+			this.cosmeticTask.runTaskTimer(JavaPlugin.getPlugin(SMP.class), 1, 1);
+		}
+	}
+	
+	public void cancelCosmetic() {
+		this.activeCosmetic = null;
+	}
+	
+	/**
+	 * This method does NOT do level checking. Please add that yourself.
+	 * @param c Cosmetc to use
+	 */
+	public void setActiveCosmetic(SMPCosmetic c) {
+		this.activeCosmetic = c;
+		updateCosmetic();
 	}
 
 	public void addLevel(int level) {
@@ -111,6 +215,86 @@ public class PlayerConfig {
 	public void setRank(String value) {
 		pConfig.set("rank", value);
 		saveFile();
+	}
+	
+	public static void updateAllItems() {
+		for (Player p : Bukkit.getOnlinePlayers()) new PlayerConfig(p).updateItemsInConfig();
+	}
+	
+	public String getRank() {
+		return pConfig.getString("rank");
+	}
+	
+	public int getLevel(LevelingType type) {
+		switch (type) {
+			case FARMING:
+				return getFarmingLevel();
+			case FLETCHING:
+				return getFletchingLevel();
+			case LEVEL:
+				return getLevel();
+			default:
+				return getLevel();
+		}
+	}
+	
+	/**
+	 * Get the display name of the player.
+	 * @return display name of player, or regular name if member
+	 */
+	public String getDisplayName() {
+		if (isMember()) return p.getName();
+		
+		return Ranks.RANK_MAP.get(getRank()).getChat() + p.getName() + ChatColor.RESET;
+	}
+	
+	public Inventory getPlayerInfo() {
+		Inventory inv = Generator.genGUI(54, getDisplayName() + "'s Info", new CancelHolder());
+		
+		ItemStack helmet = (p.isOnline() ? p.getPlayer().getEquipment().getItem(EquipmentSlot.HEAD) : getItemFromConfig(EquipmentSlot.HEAD));
+		ItemStack chestplate = (p.isOnline() ? p.getPlayer().getEquipment().getItem(EquipmentSlot.CHEST) : getItemFromConfig(EquipmentSlot.CHEST));
+		ItemStack leggings = (p.isOnline() ? p.getPlayer().getEquipment().getItem(EquipmentSlot.LEGS) : getItemFromConfig(EquipmentSlot.LEGS));
+		ItemStack boots = (p.isOnline() ? p.getPlayer().getEquipment().getItem(EquipmentSlot.FEET) : getItemFromConfig(EquipmentSlot.FEET));
+		ItemStack mainhand = (p.isOnline() ? p.getPlayer().getEquipment().getItem(EquipmentSlot.HAND) : getItemFromConfig(EquipmentSlot.HAND));
+		ItemStack offhand = (p.isOnline() ? p.getPlayer().getEquipment().getItem(EquipmentSlot.OFF_HAND) : getItemFromConfig(EquipmentSlot.OFF_HAND));
+		
+		for (int i = 10; i < 44; i++) inv.setItem(i, Items.Inventory.GUI_PANE);
+		
+		inv.setItem(10, helmet);
+		inv.setItem(19, chestplate);
+		inv.setItem(28, leggings);
+		inv.setItem(37, boots);
+		
+		inv.setItem(21, mainhand);
+		inv.setItem(22, offhand);
+		
+		ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta smeta = (SkullMeta) playerHead.getItemMeta();
+		smeta.setOwningPlayer(p);
+		smeta.setDisplayName(getDisplayName());
+		smeta.setLore(ImmutableList.<String>builder().add(p.isOnline() ? ChatColor.GREEN + "Online" : ChatColor.RED + "Offline").build());
+		playerHead.setItemMeta(smeta);
+		
+		inv.setItem(12, playerHead);
+		
+		return inv;
+	}
+	
+	/**
+	 * Will silently fail if Player is offline.
+	 */
+	public void updateItemsInConfig() {
+		if (!(p.isOnline())) return;
+		Player op = p.getPlayer();
+		
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			pConfig.getConfigurationSection("information").getConfigurationSection("items").set(slot.name().toLowerCase(), op.getEquipment().getItem(slot));
+		}
+		saveFile();
+	}
+	
+	public ItemStack getItemFromConfig(EquipmentSlot slot) {
+		return pConfig.getConfigurationSection("information").getConfigurationSection("items").getItemStack(slot.name().toLowerCase());
 	}
 	
 	public int getFletchingLevel() {
@@ -145,6 +329,22 @@ public class PlayerConfig {
 
 	public void incrementFarmingLevel(int amount) {
 		setFarmingLevel(getFarmingLevel() + amount);
+	}
+	
+	public void setLevel(LevelingType t, int level) {
+		switch (t) {
+			case FARMING:
+				setFarmingLevel(level);
+				break;
+			case FLETCHING:
+				setFletchingLevel(level);
+				break;
+			case LEVEL:
+				setLevel(level);
+				break;
+			default:
+				break;
+		}
 	}
 
 	// Other Statistics & Void Methods
