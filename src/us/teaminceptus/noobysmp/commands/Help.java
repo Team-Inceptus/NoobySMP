@@ -62,6 +62,7 @@ public class Help implements CommandExecutor {
 			new TextComponent("For bug reporting / technical difficulties, please contact a member of Team Inceptus on Discord.")
 		});
 		
+		meta.spigot().setPages(pages);
 		book.setItemMeta(meta);
 		
 		return book;
