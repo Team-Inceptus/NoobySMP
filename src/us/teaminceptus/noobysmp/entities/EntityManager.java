@@ -8,7 +8,6 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.bosses.SMPBoss;
-import us.teaminceptus.noobysmp.entities.titan.TitanSpawnable;
 
 public class EntityManager implements Listener {
 
@@ -41,22 +40,22 @@ public class EntityManager implements Listener {
 					}
 				}
 			}
-		} else {
-			for (Class<? extends SMPEntity<? extends LivingEntity>> clazz : SMPEntity.TITAN_CLASS_LIST) {
-				if (clazz.isAnnotationPresent(TitanSpawnable.class)) {
-					TitanSpawnable a = clazz.getDeclaredAnnotationsByType(TitanSpawnable.class)[0];
-
-					if (e.getEntityType() == a.replace()) {
-						e.setCancelled(true);
-						try {
-							clazz.getDeclaredConstructors()[0].newInstance(e.getLocation());
-						} catch (Exception err) {
-							err.printStackTrace();
-						}
-					}
-				}	
-			}
-		}
+		} /*else {
+//			for (Class<? extends SMPEntity<? extends LivingEntity>> clazz : SMPEntity.TITAN_CLASS_LIST) {
+//				if (clazz.isAnnotationPresent(TitanSpawnable.class)) {
+//					TitanSpawnable a = clazz.getDeclaredAnnotationsByType(TitanSpawnable.class)[0];
+//
+//					if (e.getEntityType() == a.replace()) {
+//						e.setCancelled(true);
+//						try {
+//							clazz.getDeclaredConstructors()[0].newInstance(e.getLocation());
+//						} catch (Exception err) {
+//							err.printStackTrace();
+//						}
+//					}
+//				}	
+//			}
+		}*/
 	}
 
 }
