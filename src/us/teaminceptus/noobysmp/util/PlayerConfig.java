@@ -1,7 +1,13 @@
 package us.teaminceptus.noobysmp.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,8 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.google.common.collect.ImmutableList;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -184,7 +188,25 @@ public class PlayerConfig {
 	
 	public void updateCosmetic() {
 		try {
-			if (this.activeCosmetic == null) this.cosmeticTask.cancel();
+			if (this.cosmeticTask == null) {
+				this.cosmeticTask = new BukkitRunnable() {
+					public void run() {
+						try {
+							if (!(p.isOnline())) cancel();
+							Player op = p.getPlayer();
+							config.activeCosmetic.createEffect(op.getLocation().add(0, 0.5, 0));
+						} catch (NullPointerException e) {
+							cancel();
+						}
+					}
+				};
+				return;
+			}
+			if (this.activeCosmetic == null) {
+				this.cosmeticTask.cancel();
+				return;
+			}
+			
 			if (!(this.cosmeticTask.isCancelled())) this.cosmeticTask.cancel();
 			else {
 				this.cosmeticTask.cancel();
@@ -196,7 +218,7 @@ public class PlayerConfig {
 	}
 	
 	public void cancelCosmetic() {
-		this.activeCosmetic = null;
+		this.cosmeticTask = null;
 	}
 	
 	/**
@@ -386,6 +408,55 @@ public class PlayerConfig {
 		return (Arrays.asList(HOES).contains(weapon.getType()) ? calculateHoeDamage(damage) : damage);	
 	}
 
+	public List<Friend> getFriends() {
+		return Friend.getFriendsFor(p);
+	}
+
+	public List<Friend> getOnlineFriends() {
+		return Friend.getFriendsFor(p).stream().filter(f -> f.getFriend().isOnline()).toList();
+	}
+
+	public List<Friend> getOfflineFriends() {
+		return Friend.getFriendsFor(p).stream().filter(f -> !(f.getFriend().isOnline())).toList();
+	}
+
+	public static class Friend {
+
+		private static final Map<OfflinePlayer, OfflinePlayer> requestMap = new HashMap<>();
+		private static final Map<OfflinePlayer, List<Friend>> friendMap = new HashMap<>();
+
+		private final OfflinePlayer owner;
+		private final OfflinePlayer friend;
+
+		public Friend(OfflinePlayer owner, OfflinePlayer friend) {
+			this.owner = owner;
+			this.friend = friend;
+
+			if (friendMap.containsKey(owner)) {
+				friendMap.get(owner).add(this);
+			} else {
+				friendMap.put(owner, new ArrayList<>(ImmutableList.<Friend>builder().add(this).build()));
+			}
+		}
+
+		public final OfflinePlayer getOwner() {
+			return this.owner;
+		}
+
+		public final OfflinePlayer getFriend() {
+			return this.friend;
+		}
+
+		public static boolean hasOutgoingRequest(OfflinePlayer p) {
+			return requestMap.containsKey(p);
+		}
+
+		public static List<Friend> getFriendsFor(OfflinePlayer target) {
+			return friendMap.get(target);
+		}
+
+	}
+
 	// Boolean Methods
 
 	public final boolean hasUnlocked(SMPMaterial item) {
@@ -395,5 +466,7 @@ public class PlayerConfig {
 	public boolean isMember() {
 		return pConfig.getString("rank").equalsIgnoreCase("member");	
 	}
+
+
 	
 }
