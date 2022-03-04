@@ -36,6 +36,10 @@ public class Items implements Listener {
 		this.plugin = plugin;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
+
+	public static ItemStack noName(Material m) {
+		return itemBuilder(m).setName(" ").setLocalizedName("no_name").build();
+	}
 	
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
@@ -114,6 +118,18 @@ public class Items implements Listener {
 			return this;
 		}
 
+		public Builder setType(Material type) {
+			item.setType(type);
+			return this;
+		}
+
+		public Builder setLocalizedName(String localized) {
+			ItemMeta meta = item.getItemMeta();
+			meta.setLocalizedName(localized);
+			item.setItemMeta(meta);
+			return this;
+		}
+
 		public Builder setLore(List<String> lore) {
 			ItemMeta meta = item.getItemMeta();
 			meta.setLore(lore);
@@ -166,7 +182,9 @@ public class Items implements Listener {
 		COMING_SOON,
 		Inventory.BACK_ARROW,
 		Inventory.GUI_PANE,
-		Inventory.NEXT_ARROW
+		Inventory.NEXT_ARROW,
+		Inventory.BACK_HEAD,
+		Inventory.FORWARD_HEAD
 	};
 	
 }

@@ -3,6 +3,8 @@ package us.teaminceptus.noobysmp.materials;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -19,8 +21,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.SMPMaterial.CleanOutput.MaterialOutput;
@@ -284,7 +284,60 @@ public enum SMPMaterial {
 	QARDITE_BLOCK(44, Material.EMERALD_BLOCK, "Block of Qardite", glint()),
 	QARDITE_BOW(44, Material.BOW, "Qardite Bow", genBow(91, 23, true, true), unbreak()),
 	
+	// Mob & Boss Drops & Craftables from them
+	// Drops will ALWAYS be 0
+
+	// TODO Cores
+	AQUATIC_CORE(0, "", ""),
+	NETHER_CORE(0, "", ""),
+	END_CORE(0, "", ""),
+	UNDEAD_CORE(0, "", ""),
+	PASSIVE_CORE(0, "", ""),
+
+	ZOMBIE_SWORD(0, Material.WOODEN_SWORD, "Zombie Sword", genAttack(6, 0, 0.5)),
+	END_BOW(0, Material.BOW, "End Bow", genBow(4, 1, true, false), genTool(1, 0)),
 	
+	THIEF_HELMET(0, Material.IRON_HELMET, "Thief's Helmet", genArmor(6, 1, 1)),
+
+	ENCHANTED_PEARL(0, Material.ENDER_PEARL, "Enchanted Pearl", glint()),
+	ENCHANTED_ENDER_EYE(0, Material.ENDER_EYE, "Enchanted Eye of Ender", glint()),
+
+	AQUATIC_CROWN(0, Material.LEATHER_HELMET, "Aquatic Crown", genArmor(25, 20, 3), genTool(15, 0), Color.AQUA),
+	
+	REDSTONE_CROSSBOW(0, Material.CROSSBOW, "Redstone Crossbow", genCrossbow(55, 4, true), genTool(30, 0)),
+	POWERED_CHESTPLATE(0, Material.LEATHER_CHESTPLATE, "Powered Chestplate", genArmor(10, 7, 0.5), genTool(7, 0)),
+	
+	DAMAGED_WITHERING_BOOTS(0, Material.LEATHER_BOOTS, "Damaged Withering Boots", genArmor(25, 12, 2), genTool(16, 0), SMPColor.DARK_GRAY),
+	
+	MAGIC_DUST(0, Material.BLAZE_POWDER, "Magic Dust", glint()),
+
+	GUARDIAN_TRIDENT(0, Material.TRIDENT, "Guardian Trident", genAttack(21, 9, 1), genTool(16, 0)),
+	// Craftables
+	AQUATIC_AXE(2, Material.DIAMOND_AXE, "Aquatic Axe", genAttack(7, 0.5, 1), genTool(2, 4)),
+	AQUATIC_PICKAXE(2, Material.DIAMOND_PICKAXE, "Aquatic Pickaxe", genTool(2, 4)),
+	AQUATIC_SHOVEL(2, Material.DIAMOND_SHOVEL, "Aquatic Shovel", genTool(2, 4)),
+	AQUATIC_HOE(2, Material.DIAMOND_HOE, "Aquatic Hoe", genTool(2, 4)),
+
+	END_CROSSBOW(3, Material.CROSSBOW, "End Crossbow", genCrossbow(10, 3, true), genTool(4, 0)),
+
+	PATCHED_WITHERING_BOOTS(6, Material.LEATHER_BOOTS, "Patched Withering Boots", genArmor(35, 21, 4), genTool(27, 0)),
+
+	MAGIC_RUBY_SWORD(9, Material.DIAMOND_SWORD, "Magic Ruby Sword", genAttack(55, 12, 1), genTool(100, 0)),
+
+	REPAIRED_WITHERING_BOOTS(17, Material.LEATHER_BOOTS, "Repaired Withering Boots", genArmor(61, 39, 11), genTool(41, 0)),
+	
+	MAGIC_ENDERITE_SWORD(21, Material.NETHERITE_SWORD, "Magic Enderite Sword", genAttack(71, 15, 1), genTool(100, 0)),
+
+	IMPROVED_WITHERING_BOOTS(32, Material.LEATHER_BOOTS, "Improved Withering Boots", genArmor(93, 55, 26), genTool(77, 0)),
+
+	MAGIC_GRAPHENE_SWORD(43, Material.STONE_SWORD, "Magic Graphene Sword", genAttack(97, 15, 1), genTool(100, 0)),
+	MAGIC_GUARDIAN_TRIDENT(43, Material.TRIDENT, "Magic Guardian Trident", genAttack(79, 17, 1), genTool(100, 0)),
+
+	SUPER_WITHERING_BOOTS(50, Material.NETHERITE_BOOTS, "Super Withering Boots", genArmor(105, 89, 46), genTool(100, 0)),
+
+	MAGIC_APATITE_SWORD(63, Material.IRON_ORE, "Magic Apatite Sword", genAttack(119, 15, 1), genTool(100, 0)),
+
+	MAGIC_TOPAZ_JADE_SWORD(79, Material.DIAMOND_SWORD, "Magic Topaz-Jade Sword", genAttack(142, 15, 1), genTool(100, 0)),
 	;
 	
 	public static final Map<SMPMaterial, SMPMaterial> ORE_DROPS = ImmutableMap.<SMPMaterial, SMPMaterial>builder()
@@ -511,6 +564,13 @@ public enum SMPMaterial {
 		}
 
 		return null;
+	}
+
+	public static final SMPMaterial getByItem(ItemStack item) {
+		if (!(item.hasItemMeta())) return null;
+		if (!(item.getItemMeta().hasLocalizedName())) return null;
+
+		return getByLocalization(item.getItemMeta().getLocalizedName());
 	}
 	
 	public static interface CleanOutput {

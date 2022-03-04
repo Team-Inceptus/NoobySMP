@@ -11,17 +11,37 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * All SMP items with abilities
- * Items <strong>specifically</strong> dropped from Bosses are in {@link BossItem}
+ * An "ability" counts as the item having a special reaction when it is used.
  */
 public enum AbilityItem {
 	
 	INFINIBALL(0, Material.FIRE_CHARGE, "InfiniBall"),
 	
+	INFINITNT(3, Material.TNT, "InfiniTNT"),
+
+	OCASSUS_BOW_2(7, Material.BOW, "Ocassus Bow 2"),
+
+	OCASSUS_CROSSBOW(9, Material.CROSSBOW, "Ocassus Crossbow"),
 	
-	
+	OCASSUS_TRIDENT(12, Material.TRIDENT, "Ocassus Trident"),
+
+	EARTHQUAKE_WAND_1(14, Material.IRON_HOE, "Earthquake Wand I"),
+
+	EARTHQUAKE_WAND_2(15, Material.DIAMOND_HOE, "Earthquake Wand II"),
+	EARTHQUAKE_WAND_3(15, Material.DIAMOND_HOE, "Earthquake Wand III"),
+	EARTHQUAKE_WAND_4(16, Material.DIAMOND_HOE, "Earthquake Wand IV"),
+
+	EARTHQUAKE_WAND_5(16, Material.NETHERITE_HOE, "Earthquake Wand V"),
+	EARTHQUAKE_WAND_6(16, Material.NETHERITE_HOE, "Earthquake Wand VI"),
+
 	FIRE_WAND(20, Material.BLAZE_ROD, "Fire Wand", true),
 	
 	ENDERITE_WAND(22, Material.END_ROD, "Enderite Wand", true),
+	// From Boss Drops
+	// Drops will ALWAYS be 0
+	BULLET_WAND(0, Material.STICK, "Bullet Wand"),
+
+	OCASSUS_BOW_1(0, Material.BOW, "Ocassus Bow"),
 	;
 	
 	private final int levelUnlocked;
