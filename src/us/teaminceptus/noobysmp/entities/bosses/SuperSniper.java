@@ -1,17 +1,16 @@
 package us.teaminceptus.noobysmp.entities.bosses;
 
+import com.google.common.collect.ImmutableMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
@@ -42,12 +41,7 @@ public class SuperSniper extends SMPBoss<Skeleton> {
     public SuperSniper(Location loc) {
         super(Skeleton.class, loc, 300, "Super Sniper", ImmutableMap.<ItemStack, Integer>builder()
         .put(SMPMaterial.EMERALD_BOW.getItem(), 100)
-        .build(),
-        ImmutableMap.<Attribute, Double>builder()
-        .put(Attribute.GENERIC_KNOCKBACK_RESISTANCE, 5D)
-        .put(Attribute.GENERIC_ARMOR, 15D)
-        .put(Attribute.GENERIC_ARMOR_TOUGHNESS, 10D)
-        .build());
+        .build(), attributes(300));
 
         Skeleton entity = this.getEntity();
 

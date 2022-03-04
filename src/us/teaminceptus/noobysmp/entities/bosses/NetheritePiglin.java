@@ -1,15 +1,14 @@
 package us.teaminceptus.noobysmp.entities.bosses;
 
+import com.google.common.collect.ImmutableMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Piglin;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
@@ -38,10 +37,7 @@ public class NetheritePiglin extends SMPBoss<Piglin> {
 	public NetheritePiglin(Location loc) {
 		super(Piglin.class, loc, 350, "Netherite Piglin", ImmutableMap.<ItemStack, Integer>builder()
 				.put(new ItemStack(Material.NETHERITE_INGOT), 100)
-				.build(),
-				ImmutableMap.<Attribute, Double>builder()
-				.put(Attribute.GENERIC_ATTACK_DAMAGE, 10D)
-				.build());
+				.build(), attributes(350));
 		
 		entity.setImmuneToZombification(true);
 		entity.getEquipment().setHelmet(new ItemStack(Material.NETHERITE_HELMET));

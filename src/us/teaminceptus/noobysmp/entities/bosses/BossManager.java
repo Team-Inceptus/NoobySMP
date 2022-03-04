@@ -51,6 +51,7 @@ import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Defensive;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.MinionSpawn;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Offensive;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Repeated;
+import us.teaminceptus.noobysmp.entities.bosses.npc.NPCBoss;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 import us.teaminceptus.noobysmp.util.Generator;
@@ -60,7 +61,7 @@ import us.teaminceptus.noobysmp.util.inventoryholder.CancelHolder;
 
 public class BossManager implements Listener {
     
-    private static final int T5_UNLOCK = 50;
+    // private static final int T5_UNLOCK = 50;
     private static final int T4_UNLOCK = 35;
     private static final int T3_UNLOCK = 20;
     private static final int T2_UNLOCK = 10;
@@ -76,12 +77,6 @@ public class BossManager implements Listener {
 
         private BossHolder() {
         }
-
-        @Override
-        public Inventory getInventory() {
-            return null;
-        }
-        
     }
 
     private static class BossMenuHolder extends CancelHolder {
@@ -95,8 +90,6 @@ public class BossManager implements Listener {
     public static Inventory getBossMenu(Player p) {
         Inventory inv = Generator.genGUI(27, "SMP Bosses", new BossMenuHolder());
         
-        
-        
         inv.setItem(10, Items.Inventory.GUI_PANE);
         inv.setItem(16, Items.Inventory.GUI_PANE);
 
@@ -106,7 +99,7 @@ public class BossManager implements Listener {
         ItemStack t2 = Items.itemBuilder(Material.STONE_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 2").build();
         ItemStack t3 = Items.itemBuilder(Material.IRON_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 3").build();
         ItemStack t4 = Items.itemBuilder(Material.DIAMOND_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 4").build();
-        ItemStack t5 = Items.itemBuilder(Material.NETHERITE_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 5").build();
+        // ItemStack t5 = Items.itemBuilder(Material.NETHERITE_SWORD).addGlint().addFlags(ItemFlag.HIDE_ATTRIBUTES).setName(ChatColor.AQUA + "Tier 5").build();
         
         ItemStack locked = Items.LOCKED_ITEM;
 
@@ -114,7 +107,7 @@ public class BossManager implements Listener {
         inv.setItem(12, config.getLevel() < T2_UNLOCK ? locked : t2);
         inv.setItem(13, config.getLevel() < T3_UNLOCK ? locked : t3);
         inv.setItem(14, config.getLevel() < T4_UNLOCK ? locked : t4);
-        inv.setItem(15, config.getLevel() < T5_UNLOCK ? locked : t5);
+        inv.setItem(15, Items.COMING_SOON);
 
         return inv;
     }
@@ -122,79 +115,84 @@ public class BossManager implements Listener {
     public static Inventory getBosses(Player p, int selectedTier) {
         Inventory inv = Generator.genGUI(54, "SMP Bosses - Tier " + Integer.toString(selectedTier), new BossHolder());
 
-        for (Class<? extends SMPBoss<? extends Mob>> bossClass : SMPBoss.CLASS_LIST) {
-            try {
-                if (bossClass.isAnnotationPresent(NotGeneratabele.class)) continue;
-
-                int tier = bossClass.getAnnotation(Tier.class).value();
-                if (tier != selectedTier) continue;
-
-                Material icon = bossClass.getAnnotation(Icon.class).value();
-
-                List<String> description = new ArrayList<>();
-
-                for (String s : bossClass.getAnnotation(Description.class).value()) description.add(ChatColor.translateAlternateColorCodes('&', ChatColor.GRAY + s));
-                
-                Map<ItemStack, Integer> spawnCost = new HashMap<>();
-                for (String s : bossClass.getAnnotation(SpawnCost.class).value()) {
-                    String id = s.split(":")[0];
-                    int count = Integer.parseInt(s.split(":")[1]);
-
-                    Material m = Material.matchMaterial(id.toUpperCase());
-                    SMPMaterial m2 = SMPMaterial.getByLocalization(id.toLowerCase());
-                    AbilityItem m3 = AbilityItem.getByLocalization(id.toLowerCase());
-                    if (m != null) {
-                        spawnCost.put(new ItemStack(m), count);
-                    } else if (m2 != null) {
-                        spawnCost.put(m2.getItem(), count);
-                    } else if (m3 != null) {
-                        spawnCost.put(m3.getItem(), count);
-                    }
-                }
-
-                DisplayName display = bossClass.getAnnotation(DisplayName.class);
-
-                String displayName = display.cc() + display.value();
-
-                List<String> spawnCostList = new ArrayList<>();
-
-                for (Map.Entry<ItemStack, Integer> entry : spawnCost.entrySet()) {
-                    ItemStack item = entry.getKey();
-                    spawnCostList.add((item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : ChatColor.WHITE + WordUtils.capitalize(item.getType().name().toLowerCase().replace('_', ' ')))
-                    + ChatColor.GRAY + " x" + Integer.toString(entry.getValue()));
-                }
-                
-                HP healthA = bossClass.getAnnotation(HP.class);
-                double health = healthA.value();
-                
-                DecimalFormat df = new DecimalFormat("#.00");
-                df.setGroupingUsed(true);
-                df.setGroupingSize(3);
-                
-                ItemStack item = new ItemStack(icon);
-                ItemMeta meta = item.getItemMeta();
-                meta.setDisplayName(ChatColor.DARK_GRAY + "Tier " + Integer.toString(tier) + " Boss - " + displayName);
-                meta.setLore(ImmutableList.<String>builder()
-                .add(ChatColor.RED + df.format(health) + " HP")
-                .add(" ")
-                .addAll(description)
-                .add(" ")
-                .add(ChatColor.DARK_GRAY + "" + ChatColor.UNDERLINE + "Spawn Cost")
-                .add(" ")
-                .addAll(spawnCostList)
-                .build());
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DYE, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_ATTRIBUTES);
-                meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
-                item.setItemMeta(meta);
-                
-                inv.addItem(item);
-            } catch (Exception e) {
-                JavaPlugin.getPlugin(SMP.class).getLogger().info("Error constructing entity " + bossClass.getName());
-                e.printStackTrace();
-            }
-        }
+        for (Class<? extends SMPBoss<? extends Mob>> bossClass : SMPBoss.CLASS_LIST) createBoss(selectedTier, inv, bossClass);
+        for (Class<? extends NPCBoss> npcClass : NPCBoss.NPC_BOSS_LIST) createBoss(selectedTier, inv, npcClass);
 
         return inv;
+    }
+
+    private static void createBoss(int selectedTier, Inventory inv, Class<?> bossClass) {
+        try {
+            if (bossClass.isAnnotationPresent(NotGeneratabele.class))
+                return;
+
+            int tier = bossClass.getAnnotation(Tier.class).value();
+            if (tier != selectedTier)
+                return;
+
+            Material icon = bossClass.getAnnotation(Icon.class).value();
+
+            List<String> description = new ArrayList<>();
+
+            for (String s : bossClass.getAnnotation(Description.class).value()) description.add(ChatColor.translateAlternateColorCodes('&', ChatColor.GRAY + s));
+            
+            Map<ItemStack, Integer> spawnCost = new HashMap<>();
+            for (String s : bossClass.getAnnotation(SpawnCost.class).value()) {
+                String id = s.split(":")[0];
+                int count = Integer.parseInt(s.split(":")[1]);
+
+                Material m = Material.matchMaterial(id.toUpperCase());
+                SMPMaterial m2 = SMPMaterial.getByLocalization(id.toLowerCase());
+                AbilityItem m3 = AbilityItem.getByLocalization(id.toLowerCase());
+                if (m != null) {
+                    spawnCost.put(new ItemStack(m), count);
+                } else if (m2 != null) {
+                    spawnCost.put(m2.getItem(), count);
+                } else if (m3 != null) {
+                    spawnCost.put(m3.getItem(), count);
+                }
+            }
+
+            DisplayName display = bossClass.getAnnotation(DisplayName.class);
+
+            String displayName = display.cc() + display.value();
+
+            List<String> spawnCostList = new ArrayList<>();
+
+            for (Map.Entry<ItemStack, Integer> entry : spawnCost.entrySet()) {
+                ItemStack item = entry.getKey();
+                spawnCostList.add((item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : ChatColor.WHITE + WordUtils.capitalize(item.getType().name().toLowerCase().replace('_', ' ')))
+                + ChatColor.GRAY + " x" + Integer.toString(entry.getValue()));
+            }
+            
+            HP healthA = bossClass.getAnnotation(HP.class);
+            double health = healthA.value();
+            
+            DecimalFormat df = new DecimalFormat("#.00");
+            df.setGroupingUsed(true);
+            df.setGroupingSize(3);
+            
+            ItemStack item = new ItemStack(icon);
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName(ChatColor.DARK_GRAY + "Tier " + Integer.toString(tier) + " Boss - " + displayName);
+            meta.setLore(ImmutableList.<String>builder()
+            .add(ChatColor.RED + df.format(health) + " HP")
+            .add(" ")
+            .addAll(description)
+            .add(" ")
+            .add(ChatColor.DARK_GRAY + "" + ChatColor.UNDERLINE + "Spawn Cost")
+            .add(" ")
+            .addAll(spawnCostList)
+            .build());
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DYE, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_ATTRIBUTES);
+            meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+            item.setItemMeta(meta);
+            
+            inv.addItem(item);
+        } catch (Exception e) {
+            JavaPlugin.getPlugin(SMP.class).getLogger().info("Error constructing entity " + bossClass.getName());
+            e.printStackTrace();
+        }
     }
 
     @EventHandler
@@ -304,7 +302,7 @@ public class BossManager implements Listener {
                             err.printStackTrace();
                         }
                     }
-                }.runTaskTimer(plugin, rep.interval(), rep.interval());
+                }.runTaskTimer(plugin, rep.value(), rep.value());
             }
         }
     }

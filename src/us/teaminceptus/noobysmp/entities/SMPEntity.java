@@ -12,7 +12,9 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.titan.JadeZombie;
 
 public abstract class SMPEntity<T extends LivingEntity> {
@@ -23,6 +25,8 @@ public abstract class SMPEntity<T extends LivingEntity> {
 	protected final String customName;
 	protected final List<ItemStack> drops;
 	
+	protected SMP plugin;
+
 	private final Class<T> clazz;
 	
 	// Make sure to update these as more are added!
@@ -47,6 +51,7 @@ public abstract class SMPEntity<T extends LivingEntity> {
 		this.customName = customName;
 		this.drops = drops;
 		this.clazz = clazz;
+		this.plugin = JavaPlugin.getPlugin(SMP.class);
 		
 		this.entity = loc.getWorld().spawn(loc, clazz);
 		

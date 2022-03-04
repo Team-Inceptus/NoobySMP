@@ -1,6 +1,7 @@
 package us.teaminceptus.noobysmp.entities;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -8,6 +9,7 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.bosses.SMPBoss;
+import us.teaminceptus.noobysmp.entities.titan.TitanSpawnable;
 
 public class EntityManager implements Listener {
 
@@ -40,22 +42,22 @@ public class EntityManager implements Listener {
 					}
 				}
 			}
-		} /*else {
-//			for (Class<? extends SMPEntity<? extends LivingEntity>> clazz : SMPEntity.TITAN_CLASS_LIST) {
-//				if (clazz.isAnnotationPresent(TitanSpawnable.class)) {
-//					TitanSpawnable a = clazz.getDeclaredAnnotationsByType(TitanSpawnable.class)[0];
-//
-//					if (e.getEntityType() == a.replace()) {
-//						e.setCancelled(true);
-//						try {
-//							clazz.getDeclaredConstructors()[0].newInstance(e.getLocation());
-//						} catch (Exception err) {
-//							err.printStackTrace();
-//						}
-//					}
-//				}	
-//			}
-		}*/
+		} else {
+			for (Class<? extends SMPEntity<? extends LivingEntity>> clazz : SMPEntity.TITAN_CLASS_LIST) {
+				if (clazz.isAnnotationPresent(TitanSpawnable.class)) {
+					TitanSpawnable a = clazz.getAnnotation(TitanSpawnable.class);
+
+					if (e.getEntityType() == a.replace()) {
+						e.setCancelled(true);
+						try {
+							clazz.getConstructor(Location.class).newInstance(e.getLocation());
+						} catch (Exception err) {
+							err.printStackTrace();
+						}
+					}
+				}	
+			}
+		}
 	}
 
 }

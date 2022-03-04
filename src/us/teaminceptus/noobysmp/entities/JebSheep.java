@@ -21,6 +21,9 @@ public class JebSheep extends SMPEntity<Sheep> {
 		super(Sheep.class, loc, 40, "Jeb Sheep", ImmutableList.<ItemStack>builder()
 				.add(new ItemStack(woolList.get(r.nextInt(woolList.size())), r.nextInt(4) + 3))
 				.build());
+		
+		entity.setCustomName("jeb_");
+		entity.setCustomNameVisible(false);
 	}
 
 }

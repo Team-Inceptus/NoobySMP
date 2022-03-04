@@ -19,14 +19,12 @@ public class JadeZombie extends SMPEntity<Zombie> {
         .add(SMPMaterial.JADE.getItem(r.nextInt(10) + 4))
         .build());
 
-        Zombie entity = this.getEntity();
-
         entity.getEquipment().setItemInMainHand(SMPMaterial.TOPAZ_JADE_AXE.getItem());
 
         entity.getEquipment().setHelmet(SMPMaterial.JADE_BLOCK.getItem(r.nextInt(3) + 1));
         entity.getEquipment().setChestplate(SMPMaterial.JADE_CHESTPlATE.getItem());
         entity.getEquipment().setLeggings(SMPMaterial.JADE_LEGGINGS.getItem());
         entity.getEquipment().setBoots(SMPMaterial.JADE_BOOTS.getItem());
-     }
+    }
 
 }
