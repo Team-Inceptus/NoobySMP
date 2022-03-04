@@ -1,6 +1,7 @@
 name: NoobySMP
 main: us.teaminceptus.noobysmp.SMP
 version: 1.0.0
+depend: [Sentinel, Citizens]
 api-version: 1.18
 commands:
   help:
