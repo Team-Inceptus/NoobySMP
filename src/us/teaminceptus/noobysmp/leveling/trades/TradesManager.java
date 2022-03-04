@@ -307,6 +307,7 @@ public class TradesManager implements Listener {
         if (!(e.getWhoClicked() instanceof Player p)) return;
         if (!(TradeInstance.isInTrade(p))) return;
         if (e.getCurrentItem() == null) return;
+        if (!(TradeInstance.isInTrade(p))) return;
         ItemStack clickedItem = e.getCurrentItem();
         String id = Items.getLocalization(clickedItem);
 

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.WorldCreator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,6 +29,7 @@ import us.teaminceptus.noobysmp.commands.admin.Ranks;
 import us.teaminceptus.noobysmp.conquest.ConquestManager;
 import us.teaminceptus.noobysmp.entities.EntityManager;
 import us.teaminceptus.noobysmp.entities.bosses.BossManager;
+import us.teaminceptus.noobysmp.entities.bosses.npc.NPCManager;
 import us.teaminceptus.noobysmp.generation.BlockManager;
 import us.teaminceptus.noobysmp.generation.ItemManager;
 import us.teaminceptus.noobysmp.generation.biomes.TitanBiome;
@@ -152,9 +154,9 @@ public class SMP extends JavaPlugin {
 	}
 	
 	private void loadWorlds() {
-//		WorldCreator titan = new WorldCreator("world_titan");
-//		// titan.generator(new TitanChunkGenerator(this));
-//		Bukkit.createWorld(titan);
+		WorldCreator titan = new WorldCreator("world_titan");
+		// titan.generator(new TitanChunkGenerator(this));
+		Bukkit.createWorld(titan);
 	}
 	
 	public void onEnable() {
@@ -178,6 +180,7 @@ public class SMP extends JavaPlugin {
 		// Managers
 		new EntityManager(this);
 		new BossManager(this);
+		new NPCManager(this);
 		
 		new ServerManager(this);
 		new BlockManager(this);

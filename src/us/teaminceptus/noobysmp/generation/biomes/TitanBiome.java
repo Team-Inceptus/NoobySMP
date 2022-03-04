@@ -8,17 +8,17 @@ import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_18_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.serialization.Lifecycle;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
@@ -27,10 +27,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
+import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.BiomeSpecialEffects.GrassColorModifier;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import us.teaminceptus.noobysmp.SMP;
 
@@ -227,11 +228,11 @@ public enum TitanBiome {
 			biome.resourceKey = key;
 			
 			ResourceKey<net.minecraft.world.level.biome.Biome> oldKey = Biomes.FOREST;
-			WritableRegistry<net.minecraft.world.level.biome.Biome> registrywritable = server.registryAccess().ownedRegistryOrThrow(registry);
+			WritableRegistry<net.minecraft.world.level.biome.Biome> registrywritable = (WritableRegistry<net.minecraft.world.level.biome.Biome>) server.registryAccess().ownedRegistryOrThrow(registry);
 			net.minecraft.world.level.biome.Biome forestbiome = registrywritable.get(oldKey);
 			
 			BiomeBuilder builder = new net.minecraft.world.level.biome.Biome.BiomeBuilder();
-			builder.biomeCategory(forestbiome.getBiomeCategory());
+			builder.biomeCategory(BiomeCategory.NONE);
 			builder.precipitation(forestbiome.getPrecipitation());
 			
 			Field biomeSettingMobsField = net.minecraft.world.level.biome.Biome.class.getDeclaredField("l");
@@ -264,7 +265,7 @@ public enum TitanBiome {
 			net.minecraft.world.level.biome.Biome nmsbiome = builder.build();
 			biome.nmsBiome = nmsbiome;
 
-			server.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).register(key, nmsbiome, Lifecycle.experimental());
+			Registry.register(registrywritable, key, nmsbiome);
 		}
 
 		plugin.getLogger().info("Registered " + Integer.toString(TitanBiome.values().length) + " Titan Biomes");
@@ -304,7 +305,7 @@ public enum TitanBiome {
 		if (w.isLoaded(pos)) {
 			net.minecraft.world.level.chunk.LevelChunk chunk = w.getChunkAt(pos);
 			if (chunk != null) { 	
-				chunk.setBiome(x >> 2, y >> 2, z >> 2, biome);
+				chunk.setBiome(x >> 2, y >> 2, z >> 2, Holder.direct(biome));
 			}
 		}
 	}
