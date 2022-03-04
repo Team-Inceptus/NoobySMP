@@ -1,15 +1,21 @@
 package us.teaminceptus.noobysmp.player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import us.teaminceptus.noobysmp.SMP;
@@ -77,6 +83,26 @@ public class ServerManager implements Listener {
 		InventoryView view = e.getView();
 
 		if (view.getTopInventory().getHolder() instanceof CancelHolder && !(e.getClickedInventory() instanceof PlayerInventory)) e.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onCraft(PrepareItemCraftEvent e) {
+		if (e.isRepair()) return;
+		if (e.getRecipe() != null) return;
+		
+		if (e.getInventory().getMatrix().length < 9) return;
+
+		List<ItemStack> newRecipe = new ArrayList<>();
+
+		for (ItemStack item : e.getInventory().getMatrix()) {
+			if (item != null && !(item.getItemMeta().hasDisplayName())) {
+				newRecipe.add(new ItemStack(item.getType()));
+			} else newRecipe.add(item);
+		}
+
+		Recipe r = Bukkit.getCraftingRecipe(newRecipe.toArray(new ItemStack[0]), Bukkit.getWorld("world"));
+		if (r == null) return;
+		e.getInventory().setResult(r.getResult());
 	}
 	
 }
