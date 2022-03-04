@@ -2,6 +2,7 @@ package us.teaminceptus.noobysmp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -31,6 +32,7 @@ import us.teaminceptus.noobysmp.generation.BlockManager;
 import us.teaminceptus.noobysmp.generation.ItemManager;
 import us.teaminceptus.noobysmp.generation.biomes.TitanBiome;
 import us.teaminceptus.noobysmp.leveling.LevelingManager;
+import us.teaminceptus.noobysmp.leveling.trades.TradesManager;
 import us.teaminceptus.noobysmp.player.ServerManager;
 import us.teaminceptus.noobysmp.recipes.RecipeManager;
 import us.teaminceptus.noobysmp.util.PlayerConfig;
@@ -69,6 +71,10 @@ public class SMP extends JavaPlugin {
 
 			if (!(pConfig.isString("rank"))) {
 				pConfig.set("rank", "member");
+			}
+
+			if (!(pConfig.isList("friends"))) {
+				pConfig.set("friends", new ArrayList<OfflinePlayer>());
 			}
 			
 
@@ -181,6 +187,7 @@ public class SMP extends JavaPlugin {
 		new ItemManager(this);
 		
 		new LevelingManager(this);
+		new TradesManager(this);
 		
 		getLogger().info("Successfully loaded Classes! Loading Tasks...");
 		startTasks();
