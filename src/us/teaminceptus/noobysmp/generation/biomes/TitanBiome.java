@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Lifecycle;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -260,7 +261,10 @@ public enum TitanBiome {
 	
 			builder.specialEffects(effectbuilder.build());
 
-			biome.nmsBiome = builder.build();
+			net.minecraft.world.level.biome.Biome nmsbiome = builder.build();
+			biome.nmsBiome = nmsbiome;
+
+			server.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).register(key, nmsbiome, Lifecycle.experimental());
 		}
 
 		plugin.getLogger().info("Registered " + Integer.toString(TitanBiome.values().length) + " Titan Biomes");
