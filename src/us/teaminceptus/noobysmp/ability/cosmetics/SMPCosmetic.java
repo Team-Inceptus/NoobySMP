@@ -50,13 +50,13 @@ public enum SMPCosmetic {
 		this.effects = effects;
 	}
 	
-	private static Consumer<Location> createCircle(Particle part) {
+	public static Consumer<Location> createCircle(Particle part) {
 		return createCircle(part, 1);
 	}
 	
-	private static Consumer<Location> createCircle(Particle part, double radius) {
+	public static Consumer<Location> createCircle(Particle part, double radius) {
 		return (loc -> {
-			int points = 360;
+			int points = 90;
 			for (int i = 0; i < points; i++) {
 				double angle = 2 * Math.PI * i / points;
 				loc.add(radius * Math.sin(angle), 0, radius * Math.cos(angle));
@@ -67,7 +67,7 @@ public enum SMPCosmetic {
 		});
 	}
 	
-	private static Consumer<Location> createShape(Particle part, int points, double radius) {
+	public static Consumer<Location> createShape(Particle part, int points, double radius) {
 		return (loc -> {
 			for (int i = 0; i < points; i++) {
 				  double angle = 360.0 / points * i;
@@ -80,7 +80,7 @@ public enum SMPCosmetic {
 		});
 	}
 	
-	private static Consumer<Location> createSphere(Particle part, double radius) {
+	public static Consumer<Location> createSphere(Particle part, double radius) {
 		return (loc -> {
 			for (double i = 0; i <= Math.PI; i += Math.PI / 10) {
 				double sradius = Math.sin(i) * radius;
