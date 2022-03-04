@@ -30,11 +30,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       
-      # Runs a set of commands using the runners shell
-      - name: Setup BuildTools
-        run: mkdir BuildTools && wget -O BuildTools/BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-      - name: Run BuildTools
-        run: cd BuildTools && java -jar BuildTools.jar --rev 1.18.1 --remapped
+      - name: Setup & Run BuildTools
+        run: |
+           mkdir BuildTools && 
+           wget -O BuildTools/BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+           cd BuildTools
+           java -jar BuildTools.jar --rev 1.18.2 --remapped
       - name: Build with Maven
         run: |
           mvn package clean
