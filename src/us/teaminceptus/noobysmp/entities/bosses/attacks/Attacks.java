@@ -17,7 +17,7 @@ public interface Attacks {
     @Target(ElementType.METHOD)
     public static @interface Offensive {
 
-        int chance();
+        int chance() default 100;
 
     }
 
@@ -28,7 +28,7 @@ public interface Attacks {
     @Target(ElementType.METHOD)
     public static @interface Defensive {
 
-        int chance();
+        int chance() default 100;
 
     }
 
@@ -39,7 +39,7 @@ public interface Attacks {
     @Target(ElementType.METHOD)
     public static @interface Repeated {
 
-        long interval();
+        long value();
 
     }
 
