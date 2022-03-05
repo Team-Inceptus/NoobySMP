@@ -54,15 +54,7 @@ public class BlockManager implements Listener {
 			// do nothing, block does not apply
 		}
 	}
-//	
-//	@EventHandler
-//	public void onChunkLoad(ChunkLoadEvent e) {
-//		Chunk c = e.getChunk();
-//		// Set Custom Biomes
-//		
-//		TitanBiome.WITHERED_PLAINS.setBiome(c);
-//	}
-//	
+	
 	public static final Map<Material, SMPMaterial> REPLACEABLES = ImmutableMap.<Material, SMPMaterial>builder()
 			.put(Material.END_STONE, SMPMaterial.ENDERITE_ORE)
 			.put(Material.DIAMOND_ORE, SMPMaterial.RUBY_ORE)

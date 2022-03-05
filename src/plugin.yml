@@ -1,6 +1,7 @@
 name: NoobySMP
 main: us.teaminceptus.noobysmp.SMP
 version: 1.0.0
+load: POSTWORLD
 depend: [Sentinel, Citizens]
 api-version: 1.18
 commands:
@@ -22,6 +23,15 @@ commands:
   cosmetics:
     description: Manage your active cosmetics (based on current level)
     aliases: [cosmetic, smpcosmetic, cosm, smpcosm]
+  trade:
+    description: Trade with other players
+    alias: trades
+  accepttrade:
+    description: Accept a trade from another person
+    aliases: [acctrade, atrade]
+  rejecttrade:
+    description: Deny a trade from another person
+    aliases: [denytrade, dtrade, rtrade, rejtrade]
   # Admin
   catalogue:
     description: Open up the SMP Catalogue for fetching stuff.
@@ -32,6 +42,9 @@ commands:
   experience:
     description: Experience managing for Admins
     alias: exp 
+  setbiome:
+    description: Manage Biomes in current area
+    aliases: [setcustombiome, setb, setcustomb, setcbiome]
     
 permissions:
   smp.*:

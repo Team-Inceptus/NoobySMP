@@ -111,7 +111,7 @@ public class TradesManager implements Listener {
         }
 
         public static boolean isInTrade(Player p) {
-            return from(p) == null;
+            return from(p) != null;
         }
 
         public TradeHolder getHolder() {

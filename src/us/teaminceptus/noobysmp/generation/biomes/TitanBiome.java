@@ -16,9 +16,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Lifecycle;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
@@ -217,12 +219,26 @@ public enum TitanBiome {
 
 	// Registry & Setting Methods
 	
+	public static void changeRegistryLock(boolean isLocked) {
+		DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        MappedRegistry<net.minecraft.world.level.biome.Biome> materials = (MappedRegistry<net.minecraft.world.level.biome.Biome>) server.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
+        try {
+	        Field isFrozen = materials.getClass().getDeclaredField("bL");
+	        isFrozen.setAccessible(true);
+	        isFrozen.set(materials, isLocked);  
+        } catch (Exception e) {
+        	JavaPlugin.getPlugin(SMP.class).getLogger().info("Error changing biome lock to " + isLocked);
+        	e.printStackTrace();
+        }
+	}
+	
 	public static void registerBiomes() throws Exception {
 		SMP plugin = JavaPlugin.getPlugin(SMP.class);
 
 		ResourceKey<Registry<net.minecraft.world.level.biome.Biome>> registry = Registry.BIOME_REGISTRY;
 		DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
 		
+		changeRegistryLock(false);
 		for (TitanBiome biome : values()) { 
 			ResourceKey<net.minecraft.world.level.biome.Biome> key = ResourceKey.<net.minecraft.world.level.biome.Biome>create(registry, new ResourceLocation("noobysmp", biome.name.toLowerCase().replace(' ', '_')));
 			biome.resourceKey = key;
@@ -235,12 +251,12 @@ public enum TitanBiome {
 			builder.biomeCategory(BiomeCategory.NONE);
 			builder.precipitation(forestbiome.getPrecipitation());
 			
-			Field biomeSettingMobsField = net.minecraft.world.level.biome.Biome.class.getDeclaredField("l");
+			Field biomeSettingMobsField = net.minecraft.world.level.biome.Biome.class.getDeclaredField("k");
 			biomeSettingMobsField.setAccessible(true);
 			MobSpawnSettings biomeSettingMobs = (MobSpawnSettings) biomeSettingMobsField.get(forestbiome);
 			builder.mobSpawnSettings(biomeSettingMobs);	
 			
-			Field biomeSettingGenField = net.minecraft.world.level.biome.Biome.class.getDeclaredField("k");
+			Field biomeSettingGenField = net.minecraft.world.level.biome.Biome.class.getDeclaredField("j");
 			biomeSettingGenField.setAccessible(true);
 			BiomeGenerationSettings biomeSettingGen = (BiomeGenerationSettings) biomeSettingGenField.get(forestbiome);
 			builder.generationSettings(biomeSettingGen);
@@ -264,10 +280,12 @@ public enum TitanBiome {
 
 			net.minecraft.world.level.biome.Biome nmsbiome = builder.build();
 			biome.nmsBiome = nmsbiome;
-
-			Registry.register(registrywritable, key, nmsbiome);
+			
+			registrywritable.register(key, nmsbiome, Lifecycle.stable());
+			
 		}
-
+		
+		changeRegistryLock(true);
 		plugin.getLogger().info("Registered " + Integer.toString(TitanBiome.values().length) + " Titan Biomes");
 	}
 

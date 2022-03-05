@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.WorldCreator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -23,9 +22,11 @@ import us.teaminceptus.noobysmp.commands.Help;
 import us.teaminceptus.noobysmp.commands.PlayerInfo;
 import us.teaminceptus.noobysmp.commands.Progress;
 import us.teaminceptus.noobysmp.commands.Settings;
+import us.teaminceptus.noobysmp.commands.Trade;
 import us.teaminceptus.noobysmp.commands.admin.Catalogue;
 import us.teaminceptus.noobysmp.commands.admin.Experience;
 import us.teaminceptus.noobysmp.commands.admin.Ranks;
+import us.teaminceptus.noobysmp.commands.admin.SetBiome;
 import us.teaminceptus.noobysmp.conquest.ConquestManager;
 import us.teaminceptus.noobysmp.entities.EntityManager;
 import us.teaminceptus.noobysmp.entities.bosses.BossManager;
@@ -34,6 +35,7 @@ import us.teaminceptus.noobysmp.generation.BlockManager;
 import us.teaminceptus.noobysmp.generation.ItemManager;
 import us.teaminceptus.noobysmp.generation.biomes.TitanBiome;
 import us.teaminceptus.noobysmp.leveling.LevelingManager;
+import us.teaminceptus.noobysmp.leveling.trades.TradeCommandManager;
 import us.teaminceptus.noobysmp.leveling.trades.TradesManager;
 import us.teaminceptus.noobysmp.player.ServerManager;
 import us.teaminceptus.noobysmp.recipes.RecipeManager;
@@ -153,12 +155,6 @@ public class SMP extends JavaPlugin {
 		UPDATE_TASK.runTaskTimer(this, 0, FILE_UPDATE_SPEED_TICKS);
 	}
 	
-	private void loadWorlds() {
-		WorldCreator titan = new WorldCreator("world_titan");
-		// titan.generator(new TitanChunkGenerator(this));
-		Bukkit.createWorld(titan);
-	}
-	
 	public void onEnable() {
 		getLogger().info("Loading files...");
 		loadFiles();
@@ -171,10 +167,12 @@ public class SMP extends JavaPlugin {
 		new Progress(this);
 		new Bosses(this);
 		new Cosmetics(this);
+		new Trade(this);
 		// Admin Commands
 		new Ranks(this);
 		new Catalogue(this);
 		new Experience(this);
+		new SetBiome(this);
 		
 		getLogger().info("Loading Managers...");
 		// Managers
@@ -189,21 +187,26 @@ public class SMP extends JavaPlugin {
 		new AbilityManager(this);
 		new ItemManager(this);
 		
+		
 		new LevelingManager(this);
 		new TradesManager(this);
+		new TradeCommandManager(this);
 		
-		getLogger().info("Successfully loaded Classes! Loading Tasks...");
-		startTasks();
-		getLogger().info("Successfully Started all Tasks! Loading external worlds...");
+		getLogger().info("Successfully loaded Classes! Loading external worlds...");
 		try {
 			TitanBiome.registerBiomes();
 		} catch (Exception e) {
 			getLogger().info("Error registering biomes");
 			e.printStackTrace();
 		}
-		loadWorlds();
 		
-		getLogger().info("Sucessfully loaded external worlds!");
+//		WorldCreator titan = new WorldCreator("world_titan");
+//		titan.generator(new TitanChunkGenerator(this));
+//		Bukkit.createWorld(titan);
+		
+		getLogger().info("Successfylly loaded worlds! Loading tasks...");
+		startTasks();
+		getLogger().info("Sucessfully loaded tasks!");
 		getLogger().info("Done!");
 	}
 
