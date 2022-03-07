@@ -207,12 +207,6 @@ public enum SMPMaterial {
 	BEDROCK_ORE(25, Material.COAL_ORE, "Bedrock Ore", glint()),
 	DEEPSLATE_BEDROCK_ORE(25, Material.DEEPSLATE_COAL_ORE, "Deepslate Bedrock Ore", glint()),
 	
-	GOLDEN_ANVIL(25, Material.ANVIL, "Golden Anvil"),
-	
-	STRENGTH_ESSENCE(25, "Strength Essence", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2M3ZWZkNmMxZTVjMzc0MDhiNzlhZjVlOWJmZWJkN2E1NmNhNWM5NzBlN2Y4NjFmMWU1NTVmNGI1ZWYwZjdjNiJ9fX0="),
-	AGILE_ESSENCE(25, "Agile Essence", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTMxYTRmYWIyZjg3ZGI1NDMzMDEzNjUxN2I0NTNhYWNiOWQ3YzBmZTc4NDMwMDcwOWU5YjEwOWNiYzUxNGYwMCJ9fX0="),
-	PROTECTIVE_ESSENCE(25, "Protective Essence", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTAxZTA0MGNiMDFjZjJjY2U0NDI4MzU4YWUzMWQyZTI2NjIwN2M0N2NiM2FkMTM5NzA5YzYyMDEzMGRjOGFkNCJ9fX0="),
-	
 	AMBER_ORE(26, Material.COPPER_ORE, "Amber Ore", glint()),
 	DEEPSLATE_AMBER_ORE(26, Material.DEEPSLATE_COPPER_ORE, "Deepslate Amber Ore", glint()),
 	AMBER(26, Material.RAW_COPPER, "Amber", glint()),
@@ -247,7 +241,7 @@ public enum SMPMaterial {
 	DEEPSLATE_JADE_ORE(33, Material.DEEPSLATE_LAPIS_ORE, "Deepslate Jade Ore", glint()),
 	JADE_BLOCK(33, Material.LAPIS_BLOCK, "Block of Jade", glint()),
 	JADE_HELMET(33, Material.LEATHER_HELMET, "Jade Helmet", genArmor(60, 13, 8), genTool(60, 0), Color.AQUA),
-	JADE_CHESTPlATE(33, Material.LEATHER_CHESTPLATE, "Jade Chestplate", genArmor(96, 13, 8), genTool(60, 0)),
+	JADE_CHESTPLATE(33, Material.LEATHER_CHESTPLATE, "Jade Chestplate", genArmor(96, 13, 8), genTool(60, 0)),
 	JADE_LEGGINGS(33, Material.LEATHER_LEGGINGS, "Jade Leggings", genArmor(84, 13, 8), genTool(60, 0), Color.AQUA),
 	JADE_BOOTS(33, Material.LEATHER_BOOTS, "Jade Boots", genArmor(48, 13, 8), genTool(60, 0), Color.AQUA),
 
@@ -262,6 +256,7 @@ public enum SMPMaterial {
 	TOPAZ_CROSSBOW(35, Material.CROSSBOW, "Topaz Crossbow", genCrossbow(20, 4, true)),
 	TOPAZ_BEACON(35, Material.BEACON, "Topaz Beacon"),
 
+	TOPAZ_JADE(36, Material.DIAMOND, "Topaz-Jade", glint()),
 	TOPAZ_JADE_SWORD(36, Material.DIAMOND_SWORD, "Topaz-Jade Sword", genAttack(67, 1.6, 1), genTool(82, 0)),
 	TOPAZ_JADE_AXE(36, Material.DIAMOND_AXE, "Topaz-Jade Axe", genAttack(67, 1.7, 0.9), genTool(82, 19)),
 	TOPAZ_JADE_PICKAXE(36, Material.DIAMOND_PICKAXE, "Topaz-Jade Pickaxe", genTool(82, 19)),
@@ -287,13 +282,11 @@ public enum SMPMaterial {
 	// Mob & Boss Drops & Craftables from them
 	// Drops will ALWAYS be 0
 
-	// TODO Cores
-	AQUATIC_CORE(0, "", ""),
-	NETHER_CORE(0, "", ""),
-	END_CORE(0, "", ""),
-	UNDEAD_CORE(0, "", ""),
-	PASSIVE_CORE(0, "", ""),
-
+	AQUATIC_CORE(0, "Aquatic Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTZkMWMxOWIwZGFiZGY3MzYwZmJkMThkZjlkZmQxYzYxNWRhMmY4ZDJjODRmYzQyMTY1NjVkOWM1ZGQifX19"),
+	NETHER_CORE(0, "Nether Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDQyNTMyNzVlMWI3NzU3MTMwYTJkNjM3ZDA3ZjUyMmZjYzY2ODZkYzgwNDM0NmYwZTcxNjY4ZDVjZTZkNTg5MSJ9fX0="),
+	END_CORE(0, "End Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODEyNTFkODE0YmRlYThmYzQ4ODFhZWI2ZTdkMWY0OGEyZWRmOWNkYmE5YWI0ZTNmYTdmNzM1OWM1YjkyIn19fQ=="),
+	LIFE_CORE(0, "Life Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTVjYmYzOTVlOTNlYmZlZTk0YTllZDYzNDVkMTE3ZDQ2YTYzYzczNTBmNDhlNjZiNzU0ZTMyMzFlN2YzZTMifX19"),
+	
 	ZOMBIE_SWORD(0, Material.WOODEN_SWORD, "Zombie Sword", genAttack(6, 0, 0.5)),
 	END_BOW(0, Material.BOW, "End Bow", genBow(4, 1, true, false), genTool(1, 0)),
 	
@@ -312,7 +305,7 @@ public enum SMPMaterial {
 	MAGIC_DUST(0, Material.BLAZE_POWDER, "Magic Dust", glint()),
 
 	GUARDIAN_TRIDENT(0, Material.TRIDENT, "Guardian Trident", genAttack(21, 9, 1), genTool(16, 0)),
-	// Craftables
+	// Craftables & Other
 	AQUATIC_AXE(2, Material.DIAMOND_AXE, "Aquatic Axe", genAttack(7, 0.5, 1), genTool(2, 4)),
 	AQUATIC_PICKAXE(2, Material.DIAMOND_PICKAXE, "Aquatic Pickaxe", genTool(2, 4)),
 	AQUATIC_SHOVEL(2, Material.DIAMOND_SHOVEL, "Aquatic Shovel", genTool(2, 4)),
@@ -325,11 +318,15 @@ public enum SMPMaterial {
 	MAGIC_RUBY_SWORD(9, Material.DIAMOND_SWORD, "Magic Ruby Sword", genAttack(55, 12, 1), genTool(100, 0)),
 
 	REPAIRED_WITHERING_BOOTS(17, Material.LEATHER_BOOTS, "Repaired Withering Boots", genArmor(61, 39, 11), genTool(41, 0)),
+	CHARGED_NETHER_CORE(17, "Charged Nether Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDQyNTMyNzVlMWI3NzU3MTMwYTJkNjM3ZDA3ZjUyMmZjYzY2ODZkYzgwNDM0NmYwZTcxNjY4ZDVjZTZkNTg5MSJ9fX0="),
 	
 	MAGIC_ENDERITE_SWORD(21, Material.NETHERITE_SWORD, "Magic Enderite Sword", genAttack(71, 15, 1), genTool(100, 0)),
-
+	CHARGED_END_CORE(21, "Charged End Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODEyNTFkODE0YmRlYThmYzQ4ODFhZWI2ZTdkMWY0OGEyZWRmOWNkYmE5YWI0ZTNmYTdmNzM1OWM1YjkyIn19fQ=="),
+	
 	IMPROVED_WITHERING_BOOTS(32, Material.LEATHER_BOOTS, "Improved Withering Boots", genArmor(93, 55, 26), genTool(77, 0)),
-
+	
+	TITAN_CORE(39, "Titan Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWMxZmU4MzlhOTA4YTA3MWNjNjNmMjY2ZmQ2MTQyYTEwNjA3M2ZkMjY5ZWRhMTJjMzJjMjM5ZjRkYmQwMzIyZiJ9fX0="),
+	
 	MAGIC_GRAPHENE_SWORD(43, Material.STONE_SWORD, "Magic Graphene Sword", genAttack(97, 15, 1), genTool(100, 0)),
 	MAGIC_GUARDIAN_TRIDENT(43, Material.TRIDENT, "Magic Guardian Trident", genAttack(79, 17, 1), genTool(100, 0)),
 
@@ -338,6 +335,8 @@ public enum SMPMaterial {
 	MAGIC_APATITE_SWORD(63, Material.IRON_ORE, "Magic Apatite Sword", genAttack(119, 15, 1), genTool(100, 0)),
 
 	MAGIC_TOPAZ_JADE_SWORD(79, Material.DIAMOND_SWORD, "Magic Topaz-Jade Sword", genAttack(142, 15, 1), genTool(100, 0)),
+	
+	
 	;
 	
 	public static final Map<SMPMaterial, SMPMaterial> ORE_DROPS = ImmutableMap.<SMPMaterial, SMPMaterial>builder()

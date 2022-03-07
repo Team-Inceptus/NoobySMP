@@ -42,6 +42,22 @@ public enum AbilityItem {
 	BULLET_WAND(0, Material.STICK, "Bullet Wand"),
 
 	OCASSUS_BOW_1(0, Material.BOW, "Ocassus Bow"),
+	
+	// Tags - Boss Drops
+	SCROLL_THROWING(0, Material.MAP, "Scroll of Throwing"),
+	// Tags - Craftables
+	STRENGTH_MELIORATE(4, Material.RED_DYE, "Strength Meliorate"),
+	
+	SNOWY_ENRICHMENT(10, Material.SNOW, "Snowy Enrichment"),
+	SWAMP_ENRICHMENT(10, Material.VINE, "Swamp Enrichment"),
+	
+	AQUATIC_ENRICHMENT(12, Material.HEART_OF_THE_SEA, "Aquatic Enrichment"),
+	
+	NETHER_ENRICHMENT(18, Material.MAGMA_BLOCK, "Nether Enrichment"),
+	
+	END_ENRICHMENT(24, Material.CHORUS_FRUIT, "End Enrichment"),
+	
+	TITAN_ENRICHMENT(39, Material.NETHERITE_INGOT, "Titan Enrichment")
 	;
 	
 	private final int levelUnlocked;

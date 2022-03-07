@@ -16,6 +16,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
 public class SMPRecipe {
@@ -52,6 +53,10 @@ public class SMPRecipe {
 	}
 
 	public SMPRecipe(SMPMaterial result, String recipeMap, Map<Character, ItemStack> ingredients) {
+		this(result.getItem(), recipeMap, ingredients);
+	}
+	
+	public SMPRecipe(AbilityItem result, String recipeMap, Map<Character, ItemStack> ingredients) {
 		this(result.getItem(), recipeMap, ingredients);
 	}
 
