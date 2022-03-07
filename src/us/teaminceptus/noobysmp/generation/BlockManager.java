@@ -15,6 +15,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
 public class BlockManager implements Listener {
@@ -31,6 +32,11 @@ public class BlockManager implements Listener {
 		Block b = e.getBlock();
 		if (!(e.getItemInHand().hasItemMeta())) return;
 		if (!(e.getItemInHand().getItemMeta().hasLocalizedName())) return;
+		
+		if (AbilityItem.getByLocalization(e.getItemInHand().getItemMeta().getLocalizedName()) != null) {
+			e.setCancelled(true);
+			return;
+		}
 		
 		b.setMetadata("type", new FixedMetadataValue(plugin, e.getItemInHand().getItemMeta().getLocalizedName()));
 	}
