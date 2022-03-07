@@ -48,6 +48,11 @@ public class Trade implements CommandExecutor {
         }
 
         Player target = Bukkit.getPlayer(args[0]);
+        
+        if (target.getUniqueId().equals(p.getUniqueId())) {
+        	p.sendMessage(ChatColor.RED + "You can't trade with yourself!");
+        	return false;
+        }
 
         if (!(TradeInstance.canTrade(target))) {
             p.sendMessage(ChatColor.RED + "This player cannot trade yet!");
