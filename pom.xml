@@ -66,6 +66,10 @@
 			<id>everything</id>
 			<url>https://repo.citizensnpcs.co/</url>
 		</repository>
+		<repository>
+		    <id>jeff-media-public</id>
+		    <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
+		</repository>
 	</repositories>
 	
 	<dependencies>
@@ -76,6 +80,12 @@
 			<scope>provided</scope>
 			<classifier>remapped-mojang</classifier>
 	    </dependency>
+		<dependency>
+		    <groupId>com.jeff_media</groupId>
+		    <artifactId>CustomBlockData</artifactId>
+		    <version>1.0.5</version>
+		    <scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>net.citizensnpcs</groupId>
 			<artifactId>citizens-main</artifactId>

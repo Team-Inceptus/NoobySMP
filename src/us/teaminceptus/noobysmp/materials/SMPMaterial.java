@@ -3,12 +3,11 @@ package us.teaminceptus.noobysmp.materials;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -19,8 +18,12 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.google.common.collect.ImmutableMap;
+import com.jeff_media.customblockdata.CustomBlockData;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.SMPMaterial.CleanOutput.MaterialOutput;
@@ -335,19 +338,24 @@ public enum SMPMaterial {
 	MAGIC_APATITE_SWORD(63, Material.IRON_ORE, "Magic Apatite Sword", genAttack(119, 15, 1), genTool(100, 0)),
 
 	MAGIC_TOPAZ_JADE_SWORD(79, Material.DIAMOND_SWORD, "Magic Topaz-Jade Sword", genAttack(142, 15, 1), genTool(100, 0)),
-	
-	
 	;
+	
+	private static int idCounter = 0;
 	
 	public static final Map<SMPMaterial, SMPMaterial> ORE_DROPS = ImmutableMap.<SMPMaterial, SMPMaterial>builder()
 			.put(SMPMaterial.RUBY_ORE, SMPMaterial.RUBY)
 			.put(SMPMaterial.DEEPSLATE_RUBY_ORE, SMPMaterial.RUBY)
+			.put(SMPMaterial.ENDERITE_ORE, SMPMaterial.ENDER_FRAGMENT)
+			// Titan
+			.put(SMPMaterial.BEDROCK_ORE, SMPMaterial.BEDROCK_INGOT)
+			.put(SMPMaterial.DEEPSLATE_BEDROCK_ORE, SMPMaterial.BEDROCK_INGOT)
+			
 			.build();
 	
 	private final String localization;
 	
 	private final String name;
-	private final ItemStack item;
+	private ItemStack item;
 	private final int levelUnlocked;
 	
 	private final ChatColor cc;
@@ -368,10 +376,16 @@ public enum SMPMaterial {
 	 */
 	public void setBlock(Location loc) {
 		if (!(this.item.getType().isBlock())) return;
+		SMP plugin = JavaPlugin.getPlugin(SMP.class);
+		
+		
 		
 		Block b = loc.getWorld().getBlockAt(loc);
 		b.setType(this.item.getType());
-		b.setMetadata("type", new FixedMetadataValue(JavaPlugin.getPlugin(SMP.class), this.localization));
+		
+		PersistentDataContainer c = new CustomBlockData(b, plugin);
+		
+		c.set(new NamespacedKey(plugin, "type"), PersistentDataType.STRING, this.localization);
 	}
 	
 	public void setBlock(World w, int x, int y, int z) {
@@ -409,6 +423,17 @@ public enum SMPMaterial {
 	
 	private static final HashMap<Enchantment, Integer> unbreak() {
 		return genTool(100, 0);
+	}
+	
+	static {
+		for (SMPMaterial m : values()) {
+			ItemStack item = m.getItem();
+			ItemMeta meta = item.getItemMeta();
+			meta.setCustomModelData(idCounter);
+			item.setItemMeta(meta);
+			m.item = item;
+			idCounter++;
+		}
 	}
 
 	private static final HashMap<Attribute, AttributeModifier> genArmor(double armor, double toughness, double knockback) {
