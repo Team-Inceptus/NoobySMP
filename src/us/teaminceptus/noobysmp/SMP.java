@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,6 +28,7 @@ import us.teaminceptus.noobysmp.commands.Trade;
 import us.teaminceptus.noobysmp.commands.admin.Catalogue;
 import us.teaminceptus.noobysmp.commands.admin.Experience;
 import us.teaminceptus.noobysmp.commands.admin.Ranks;
+import us.teaminceptus.noobysmp.commands.admin.RunTest;
 import us.teaminceptus.noobysmp.commands.admin.SetBiome;
 import us.teaminceptus.noobysmp.conquest.ConquestManager;
 import us.teaminceptus.noobysmp.entities.EntityManager;
@@ -37,8 +40,10 @@ import us.teaminceptus.noobysmp.generation.biomes.TitanBiome;
 import us.teaminceptus.noobysmp.leveling.LevelingManager;
 import us.teaminceptus.noobysmp.leveling.trades.TradeCommandManager;
 import us.teaminceptus.noobysmp.leveling.trades.TradesManager;
+import us.teaminceptus.noobysmp.materials.TagsManager;
 import us.teaminceptus.noobysmp.player.ServerManager;
 import us.teaminceptus.noobysmp.recipes.RecipeManager;
+import us.teaminceptus.noobysmp.util.Items;
 import us.teaminceptus.noobysmp.util.PlayerConfig;
 
 public class SMP extends JavaPlugin {
@@ -151,8 +156,19 @@ public class SMP extends JavaPlugin {
 		}
 	};
 	
+	public static final BukkitRunnable UPDATE_BIOMES = new BukkitRunnable() {
+		public void run() {
+			World tW = Bukkit.getWorld("world_titan");
+			
+			for (Chunk c : tW.getLoadedChunks()) {
+				TitanBiome.WITHERED_PLAINS.setBiome(c);
+			}
+		}
+	};
+	
 	private void startTasks() {
 		UPDATE_TASK.runTaskTimer(this, 0, FILE_UPDATE_SPEED_TICKS);
+//		UPDATE_BIOMES.runTaskTimer(this, 20, 20);
 	}
 	
 	public void onEnable() {
@@ -173,6 +189,7 @@ public class SMP extends JavaPlugin {
 		new Catalogue(this);
 		new Experience(this);
 		new SetBiome(this);
+		new RunTest(this);
 		
 		getLogger().info("Loading Managers...");
 		// Managers
@@ -186,7 +203,9 @@ public class SMP extends JavaPlugin {
 		new RecipeManager(this);
 		new AbilityManager(this);
 		new ItemManager(this);
+		new TagsManager(this);
 		
+		new Items(this);
 		
 		new LevelingManager(this);
 		new TradesManager(this);
@@ -201,7 +220,7 @@ public class SMP extends JavaPlugin {
 		}
 		
 //		WorldCreator titan = new WorldCreator("world_titan");
-//		titan.generator(new TitanChunkGenerator(this));
+////		titan.generator(new TitanChunkGenerator(this));
 //		Bukkit.createWorld(titan);
 		
 		getLogger().info("Successfylly loaded worlds! Loading tasks...");
