@@ -78,7 +78,7 @@ public interface BossSetup {
     @Target(ElementType.TYPE)
     public static @interface Icon {
 
-        Material value() default Material.DIAMOND_SWORD;
+        Material value();
 
     }
     

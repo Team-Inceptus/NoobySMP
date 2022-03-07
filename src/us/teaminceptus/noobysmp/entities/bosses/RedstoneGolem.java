@@ -1,7 +1,6 @@
 package us.teaminceptus.noobysmp.entities.bosses;
 
-import com.google.common.collect.ImmutableMap;
-
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -11,10 +10,14 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.collect.ImmutableMap;
+
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.SpawnCost;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Tier;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.CancelChance;
@@ -28,6 +31,8 @@ import us.teaminceptus.noobysmp.util.Items;
 @HP(180000)
 @Description({"The ancients discovered the usefulness of", "redstone many years ago, and have built", "protective measures to defend themselves.", "These remnants of a dark past were hidden for a", "very good reason."})
 @SpawnCost({"redstone_block:16", "redstone_dust:8"})
+@Icon(Material.REDSTONE_BLOCK)
+@DisplayName(value = "Redstone Golem", cc = ChatColor.RED)
 public class RedstoneGolem extends SMPBoss<IronGolem> {
     
     @CancelChance(35)

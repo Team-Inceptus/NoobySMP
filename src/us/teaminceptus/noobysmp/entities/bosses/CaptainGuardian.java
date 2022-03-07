@@ -27,15 +27,16 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @Tier(2)
 @Description({"Captain of a Guardian Fleet, he's one of", "the strongest foes you'll meet."})
 @SpawnCost({"prismarine_shard:32", "prismarine:8"})
-@HP(6000)
-@Icon(Material.PRISMARINE_SHARD)
+@HP(40000)
+@Icon(Material.SEA_LANTERN)
 @DisplayName(value = "Captain Guardian", cc = ChatColor.AQUA)
 public class CaptainGuardian extends SMPBoss<ElderGuardian> {
+	
     @Experience(50)
     @MinionSpawn(type = EntityType.GUARDIAN, chance = 15)
     @MinionSpawn(type = EntityType.ELDER_GUARDIAN, chance = 5)
     public CaptainGuardian(Location loc) {
-        super(ElderGuardian.class, loc, 6000, "Captain Guardian",
+        super(ElderGuardian.class, loc, 40000, "Captain Guardian",
         ImmutableMap.<ItemStack, Integer>builder()
         .put(SMPMaterial.GUARDIAN_TRIDENT.getItem(), 20)
         .put(new ItemStack(Material.SPONGE, r.nextInt(12) + 12), 100)

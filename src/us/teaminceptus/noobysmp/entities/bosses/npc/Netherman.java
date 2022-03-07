@@ -1,7 +1,5 @@
 package us.teaminceptus.noobysmp.entities.bosses.npc;
 
-import com.google.common.collect.ImmutableMap;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,10 +11,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.google.common.collect.ImmutableMap;
+
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.SpawnCost;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Tier;
@@ -30,6 +31,7 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @SpawnCost({"nether_core:4"})
 @Icon(Material.BLAZE_POWDER)
 @DisplayName(value = "Netherman", cc = ChatColor.RED)
+@HP(100)
 public class Netherman extends NPCBoss {
 
     @Experience(10)
