@@ -45,6 +45,9 @@ commands:
   setbiome:
     description: Manage Biomes in current area
     aliases: [setcustombiome, setb, setcustomb, setcbiome]
+  runtest:
+    description: Run Tests for Features
+    permission: smp.admin
     
 permissions:
   smp.*:
