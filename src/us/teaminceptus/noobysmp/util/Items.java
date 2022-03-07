@@ -140,6 +140,7 @@ public class Items implements Listener {
 		public Builder addFlags(ItemFlag... flags) {
 			ItemMeta meta = item.getItemMeta();
 			meta.addItemFlags(flags);
+			item.setItemMeta(meta);
 			return this;
 		}
 
@@ -164,17 +165,23 @@ public class Items implements Listener {
 		return new Builder(starter);
 	}
 
-	public static class Inventory {
+	public static interface Inventory {
 
-		public static final ItemStack GUI_PANE = itemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName(" ").build();
-		public static final ItemStack NEXT_ARROW = itemBuilder(Material.ARROW).setName(ChatColor.GREEN + "Next").build();
-		public static final ItemStack BACK_ARROW = itemBuilder(Material.ARROW).setName(ChatColor.RED + "Back").build();
+		ItemStack GUI_PANE = noName(Material.BLACK_STAINED_GLASS_PANE);
+		ItemStack NEXT_ARROW = itemBuilder(Material.ARROW).setName(ChatColor.GREEN + "Next").build();
+		ItemStack BACK_ARROW = itemBuilder(Material.ARROW).setName(ChatColor.RED + "Back").build();
 	
-		public static final ItemStack BACK_HEAD = itemBuilder(getHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ=="))
+		ItemStack BACK_HEAD = itemBuilder(getHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ=="))
 				.setName(ChatColor.RED + "Back").build();
 		
-		public static final ItemStack FORWARD_HEAD = itemBuilder(getHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19"))
+		ItemStack FORWARD_HEAD = itemBuilder(getHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19"))
 				.setName(ChatColor.GREEN + "Forward").build();
+	}
+	
+	public static interface Tags {
+		
+		ItemStack TOO_MANY_TAGS = itemBuilder(Material.BARRIER).setName(ChatColor.RED + "You have too Many Tags!").build();
+		
 	}
 	
 	public static final ItemStack[] NON_COLLECTIBLES = {
@@ -184,7 +191,8 @@ public class Items implements Listener {
 		Inventory.GUI_PANE,
 		Inventory.NEXT_ARROW,
 		Inventory.BACK_HEAD,
-		Inventory.FORWARD_HEAD
+		Inventory.FORWARD_HEAD,
+		Tags.TOO_MANY_TAGS
 	};
 	
 }
