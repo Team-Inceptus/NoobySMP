@@ -11,15 +11,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.google.common.collect.ImmutableList;
-
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -27,7 +29,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -36,6 +37,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Vector;
+
+import com.google.common.collect.ImmutableList;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
@@ -68,10 +73,117 @@ public class BossManager implements Listener {
     private static final int T1_UNLOCK = 5;
     protected SMP plugin;
 
+    
+    private final BukkitRunnable REPEATED_ATTACKS = new BukkitRunnable() {
+    	public void run() {
+    		for (World w : Bukkit.getWorlds()) {
+    			for (LivingEntity e : w.getEntitiesByClass(LivingEntity.class)) {
+    				if (SMPBoss.getByUUID(e.getUniqueId()) == null && NPCBoss.getByUUID(e.getUniqueId()) == null) continue;
+    				
+    				final 
+    				Class<?> bossClass;
+    				if (SMPBoss.getByUUID(e.getUniqueId()) != null) {
+    					bossClass = SMPBoss.getByUUID(e.getUniqueId()).getClass();
+    				} else if (NPCBoss.getByUUID(e.getUniqueId()) != null) {
+    					bossClass = NPCBoss.getByUUID(e.getUniqueId()).getClass();
+    				} else bossClass = null;
+    				
+    				if (bossClass == null) continue;
+    				
+    				for (Method m : bossClass.getDeclaredMethods()) {
+    					if (m.isAnnotationPresent(Repeated.class)) {
+    						Repeated r = m.getAnnotation(Repeated.class);
+    						
+    						new BukkitRunnable() {
+    							public void run() {
+    								if (e.isDead()) cancel();
+    								
+    								try {
+    									m.invoke(SMPBoss.getByUUID(e.getUniqueId()) == null ? NPCBoss.getByUUID(e.getUniqueId()) : SMPBoss.getByUUID(e.getUniqueId()));
+    								} catch (Exception err) {
+    									plugin.getLogger().info("Error executing repeated attack " + m.getName() + " in class " + bossClass.getName());
+    									err.printStackTrace();
+    								}
+    							}
+    						}.runTaskTimer(plugin, r.value(), r.value());
+    					}
+    				}
+    			}
+    		}
+    	}
+    };
+    
     public BossManager(SMP plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        REPEATED_ATTACKS.runTaskTimer(plugin, 2, 2);
+        plugin.getLogger().info("Loaded Repeated Attacks Runnable");
     }
+    
+	
+    public static void throwItem(Location start, double distance, ItemStack item, double damage) {
+    	throwItem(start, distance, item, damage, null);
+    }
+    
+	public static void throwItem(Location start, double distance, ItemStack item, double damage, Player p) {
+		Vector direction = start.getDirection();
+		
+		ArmorStand stand = start.getWorld().spawn(start, ArmorStand.class);
+		
+		stand.setInvulnerable(true);
+		stand.setInvisible(true);
+		stand.setBasePlate(false);
+		stand.setArms(true);
+		stand.setGravity(false);
+		
+		stand.getEquipment().setItemInMainHand(item);
+		stand.setRightArmPose(EulerAngle.ZERO);
+		
+		double tpRange = 0.2;
+		
+		if (p != null) p.getInventory().removeItem(item);
+		
+		new BukkitRunnable() {
+			int runs = 0;
+			
+			public void run() {
+				
+				if (stand.isDead()) cancel();
+				// Rotate Arm
+				double currentRot = stand.getRightArmPose().getX();
+				stand.setRightArmPose(new EulerAngle(currentRot + 0.5, 0, 0));
+				
+				// Move
+				
+				Location target = stand.getLocation().add(direction.normalize().multiply(tpRange));
+				
+				if (!(target.getBlock().isPassable())) {
+					stand.remove();
+					cancel();
+				}
+				
+				stand.teleport(target);
+				
+				// Damage
+				List<LivingEntity> targets = new ArrayList<>();
+				
+				for (Entity en : stand.getNearbyEntities(0.75, 0.75, 0.75)) if (en instanceof LivingEntity len) targets.add(len);
+				
+				for (LivingEntity len : targets) len.damage(damage, stand);
+				
+				if (runs >= (1 / tpRange) * distance) {
+					stand.remove();
+					cancel();
+					if (p != null) {
+						HashMap<Integer, ItemStack> leftovers = p.getInventory().addItem(item);
+						for (ItemStack l : leftovers.values()) p.getWorld().dropItemNaturally(p.getLocation(), l);
+					}
+				}
+				
+				runs++;
+			}
+		}.runTaskTimer(JavaPlugin.getPlugin(SMP.class), 0, 1);
+	}
 
     private static class BossHolder extends CancelHolder {
 
@@ -207,7 +319,7 @@ public class BossManager implements Listener {
 
         if (inv.getHolder() instanceof BossHolder) {
 
-            Class<? extends SMPBoss<? extends Mob>> bossClass = SMPBoss.getByIcon(clickedItem.getType());
+            Class<?> bossClass = (SMPBoss.getByIcon(clickedItem.getType()) != null ? SMPBoss.getByIcon(clickedItem.getType()) : NPCBoss.getByIcon(clickedItem.getType()));
             if (bossClass == null) return;
 
             SpawnCost cost = bossClass.getAnnotation(SpawnCost.class);
@@ -278,34 +390,6 @@ public class BossManager implements Listener {
     	Material.STONE_SWORD,
     	Material.NETHERITE_SWORD
     };
-
-    @EventHandler
-    public void onSpawn(EntitySpawnEvent e) {
-        if (!(e.getEntity() instanceof Mob m)) return;
-
-        if (!(SMPBoss.getBossList().contains(m.getUniqueId()))) return;
-
-        SMPBoss<? extends Mob> boss = SMPBoss.getByUUID(m.getUniqueId());
-
-        for (Method method : boss.getClass().getDeclaredMethods()) {
-            if (method.isAnnotationPresent(Repeated.class)) {
-                Repeated rep = method.getAnnotation(Repeated.class);
-
-                new BukkitRunnable() {
-                    public void run() {
-                        if (m.isDead()) cancel();
-
-                        try {
-                            method.invoke(boss);
-                        } catch (Exception err) {
-                            plugin.getLogger().info("Error executing repeated task " + method.getName() + " in " + boss.getClass().getName());
-                            err.printStackTrace();
-                        }
-                    }
-                }.runTaskTimer(plugin, rep.value(), rep.value());
-            }
-        }
-    }
 
     @EventHandler
     public void onDamageDefensive(EntityDamageByEntityEvent e) {
