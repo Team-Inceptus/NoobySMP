@@ -3,7 +3,7 @@
 > TheNoobyGodsSMP Version 2.0
 
 ## What is NoobySMP?
-NoobySMP is a Minecraft Server developed by Team Inceptus for TheNoobyGods. It is currently in high development, and has a planned release of **March 19**. This data can be changed, either delyaed or released early.
+NoobySMP is a Minecraft Server developed by Team Inceptus for TheNoobyGods. It is currently in high development, and has a planned beta release of **March 19** at `smp.teaminceptus.us`. This data can be changed, either delyaed or released early.
 
 ## Why was it created?
 At the beginning of the TheNoobyGods, they held a SMP. This SMP did alright, but it eventually spun into madness and died. It is curently still up, but will be taken down after beta is finished and ready for testing release.
@@ -17,6 +17,8 @@ Team Inceptus, as a whole, is the development behind many projects. You can find
 
 ## How is NoobySMP?
 As said earlier, the server is currently in development. You can view public pre-releases on our [releases](https://github.com/Team-Inceptus/NoobySMP/releases) page. Screenshots of previous features can be found below.
+![BiomeTest2](https://ibb.co/FYFcSTH)
+![BiomeTest1](https://ibb.co/tsLdFTk)
 ![2022-02-26_11 44 55](https://user-images.githubusercontent.com/54124162/155906403-7cab99c6-5c40-4be4-ad6c-1410dfcb25f0.png)
 ![2022-02-26_11 24 18](https://user-images.githubusercontent.com/54124162/155906409-607f517d-21f5-4dde-a4ed-ff5427a748ad.png)
 ![2022-02-12_12 50 52](https://user-images.githubusercontent.com/54124162/155906416-b25ec520-d4c0-43db-8e8e-c687949ad0e4.png)
