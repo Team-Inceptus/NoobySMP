@@ -57,6 +57,7 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 	.add(EmeraldThief.class)
 	.add(EnchantedEnderman.class)
 	.add(Graphenefish.class)
+	.add(CaptainGuardian.class)
 	.build();
 
 	public SMPBoss(Class<T> clazz, Location loc, double maxHealth, String name, Map<ItemStack, Integer> drops, Map<Attribute, Double> attributes) {
@@ -94,6 +95,7 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 	}
 	public static Class<? extends SMPBoss<?>> getByIcon(Material icon) {
 		for (Class<? extends SMPBoss<?>> bossClass : CLASS_LIST) {
+			if (!(bossClass.isAnnotationPresent(Icon.class))) continue;
 			if (icon == bossClass.getAnnotation(Icon.class).value()) return bossClass;
 		}
 
@@ -120,7 +122,7 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 		.put(Attribute.GENERIC_ARMOR, Math.min(maxHealth / 200, 500))
 		.put(Attribute.GENERIC_KNOCKBACK_RESISTANCE, maxHealth / 2000)
 		.put(Attribute.GENERIC_ARMOR_TOUGHNESS, Math.min(maxHealth / 400, 400))
-		.put(Attribute.GENERIC_MOVEMENT_SPEED, Math.min(maxHealth / 1000, 1))
+		.put(Attribute.GENERIC_MOVEMENT_SPEED, Math.min(maxHealth / 3000, 0.6))
 		.put(Attribute.GENERIC_ATTACK_DAMAGE, Math.min(maxHealth / 300, 400))
 		.build();
 	}
