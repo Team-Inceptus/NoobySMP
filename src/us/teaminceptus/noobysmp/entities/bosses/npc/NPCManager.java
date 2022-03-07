@@ -5,9 +5,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
-
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
