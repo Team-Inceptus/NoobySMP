@@ -1,6 +1,7 @@
 package us.teaminceptus.noobysmp.generation.biomes;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -102,6 +103,16 @@ public enum TitanBiome {
 		this.skyColor = (skyColor == null ? "78A7FF" : skyColor);
 		this.grassColor = grassColor;
 		this.foliageColor = (foliageColor == null ? grassColor : foliageColor);
+	}
+	
+	public static final TitanBiome getReplaceable(Biome b) {
+		for (TitanBiome t : REPLACEABLES.keySet()) {
+			if (Arrays.asList(REPLACEABLES.get(t)).contains(b)) {
+				return t;
+			}
+		}
+		
+		return TitanBiome.WITHERED_PLAINS;
 	}
 	
 	public static final Map<TitanBiome, Biome[]> REPLACEABLES = ImmutableMap.<TitanBiome, Biome[]>builder()
@@ -246,6 +257,8 @@ public enum TitanBiome {
 			ResourceKey<net.minecraft.world.level.biome.Biome> oldKey = Biomes.FOREST;
 			WritableRegistry<net.minecraft.world.level.biome.Biome> registrywritable = (WritableRegistry<net.minecraft.world.level.biome.Biome>) server.registryAccess().ownedRegistryOrThrow(registry);
 			net.minecraft.world.level.biome.Biome forestbiome = registrywritable.get(oldKey);
+			
+			if (registrywritable.containsKey(key)) continue;
 			
 			BiomeBuilder builder = new net.minecraft.world.level.biome.Biome.BiomeBuilder();
 			builder.biomeCategory(BiomeCategory.NONE);
