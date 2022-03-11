@@ -20,9 +20,11 @@ import net.minecraft.world.entity.EquipmentSlot;
 import us.teaminceptus.noobysmp.ability.AbilityManager;
 import us.teaminceptus.noobysmp.ability.cosmetics.Cosmetics;
 import us.teaminceptus.noobysmp.commands.Bosses;
+import us.teaminceptus.noobysmp.commands.GetRecipe;
 import us.teaminceptus.noobysmp.commands.Help;
 import us.teaminceptus.noobysmp.commands.PlayerInfo;
 import us.teaminceptus.noobysmp.commands.Progress;
+import us.teaminceptus.noobysmp.commands.Query;
 import us.teaminceptus.noobysmp.commands.Settings;
 import us.teaminceptus.noobysmp.commands.Trade;
 import us.teaminceptus.noobysmp.commands.admin.Catalogue;
@@ -184,6 +186,8 @@ public class SMP extends JavaPlugin {
 		new Bosses(this);
 		new Cosmetics(this);
 		new Trade(this);
+		new Query(this);
+		new GetRecipe(this);
 		// Admin Commands
 		new Ranks(this);
 		new Catalogue(this);

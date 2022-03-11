@@ -26,12 +26,18 @@ commands:
   trade:
     description: Trade with other players
     alias: trades
+  query:
+    description: Query an item available
+    alias: [iteminfo, iinfo, itemi, queryitem, qitem]
   accepttrade:
     description: Accept a trade from another person
     aliases: [acctrade, atrade]
   rejecttrade:
     description: Deny a trade from another person
     aliases: [denytrade, dtrade, rtrade, rejtrade]
+  getrecipe:
+    description: Fetch a recipe for an item
+    aliases: [getr, fetchrecipe, fetchr, grecipe, frecipe]
   # Admin
   catalogue:
     description: Open up the SMP Catalogue for fetching stuff.
