@@ -86,6 +86,12 @@ public class PlayerConfig {
 		saveFile();
 	}
 
+	public void sendNotification(String message) {
+		if (getSetting("notifications") && p.isOnline()) {
+			p.getPlayer().sendMessage(message);
+		}
+	}
+
 	public double getExpToNextLevel() {
 		return toMinExperience(getLevel() + 1) - getExperience(); 
 	}
@@ -219,6 +225,7 @@ public class PlayerConfig {
 	
 	public void cancelCosmetic() {
 		this.cosmeticTask = null;
+		updateCosmetic();
 	}
 	
 	/**
