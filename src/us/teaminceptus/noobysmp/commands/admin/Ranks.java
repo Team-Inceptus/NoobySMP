@@ -26,27 +26,27 @@ public class Ranks implements TabExecutor, Listener {
 	// Admin
 	public static final RankData OWNER = new RankData(
 		ChatColor.DARK_RED + "" + ChatColor.BOLD + "[OWNER] " + ChatColor.GOLD,
-		ChatColor.DARK_RED + "" + ChatColor.BOLD + "Owner " + ChatColor.GOLD	
+		ChatColor.DARK_RED + "" + ChatColor.BOLD + "Owner " + ChatColor.GOLD, 0	
 	);
 
 	public static final RankData ADMIN = new RankData(
 		ChatColor.RED + "" + ChatColor.BOLD + "[ADMIN] " + ChatColor.YELLOW,
-		ChatColor.RED + "" + ChatColor.BOLD + "Admin " + ChatColor.YELLOW
+		ChatColor.RED + "" + ChatColor.BOLD + "Admin " + ChatColor.YELLOW, 1
 	);
 
 	public static final RankData MOD = new RankData(
 		ChatColor.AQUA + "[MOD] " + ChatColor.DARK_AQUA,
-		ChatColor.AQUA + "Mod " + ChatColor.DARK_AQUA
+		ChatColor.AQUA + "Mod " + ChatColor.DARK_AQUA, 2
 	);
 
 	public static final RankData JRMOD = new RankData(
 		ChatColor.BLUE + "[JRMOD] " + ChatColor.DARK_BLUE,
-		ChatColor.BLUE + "JrMod " + ChatColor.DARK_BLUE
+		ChatColor.BLUE + "JrMod " + ChatColor.DARK_BLUE, 3
 	);
 
 	public static final RankData TRIALMOD = new RankData(
 		ChatColor.RED + "[TMOD] " + ChatColor.LIGHT_PURPLE,
-		ChatColor.RED + "Trial Mod " + ChatColor.LIGHT_PURPLE
+		ChatColor.RED + "Trial Mod " + ChatColor.LIGHT_PURPLE, 4
 	);
 
 	public static final Map<String, RankData> RANK_MAP = ImmutableMap.<String, RankData>builder()
@@ -58,17 +58,31 @@ public class Ranks implements TabExecutor, Listener {
 	.put("member", RankData.member())
 	.build();
 
-	public static class RankData {
+	public static final class RankData {
 		private final String tab;
 		private final String chat;
+		private final int weight;
 		
-		public RankData(String tab, String chat) {
+		public RankData(String tab, String chat, int weight) {
 			this.tab = tab;
 			this.chat = chat;
+			this.weight = weight;
+		}
+
+		public final int getWeight() {
+			return this.weight;
 		}
 		
 		public static RankData member() {
-			return new RankData("MEMBER", "MEMBER");
+			return new RankData("MEMBER", "MEMBER", 5);
+		}
+
+		public static RankData from(String rank) {
+			return RANK_MAP.get(rank.toLowerCase());
+		}
+
+		public static RankData from(Player p) {
+			return from(new PlayerConfig(p).getRank());
 		}
 		
 		public boolean isMember() {
