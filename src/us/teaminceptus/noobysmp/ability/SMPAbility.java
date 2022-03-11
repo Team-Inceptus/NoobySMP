@@ -20,8 +20,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import us.teaminceptus.noobysmp.SMP;
-import us.teaminceptus.noobysmp.enchants.SMPEnchant;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
+import us.teaminceptus.noobysmp.util.PlayerConfig;
 
 /**
  * Enum used for abilities from items and some from enchants.
@@ -45,9 +45,6 @@ public enum SMPAbility {
 		else b.setTarget(null);
 	}),
 	
-	// Enchants
-	THUNDERING("Thundering", RIGHT_CLICK(), SMPEnchant.THUNDERING, (p, target) -> p.getWorld().strikeLightning(target.getLocation()))
-	
 	;
 	
 //	private static final Action[] combineLists(Action[]... mats) {
@@ -69,7 +66,6 @@ public enum SMPAbility {
 	private final long cooldown;
 	
 	private final AbilityItem item;
-	private final SMPEnchant enchantment;
 
 	public static final Map<SMPAbility, List<UUID>> cooldowns = new HashMap<>();
 	
@@ -80,17 +76,6 @@ public enum SMPAbility {
 		this.name = name;
 		this.actions = action;
 		this.item = item;
-		this.enchantment = null;
-		this.output = output;
-		this.cooldown = cooldown;
-		this.bioutput = null;
-	}
-	
-	private SMPAbility(String name, Action[] action, long cooldown, SMPEnchant enchantment, Consumer<Player> output) {
-		this.name = name;
-		this.actions = action;
-		this.enchantment = enchantment;
-		this.item = null;
 		this.output = output;
 		this.cooldown = cooldown;
 		this.bioutput = null;
@@ -100,21 +85,10 @@ public enum SMPAbility {
 		this.name = name;
 		this.actions = action;
 		this.item = item;
-		this.enchantment = null;
 		this.output = null;
 		this.bioutput = output;
 
 		this.cooldown = cooldown;
-	}
-	
-	private SMPAbility(String name, Action[] action, SMPEnchant enchantment, BiConsumer<Player, LivingEntity> output) {
-		this.name = name;
-		this.actions = action;
-		this.enchantment = enchantment;
-		this.item = null;
-		this.output = null;
-		this.bioutput = output;
-		this.cooldown = 0;
 	}
 
 	static {
@@ -129,15 +103,6 @@ public enum SMPAbility {
 		return null;
 	}
 	
-	public static final SMPAbility getByEnchant(SMPEnchant enchant) {
-		for (SMPAbility ability : values()) {
-			if (ability.enchantment == null) continue;
-			if (ability.enchantment.getId().equals(enchant.getId())) return ability;
-		}
-		
-		return null;
-	}
-	
 	public final String getName() {
 		return this.name;
 	}
@@ -146,28 +111,8 @@ public enum SMPAbility {
 		return this.actions;
 	}
 	
-	public final boolean isAbility() {
-		return this.item != null;
-	}
-	
-	public final boolean isEnchant() {
-		return !(isAbility());
-	}
-	
-	/**
-	 * Can be null if ability is from an enchant. Check {@link SMPAbility#isAbility()} before calling this.
-	 * @return AbilityItem
-	 */
 	public final AbilityItem getItem() {
 		return this.item;
-	}
-	
-	/**
-	 * Can be null if ability is for an item. Check {@link SMPAbility#isEnchant()} before calling this.
-	 * @return
-	 */
-	public final SMPEnchant getEnchantment() {
-		return this.enchantment;
 	}
 	
 	/**
@@ -192,11 +137,11 @@ public enum SMPAbility {
 	 */
 	public void init(Player p) {
 		if (cooldowns.get(this).contains(p.getUniqueId())) {
-			p.sendMessage(ChatColor.RED + "Please wait before using this again!");
+			new PlayerConfig(p).sendNotification(ChatColor.RED + "Please wait before using this again!");
 			return;
 		}
 		output.accept(p);
-		initCooldown(p);
+		if (this.cooldown > 0) initCooldown(p);
 	}
 	
 	/**
@@ -205,7 +150,12 @@ public enum SMPAbility {
 	 * @param target LivingEntity target
 	 */
 	public void init(Player p, LivingEntity target) {
+		if (cooldowns.get(this).contains(p.getUniqueId())) {
+			new PlayerConfig(p).sendNotification(ChatColor.RED + "Please wait before using this again!");
+			return;
+		}
 		bioutput.accept(p, target);
+		if (this.cooldown > 0) initCooldown(p);
 	}
 
 	public void initCooldown(Player p) {
@@ -214,7 +164,7 @@ public enum SMPAbility {
 		new BukkitRunnable() {
 			public void run() {
 				cooldowns.get(a).remove(p.getUniqueId());
-				p.sendMessage(ChatColor.GREEN + "You can use " + ChatColor.GOLD + a.name + ChatColor.GREEN + " again!");
+				new PlayerConfig(p).sendNotification(ChatColor.GREEN + "You can use " + ChatColor.GOLD + a.name + ChatColor.GREEN + " again!");
 			}
 		}.runTaskLater(JavaPlugin.getPlugin(SMP.class), this.cooldown);
 	}

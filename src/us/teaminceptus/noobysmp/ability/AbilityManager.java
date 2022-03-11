@@ -15,14 +15,24 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.BeaconInventory;
+import org.bukkit.inventory.CartographyInventory;
+import org.bukkit.inventory.EnchantingInventory;
+import org.bukkit.inventory.FurnaceInventory;
+import org.bukkit.inventory.GrindstoneInventory;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.StonecutterInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import us.teaminceptus.noobysmp.SMP;
-import us.teaminceptus.noobysmp.enchants.SMPEnchant;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
+import us.teaminceptus.noobysmp.util.Items;
+import us.teaminceptus.noobysmp.util.Messages;
 
 public class AbilityManager implements Listener {
 
@@ -33,6 +43,34 @@ public class AbilityManager implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
+	// Prevent ability items being used in non-ability ways
+	@EventHandler
+	public void onConsume(PlayerItemConsumeEvent e) {
+		Player p = e.getPlayer();
+
+		if (AbilityItem.getByItem(e.getItem()) != null) {
+			e.setCancelled(true);
+			p.sendMessage(Messages.CANNOT_CONSUME);
+		}
+	}
+
+	@EventHandler
+	public void onClick(InventoryClickEvent e) {
+		if (e.getCurrentItem() == null) return;
+		ItemStack item = e.getCurrentItem();
+		if (!(item.hasItemMeta())) return;
+		if (AbilityItem.getByItem(item) == null) return;
+
+		Inventory inv = e.getClickedInventory();
+		if (inv instanceof FurnaceInventory) e.setCancelled(true);
+		if (inv instanceof EnchantingInventory) e.setCancelled(true);
+		if (inv instanceof CartographyInventory) e.setCancelled(true);
+		if (inv instanceof BeaconInventory) e.setCancelled(true);
+		if (inv instanceof StonecutterInventory) e.setCancelled(true);
+		if (inv instanceof GrindstoneInventory) e.setCancelled(true);
+		
+	}
+
 	/*
 	 * Name-specific abilities (i.e. Ocassus) 
 	 */
@@ -40,6 +78,11 @@ public class AbilityManager implements Listener {
 	@EventHandler
 	public void onShoot(EntityShootBowEvent e) {
 		if (!(e.getEntity() instanceof Player p)) return;
+
+		if (AbilityItem.getByLocalization(Items.getLocalization(e.getConsumable())) != null) {
+			e.setCancelled(true);
+			return;
+		}
 		
 		e.getProjectile().setMetadata("bow", new FixedMetadataValue(plugin, e.getBow()));
 		
@@ -113,16 +156,6 @@ public class AbilityManager implements Listener {
 				SMPAbility ability = SMPAbility.getByItem(item);
 				if (ability.getItem() == item && ability.getConsumer() != null && Arrays.asList(ability.getActions()).contains(e.getAction())) {
 					ability.init(p);
-				}
-			}
-		} else {
-			for (SMPEnchant ench : SMPEnchant.values()) {
-				if (itemStack.containsEnchantment(ench) && SMPAbility.getByEnchant(ench) != null) {
-					SMPAbility ability = SMPAbility.getByEnchant(ench);
-					
-					if (ability.getConsumer() != null && Arrays.asList(ability.getActions()).contains(e.getAction())) {
-						ability.init(p);
-					}
 				}
 			}
 		}
