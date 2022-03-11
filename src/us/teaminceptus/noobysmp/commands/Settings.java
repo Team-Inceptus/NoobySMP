@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
@@ -35,9 +36,13 @@ public class Settings implements Listener, CommandExecutor {
 	}
 
 	public static final String NOTIFICATIONS = "Notifications";
+	public static final String DROP_ITEMS = "Drop Items";
+	public static final String TAG_ABILITIES = "Tag Abilities";
 
 	public static final String[] SETTINGS = {
 		NOTIFICATIONS,
+		DROP_ITEMS,
+		TAG_ABILITIES
 	};
 	
 	public static class SettingsHolder implements InventoryHolder {
@@ -47,6 +52,19 @@ public class Settings implements Listener, CommandExecutor {
 			return null;
 		}
 	}
+
+	// Settings Listeners
+	@EventHandler
+	public void onDrop(PlayerDropItemEvent e) {
+		Player p = e.getPlayer();
+		PlayerConfig config = new PlayerConfig(p);
+		if (config.getSetting(DROP_ITEMS)) {
+			p.sendMessage(ChatColor.RED + "You currently have the setting " + ChatColor.GOLD + "Drop Items" + ChatColor.RED + " turned off. Turn it back on to drop items.");
+			e.setCancelled(true);
+		}
+	}
+
+	// Util & Other
 	
 	public static Inventory getSettings(Player p) {
 		Inventory settings = Generator.genGUI(36, p.getDisplayName() + ChatColor.DARK_GRAY + "'s Settings", new SettingsHolder());
