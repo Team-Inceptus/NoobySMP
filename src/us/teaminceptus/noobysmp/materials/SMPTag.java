@@ -3,6 +3,7 @@ package us.teaminceptus.noobysmp.materials;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -14,11 +15,20 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +37,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.bosses.BossManager;
@@ -51,7 +62,8 @@ public class SMPTag<T extends Event> {
 		LEGGINGS(getEndingIn("leggings")),
 		BOOTS(getEndingIn("boots")),
 		
-		WEAPONS(getEndingIn("sword"), getEndingIn("axe")),
+		BOWS(Material.BOW, Material.CROSSBOW),
+		WEAPONS(getEndingIn("sword"), getEndingIn("axe"), BOWS.getTargets()),
 		MINING_TOOLS(getEndingIn("axe"), getEndingIn("shovel"), getEndingIn("hoe"), getEndingIn("pickaxe")),
 		TOOLS(getEndingIn("axe"), getEndingIn("shovel"), getEndingIn("hoe"), getEndingIn("pickaxe"), getEndingIn("sword")),
 		
@@ -87,6 +99,18 @@ public class SMPTag<T extends Event> {
 		private TagTarget(List<Material>... targets) {
 			this.targets = combineLists(targets);
 		}
+
+		private TagTarget(Material... targets) {
+			this.targets = Arrays.asList(targets);
+		}
+
+		public boolean matches(ItemStack stack) {
+			return matches(stack.getType());
+		}
+
+		public boolean matches(Material m) {
+			return targets.contains(m);
+		}
 		
 		public List<Material> getTargets() {
 			return this.targets;
@@ -97,6 +121,7 @@ public class SMPTag<T extends Event> {
 	private static final Class<PlayerInteractEvent> inter = PlayerInteractEvent.class;
 	private static final Class<EntityDamageByEntityEvent> damage = EntityDamageByEntityEvent.class;
 	private static final Class<PlayerTickEvent> tick = PlayerTickEvent.class;
+	private static final Class<BlockBreakEvent> bbreak = BlockBreakEvent.class;
 	
 	// Scrolls
 	
@@ -114,16 +139,125 @@ public class SMPTag<T extends Event> {
 		
 		BossManager.throwItem(p.getEyeLocation(), r.nextInt(5) + 7, target, r.nextDouble() * (damage + config.getLevel()), p);
 	});
-	
-	// Meliorates
-	public static final SMPTag<EntityDamageByEntityEvent> STRONG = new SMPTag<>(damage, "Strong", AbilityItem.STRENGTH_MELIORATE, TagTarget.WEAPONS, e -> {
-		e.setDamage(e.getDamage() * ((r.nextDouble() / 2) + 1));
+
+	public static final SMPTag<EntityDamageByEntityEvent> ELECTRIC = new SMPTag<>(damage, "Electric", AbilityItem.SCROLL_ELECTRIC, TagTarget.SWORDS, e -> {
+		if (!(e.getDamager() instanceof Player p)) return;
+
+		if (r.nextInt(100) < 25) p.getWorld().strikeLightning(e.getEntity().getLocation());
+	});
+
+	public static final SMPTag<EntityShootBowEvent> EXPLOSIVE = new SMPTag<>(EntityShootBowEvent.class, "Explosive", AbilityItem.SCROLL_EXPLOSION, TagTarget.BOWS, e -> {
+		Player p = (Player) e.getEntity();
+
+		new BukkitRunnable() {
+			public void run() {
+				if (e.getProjectile().isDead()) cancel();
+
+				e.getProjectile().getWorld().createExplosion(e.getProjectile().getLocation(), 3F, false, false, p);
+			}
+		}.runTaskTimer(JavaPlugin.getPlugin(SMP.class), 10, 10);
+	});
+
+	public static final SMPTag<EntityDamageByEntityEvent> HARDEN = new SMPTag<>(damage, "Harden", AbilityItem.SCROLL_HARDENING, TagTarget.CHESTPLATES, e -> {
+		if (!(e.getEntity() instanceof Player p)) return;
+		
+		if (r.nextInt(100) < 10) {
+			e.setCancelled(true);
+			p.playSound(p, Sound.ITEM_SHIELD_BLOCK, 3F, 1F);
+			new PlayerConfig(p).sendNotification(ChatColor.GREEN + "Your " + ChatColor.GOLD + "Scroll of Hardening" + ChatColor.GREEN + " has cancelled the damage!");
+			if (e.getDamager() instanceof Player damager) {
+				new PlayerConfig(damager).sendNotification(ChatColor.RED + "The target's " + ChatColor.GOLD + "Scroll of Hardening" + ChatColor.GREEN + " has cancelled the damage.");
+			}
+		}
 	});
 	
+	private static final Material[] SHARP_INSTABREAK = {
+		Material.GRAVEL, Material.SAND, Material.DIRT, Material.GRASS_BLOCK, Material.COARSE_DIRT,
+		Material.PODZOL, Material.MYCELIUM
+	};
+
+	// Meliorates
+	public static final SMPTag<BlockDamageEvent> SHARP = new SMPTag<>(BlockDamageEvent.class, "Sharp", AbilityItem.SHARP_MELIORATE, TagTarget.SHOVELS, e -> {
+		Block b = e.getBlock();
+		
+		if (Arrays.asList(SHARP_INSTABREAK).contains(b.getType())) {
+			e.setInstaBreak(true);
+		}	
+	});
 	
+	public static final SMPTag<BlockBreakEvent> REPLENISHING = new SMPTag<>(bbreak, "Replenishing", AbilityItem.REPLENISH_MELIORATE, TagTarget.HOES, e -> {
+		Block b = e.getBlock();
+		if (b.getType() == Material.FIRE) return;
+		if (!(b.getBlockData() instanceof Ageable a)) return;
+		
+		Ageable clone = (Ageable) a.clone();
+		clone.setAge(0);
+
+		b.setBlockData(clone);
+	});
+
+	public static final SMPTag<PlayerTickEvent> SATURATION = new SMPTag<>(tick, "Saturating", AbilityItem.SCROLL_SATURATION, TagTarget.CHESTPLATES, e -> {
+		e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 2, 0));
+	});
+
+	
+
+	public static final SMPTag<EntityDamageByEntityEvent> STRONG = new SMPTag<>(damage, "Strong", AbilityItem.STRENGTH_MELIORATE, TagTarget.WEAPONS, e -> {
+		if (!(e.getDamager() instanceof Player p)) return;
+		e.setDamage(e.getDamage() * ((r.nextDouble() / 2) + 1));
+	});
+
+	public static final SMPTag<EntityDamageByEntityEvent> POISON = new SMPTag<>(damage, "Poisoned", AbilityItem.POISON_MELIORATE, TagTarget.WEAPONS, e -> {
+		if (!(e.getEntity() instanceof LivingEntity en)) return;
+		en.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * (r.nextInt(10) + 5), (r.nextInt(2) + 1)));
+	});
+
+	public static final SMPTag<EntityDamageByEntityEvent> WITHERING = new SMPTag<>(damage, "Withering", AbilityItem.WITHER_MELIORATE, TagTarget.SWORDS, e -> {
+		if (!(e.getEntity() instanceof LivingEntity en)) return;
+		en.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * (r.nextInt(10) + 5), (r.nextInt(3) + 1)));
+	});
+	
+	public static final SMPTag<EntityDamageByEntityEvent> STICKY = new SMPTag<>(damage, "Sticky", AbilityItem.STICKY_MELIORATE, TagTarget.WEAPONS, e -> {
+		if (!(e.getDamager() instanceof Player p)) return;
+		if (!(e.getEntity() instanceof LivingEntity en)) return;
+
+		en.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * (r.nextInt(5) + 5), 1, false));
+		en.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * (r.nextInt(5) + 5), 1, false));
+	});
+
+	public static final SMPTag<EntityDamageEvent> SLIMY = new SMPTag<>(EntityDamageEvent.class, "Slimy", AbilityItem.SLIMY_MELIORATE, TagTarget.BOOTS, e -> {
+		if (!(e.getCause() != DamageCause.FALL)) return;
+		Player p = (Player) e.getEntity();
+		e.setCancelled(true);
+		p.setVelocity(p.getVelocity().setY(Math.min(p.getFallDistance() / 10, 2)));
+	});
+
+	public static final SMPTag<PlayerTickEvent> SOAKING = new SMPTag<>(tick, "Soaking", AbilityItem.SOAKING_MELIORATE, TagTarget.HELMETS, e -> {
+		Player p = e.getPlayer();
+		
+		for (int x = 0; x < 2; x++) {
+			for (int y = 0; y < 2; y++) {
+				for (int z = 0; z < 2; z++) {
+					Location target = p.getLocation().add(x, y, z);
+					if (p.getWorld().getBlockAt(target).isLiquid()) {
+						target.getBlock().setType(Material.AIR);
+					}
+				}
+			}
+		}
+	});
+
 	// Enrichments
-	
+
+	public static final SMPTag<PlayerTickEvent> BUOYANT = new SMPTag<>(tick, "Buoyant", AbilityItem.BUOYANT_ENRICHMENT, TagTarget.LEGGINGS, e -> {
+		Player p = e.getPlayer();
+		if (!(p.getLocation().getBlock().isLiquid())) return;
+
+		p.setVelocity(p.getVelocity().setY(0.2));
+	});
+
 	public static final SMPTag<EntityDamageByEntityEvent> COLD = new SMPTag<>(damage, "Cold", AbilityItem.SNOWY_ENRICHMENT, TagTarget.WEAPONS, e -> {
+		if (!(e.getDamager() instanceof Player p)) return;
 		Entity en = e.getEntity();
 		en.setFreezeTicks(en.getFreezeTicks() + (20 * (r.nextInt(3) + 1)));
 	});
@@ -133,10 +267,106 @@ public class SMPTag<T extends Event> {
 	});
 	
 	public static final SMPTag<EntityDamageByEntityEvent> HOT = new SMPTag<>(damage, "Hot", AbilityItem.NETHER_ENRICHMENT, TagTarget.SWORDS, e -> {
+		if (!(e.getDamager() instanceof Player p)) return;
 		Entity en = e.getEntity();
 		en.setFireTicks(en.getFireTicks() + (20 * (r.nextInt(2) + 1)));
 	});
-	
+
+	private static final BlockFace[] DOWN = new BlockFace[] {
+		BlockFace.NORTH, BlockFace.SOUTH, BlockFace.NORTH_EAST, BlockFace.NORTH_WEST,
+		BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST, BlockFace.EAST, BlockFace.WEST 
+	};
+
+	private static final Material getLeaves(Material woodType) {
+		switch (woodType) {
+			case STRIPPED_OAK_LOG:
+			case OAK_LOG:
+				return Material.OAK_LEAVES;
+			case STRIPPED_SPRUCE_LOG:
+			case SPRUCE_LOG:
+				return Material.SPRUCE_LEAVES;
+			case STRIPPED_ACACIA_LOG:
+			case ACACIA_LOG:
+				return Material.ACACIA_LEAVES;
+			case STRIPPED_BIRCH_LOG:
+			case BIRCH_LOG:
+				return Material.BIRCH_LEAVES;
+			case STRIPPED_DARK_OAK_LOG:
+			case DARK_OAK_LOG:
+				return Material.DARK_OAK_LEAVES;
+			case STRIPPED_JUNGLE_LOG:
+			case JUNGLE_LOG:
+				return Material.JUNGLE_LEAVES;
+			case STRIPPED_CRIMSON_STEM:
+			case CRIMSON_STEM:
+				return Material.NETHER_WART_BLOCK;
+			case STRIPPED_WARPED_STEM:
+			case WARPED_STEM:
+				return Material.WARPED_WART_BLOCK;
+			default: {
+				return Material.OAK_LEAVES;
+			}
+		}
+	}
+
+	private static List<Block> getTree(Block start) {
+		List<Block> list = new ArrayList<>();
+		for (BlockFace b : BlockFace.values()) {
+			if (!(b.isCartesian())) continue;
+			Material leaves = getLeaves(start.getType());
+			Block rel = start.getRelative(b);
+			if (rel.getType() == start.getType() || rel.getType() == leaves) {
+				list.add(rel);
+				list.addAll(getTree(rel));
+			}
+		}
+
+		return list;
+	}
+
+	public static final SMPTag<BlockBreakEvent> TIMBERING = new SMPTag<>(bbreak, "Timbering", AbilityItem.SCROLL_TIMBERING, TagTarget.AXES, e -> {
+		Block b = e.getBlock();
+		Player p = e.getPlayer();
+
+		List<Block> relatives = getTree(b);
+		for (Block target : relatives) target.breakNaturally(p.getEquipment().getItemInMainHand());
+	});
+
+	public static final SMPTag<BlockBreakEvent> MULTIBREAK = new SMPTag<>(bbreak, "MultiBreaking", AbilityItem.SCROLL_MULTIBREAK, TagTarget.PICKAXES, e -> {
+		Player p = e.getPlayer();
+		Block b = e.getBlock();
+		ItemStack tool = p.getInventory().getItemInMainHand();
+		float pitch = Math.abs(p.getLocation().getPitch());
+		if (pitch >= 45) {
+			// Use Down
+			for (BlockFace f : DOWN) b.getRelative(f).breakNaturally(tool);
+		} else {
+			// Use Side, Calculate math
+			for (BlockFace f : Arrays.asList(BlockFace.UP, BlockFace.DOWN)) b.getRelative(f).breakNaturally(tool);
+			float yaw = (p.getLocation().getYaw() < 0 ? p.getLocation().getYaw() + 360 : p.getLocation().getYaw());
+
+			if ((yaw >= 45 && yaw < 135) || (yaw >= 225 && yaw < 315)) {
+				// Use North South
+				b.getRelative(BlockFace.NORTH).breakNaturally(tool);
+				b.getRelative(BlockFace.SOUTH).breakNaturally(tool);
+
+				b.getRelative(0, 1, -1).breakNaturally(tool);
+				b.getRelative(0, 1, 1).breakNaturally(tool);
+				b.getRelative(0, -1, -1).breakNaturally(tool);
+				b.getRelative(0, -1, 1).breakNaturally(tool);
+			} else {
+				// Use East West
+				b.getRelative(BlockFace.EAST).breakNaturally(tool);
+				b.getRelative(BlockFace.WEST).breakNaturally(tool);
+
+				b.getRelative(-1, 1, 0).breakNaturally(tool);
+				b.getRelative(1, 1, 0).breakNaturally(tool);
+				b.getRelative(-1, -1, 0).breakNaturally(tool);
+				b.getRelative(1, -1, 0).breakNaturally(tool);
+			}
+		}
+	});
+
 	public static final SMPTag<PlayerInteractEvent> ENDER = new SMPTag<>(inter, "Ender", AbilityItem.END_ENRICHMENT, TagTarget.SWORDS, e -> {
 		if (e.getAction() != Action.RIGHT_CLICK_AIR) return;
 		
@@ -194,6 +424,10 @@ public class SMPTag<T extends Event> {
 		this.origin = origin;
 		this.clazz = clazz;
 	}
+
+	public final String getName() {
+		return this.name;
+	}
 	
 	public final Class<? extends T> getTypeClass() {
 		return this.clazz;
@@ -228,12 +462,11 @@ public class SMPTag<T extends Event> {
 		return newItem;
 	}
 	
-	public static final List<SMPTag<?>> getByOrigin(AbilityItem origin) {
-		List<SMPTag<?>> tags = new ArrayList<>();
+	public static final SMPTag<?> getByOrigin(AbilityItem origin) {
 		
-		for (SMPTag<?> tag : values()) if (tag.origin == origin) tags.add(tag);
+		for (SMPTag<?> tag : values()) if (tag.origin == origin) return tag;
 		
-		return tags;
+		return null;
 	}
 	
 	public final TagTarget getTarget() {
@@ -271,9 +504,8 @@ public class SMPTag<T extends Event> {
 		return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin, tag.name.toLowerCase()), PersistentDataType.STRING);	
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void run(Event e) {
-		this.func.accept((T) e);
+	public void run(T e) {
+		this.func.accept(e);
 	}
 	
 	public ItemStack addTag(ItemStack item) {
