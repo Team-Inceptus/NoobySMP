@@ -19,5 +19,8 @@ public interface Messages {
 	String ARGUMENT_ITEM = ChatColor.RED + "Please provide a valid item.";
 	String ARGUMENT_ACTION = ChatColor.RED + "Please provide a valid action.";
 	String ARGUMENT_DOUBLE = ChatColor.RED + "Please provide a valid decimal.";
+
+	// Event-Related
+	String CANNOT_CONSUME = ChatColor.RED + "You cannot consume this item!";
 	
 }
