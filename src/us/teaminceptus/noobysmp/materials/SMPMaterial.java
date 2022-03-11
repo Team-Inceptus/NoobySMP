@@ -3,6 +3,9 @@ package us.teaminceptus.noobysmp.materials;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+import com.jeff_media.customblockdata.CustomBlockData;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -22,12 +25,10 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.collect.ImmutableMap;
-import com.jeff_media.customblockdata.CustomBlockData;
-
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.SMPMaterial.CleanOutput.MaterialOutput;
 import us.teaminceptus.noobysmp.util.Items;
+import us.teaminceptus.noobysmp.util.Queryable;
 import us.teaminceptus.noobysmp.util.SMPColor;
 
 /**
@@ -35,7 +36,7 @@ import us.teaminceptus.noobysmp.util.SMPColor;
  * Utility Items (i.e. tables, items with inventory) are not included.
  * Items with Abilities are used in {@link AbilityItem}
  */
-public enum SMPMaterial {
+public enum SMPMaterial implements Queryable {
 	
 	RUBY(0, Material.DIAMOND, "Ruby"),
 	RUBY_SWORD(0, Material.DIAMOND_SWORD, "Ruby Sword", genAttack(6.5, 0.5, 0.7)),
@@ -206,6 +207,7 @@ public enum SMPMaterial {
 	HARDENED_BIRCH_LOG(25, Material.BIRCH_LOG, "Hardened Birch Log", glint()),
 	HARDENED_DARK_OAK_LOG(25, Material.DARK_OAK_LOG, "Hardened Dark Oak Log", glint()),
 	HARDENED_JUNGLE_LOG(25, Material.JUNGLE_LOG, "Hardened Jungle Log", glint()),
+	HARDENED_ACACIA_LOG(25, Material.ACACIA_LOG, "Hardened Acacia Log", glint()),
 	
 	BEDROCK_ORE(25, Material.COAL_ORE, "Bedrock Ore", glint()),
 	DEEPSLATE_BEDROCK_ORE(25, Material.DEEPSLATE_COAL_ORE, "Deepslate Bedrock Ore", glint()),
@@ -249,6 +251,8 @@ public enum SMPMaterial {
 	JADE_BOOTS(33, Material.LEATHER_BOOTS, "Jade Boots", genArmor(48, 13, 8), genTool(60, 0), Color.AQUA),
 
 	TOPAZ(35, Material.RAW_GOLD, "Topaz", glint()),
+	TOPAZ_ORE(35, Material.GOLD_ORE, "Topaz Ore", glint()),
+	DEEPSLATE_TOPAZ_ORE(35, Material.DEEPSLATE_GOLD_ORE, "Deepslate Topaz Ore"),
 	TOPAZ_BLOCK(35, Material.RAW_GOLD_BLOCK, "Block of Topaz", glint()),
 	CUT_TOPAZ(35, Material.GOLD_INGOT, "Cut Topaz", glint()),
 	CUT_TOPAZ_BLOCK(35, Material.GOLD_BLOCK, "Block of Cut Topaz", glint()),
@@ -300,11 +304,15 @@ public enum SMPMaterial {
 
 	AQUATIC_CROWN(0, Material.LEATHER_HELMET, "Aquatic Crown", genArmor(25, 20, 3), genTool(15, 0), Color.AQUA),
 	
+	UPGRADER(0, "", ""), // TODO Upgrader Head
+
 	REDSTONE_CROSSBOW(0, Material.CROSSBOW, "Redstone Crossbow", genCrossbow(55, 4, true), genTool(30, 0)),
 	POWERED_CHESTPLATE(0, Material.LEATHER_CHESTPLATE, "Powered Chestplate", genArmor(10, 7, 0.5), genTool(7, 0)),
 	
 	DAMAGED_WITHERING_BOOTS(0, Material.LEATHER_BOOTS, "Damaged Withering Boots", genArmor(25, 12, 2), genTool(16, 0), SMPColor.DARK_GRAY),
 	
+	BLAZESABER(0, Material.GOLDEN_SWORD, "BlazeSaber", genAttack(40, 7, 1), genTool(60, 0)),
+
 	MAGIC_DUST(0, Material.BLAZE_POWDER, "Magic Dust", glint()),
 
 	GUARDIAN_TRIDENT(0, Material.TRIDENT, "Guardian Trident", genAttack(21, 9, 1), genTool(16, 0)),
@@ -357,7 +365,8 @@ public enum SMPMaterial {
 	private final String name;
 	private ItemStack item;
 	private final int levelUnlocked;
-	
+	private int customModelId;
+
 	private final ChatColor cc;
 	
 	public final SMPMaterial getOreDrops() throws IllegalArgumentException {
@@ -377,8 +386,6 @@ public enum SMPMaterial {
 	public void setBlock(Location loc) {
 		if (!(this.item.getType().isBlock())) return;
 		SMP plugin = JavaPlugin.getPlugin(SMP.class);
-		
-		
 		
 		Block b = loc.getWorld().getBlockAt(loc);
 		b.setType(this.item.getType());
@@ -425,6 +432,10 @@ public enum SMPMaterial {
 		return genTool(100, 0);
 	}
 	
+	public final int getID() {
+		return this.customModelId;
+	}
+
 	static {
 		for (SMPMaterial m : values()) {
 			ItemStack item = m.getItem();
@@ -432,6 +443,8 @@ public enum SMPMaterial {
 			meta.setCustomModelData(idCounter);
 			item.setItemMeta(meta);
 			m.item = item;
+
+			m.customModelId = idCounter;
 			idCounter++;
 		}
 	}
@@ -511,7 +524,7 @@ public enum SMPMaterial {
 				meta.addEnchant(e, enchants.get(e), true);
 			}
 		
-		if (meta.getEnchantLevel(Enchantment.DURABILITY) > 100) {
+		if (meta.getEnchantLevel(Enchantment.DURABILITY) >= 100) {
 			meta.removeEnchant(Enchantment.DURABILITY);
 			meta.setUnbreakable(true);
 		}
@@ -668,6 +681,21 @@ public enum SMPMaterial {
 		newItem.setAmount(amount);
 
 		return newItem;
+	}
+
+	@Override
+	public QueryID queryId() {
+		return new QueryID("smpmaterial", name().toLowerCase());
+	}
+
+	@Override
+	public final ItemStack genInfo() {
+		ItemStack info = Queryable.super.genInfo();
+		ItemMeta meta = info.getItemMeta();
+		meta.setCustomModelData(this.customModelId);
+		info.setItemMeta(meta);
+
+		return info;
 	}
 
 	
