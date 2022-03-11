@@ -43,7 +43,12 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
-
+    - name: Setup & Run BuildTools
+      run: |
+       mkdir BuildTools && 
+       wget -O BuildTools/BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+       cd BuildTools
+       java -jar BuildTools.jar --rev 1.18.2 --remapped
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
