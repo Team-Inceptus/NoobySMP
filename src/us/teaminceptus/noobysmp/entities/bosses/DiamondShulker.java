@@ -1,5 +1,7 @@
 package us.teaminceptus.noobysmp.entities.bosses;
 
+import com.google.common.collect.ImmutableMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -12,11 +14,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.google.common.collect.ImmutableMap;
-
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.SpawnCost;
@@ -24,7 +25,6 @@ import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Tier;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.CancelChance;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Defensive;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Repeated;
-import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
 @Tier(4)
@@ -33,13 +33,13 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @HP(1500000)
 @Icon(Material.DIAMOND)
 @DisplayName(value = "Diamond Shulker", cc = ChatColor.AQUA)
+@Drop(drop = "enchanted_diamond", amount = "16-32")
 public class DiamondShulker extends SMPBoss<Shulker>{
 	
 	@CancelChance(50)
 	public DiamondShulker(Location loc) {
 		super(Shulker.class, loc, 1500000, "Diamond Shulker",
 				ImmutableMap.<ItemStack, Integer>builder()
-				.put(AbilityItem.BULLET_WAND.getItem(), 80)
 				.put(SMPMaterial.ENCHANTED_DIAMOND.getItem(r.nextInt(16) + 16), 100)
 				.build(), attributes(1500000));
 		

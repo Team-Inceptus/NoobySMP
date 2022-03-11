@@ -45,6 +45,7 @@ import com.google.common.collect.ImmutableList;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -276,6 +277,33 @@ public class BossManager implements Listener {
                 spawnCostList.add((item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : ChatColor.WHITE + WordUtils.capitalize(item.getType().name().toLowerCase().replace('_', ' ')))
                 + ChatColor.GRAY + " x" + Integer.toString(entry.getValue()));
             }
+
+            List<String> drops = new ArrayList<>();
+
+            for (Drop d : bossClass.getAnnotationsByType(Drop.class)) {
+                String am = d.amount();
+                final String amount;
+
+                if (am.contains("-")) {
+                    amount = "x" + am.split("-")[0] + " - x" + am.split("-")[1];
+                } else amount = am;
+
+                if (SMPMaterial.getByLocalization(d.drop().toLowerCase()) != null) {
+                    SMPMaterial m = SMPMaterial.getByLocalization(d.drop().toLowerCase());
+
+                    drops.add(m.getDisplayName() + ChatColor.GRAY + amount + ChatColor.DARK_GRAY + " (" + d.chance() + "%)");
+                } else if (AbilityItem.getByLocalization(d.drop().toLowerCase()) != null) {
+                    AbilityItem m = AbilityItem.getByLocalization(d.drop().toLowerCase());
+
+                    drops.add(m.getDisplayName() + ChatColor.GRAY + amount + ChatColor.DARK_GRAY + " (" + d.chance() + "%)");
+                } else if (Material.getMaterial(d.drop().toUpperCase()) != null) {
+                    Material m = Material.getMaterial(d.drop().toUpperCase());
+
+                    String mName = WordUtils.capitalizeFully(m.name().replace('_', ' '));
+                    drops.add(ChatColor.WHITE + mName + ChatColor.GRAY + amount + ChatColor.DARK_GRAY + " (" + d.chance() + "%)");
+                }
+            }
+
             
             HP healthA = bossClass.getAnnotation(HP.class);
             double health = healthA.value();
@@ -295,6 +323,10 @@ public class BossManager implements Listener {
             .add(ChatColor.DARK_GRAY + "" + ChatColor.UNDERLINE + "Spawn Cost")
             .add(" ")
             .addAll(spawnCostList)
+            .add(" ")
+            .add(ChatColor.DARK_GRAY + "" + ChatColor.UNDERLINE + "Drops")
+            .add(" ")
+            .addAll(drops)
             .build());
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DYE, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_ATTRIBUTES);
             meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);

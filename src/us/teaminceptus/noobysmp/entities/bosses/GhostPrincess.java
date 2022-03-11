@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -24,6 +25,7 @@ import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.MinionSpawn;
 @SpawnCost("bone:16")
 @Icon(Material.BONE)
 @DisplayName(value = "Ghost Princess", cc = ChatColor.DARK_GRAY)
+@Drop(drop = "bone", amount = "32-64")
 public class GhostPrincess extends SMPBoss<Stray> {
     
     @Experience(60)

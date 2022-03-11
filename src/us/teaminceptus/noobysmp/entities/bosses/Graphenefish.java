@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.SpawnCost;
@@ -22,12 +23,15 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @SpawnCost("graphene:12")
 @Icon(Material.GRAY_DYE)
 @DisplayName(value = "Graphenefish", cc = ChatColor.RED)
+@Drop(drop = "graphene", amount = "4-6", chance = 50)
+@Drop(drop = "graphene_sword", chance = 20)
+@Drop(drop = "graphene_axe", chance = 15)
 public class Graphenefish extends SMPBoss<Silverfish> {
     
     public Graphenefish(Location loc) {
         super(Silverfish.class, loc, 10000, "Graphenefish",
         ImmutableMap.<ItemStack, Integer>builder()
-        .put(SMPMaterial.GRAPHENE.getItem(r.nextInt(2) + 1), 50)
+        .put(SMPMaterial.GRAPHENE.getItem(r.nextInt(2) + 4), 50)
         .put(SMPMaterial.GRAPHENE_SWORD.getItem(), 20)
         .put(SMPMaterial.GRAPHENE_AXE.getItem(), 15)
         .build(), attributes(10000));

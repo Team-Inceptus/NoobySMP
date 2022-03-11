@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -27,6 +28,8 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @HP(950)
 @Icon(Material.WITHER_ROSE)
 @DisplayName(value = "Wither Zombie", cc = ChatColor.GRAY)
+@Drop(drop = "wither_rose", amount = "4-12")
+@Drop(drop = "nether_star", amount = "2-4", chance = 50)
 public class WitherZombie extends SMPBoss<Zombie> {
     
     @Experience(25)

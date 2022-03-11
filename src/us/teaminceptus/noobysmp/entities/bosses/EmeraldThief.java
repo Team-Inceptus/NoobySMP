@@ -1,5 +1,7 @@
 package us.teaminceptus.noobysmp.entities.bosses;
 
+import com.google.common.collect.ImmutableMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -7,10 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 
-import com.google.common.collect.ImmutableMap;
-
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -25,6 +26,7 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @Icon(Material.EMERALD)
 @HP(4000)
 @DisplayName(value = "Emerald Thief", cc = ChatColor.GREEN)
+@Drop(drop = "emerald_block", amount = "8-16")
 public class EmeraldThief extends SMPBoss<Villager> {
     
     @Experience(40)

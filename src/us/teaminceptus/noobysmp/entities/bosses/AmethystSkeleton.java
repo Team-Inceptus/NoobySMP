@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -20,6 +21,7 @@ import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Tier;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Defensive;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.MinionSpawn;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Repeated;
+import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
 @Tier(1)
@@ -28,6 +30,8 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @SpawnCost("amethyst_shard:24")
 @Icon(Material.AMETHYST_SHARD)
 @DisplayName(value = "Amethyst Skeleton", cc = ChatColor.LIGHT_PURPLE)
+@Drop(drop = "amethyst_shard", amount = "16-48")
+@Drop(drop = "sharp_meliorate", chance = 10)
 public class AmethystSkeleton extends SMPBoss<Skeleton> {
     
     @Experience(20)
@@ -37,6 +41,7 @@ public class AmethystSkeleton extends SMPBoss<Skeleton> {
         super(Skeleton.class, loc, 1600, "Amethyst Skeleton",
         ImmutableMap.<ItemStack, Integer>builder()
         .put(new ItemStack(Material.AMETHYST_SHARD, r.nextInt(32) + 16), 100)
+        .put(AbilityItem.SHARP_MELIORATE.getItem(), 10)
         .build(), attributes(1600));
 
         entity.getEquipment().setHelmet(SMPMaterial.AMETHYST_HELMET.getItem());

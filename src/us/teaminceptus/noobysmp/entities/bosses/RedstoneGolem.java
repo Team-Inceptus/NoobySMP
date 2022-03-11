@@ -1,5 +1,7 @@
 package us.teaminceptus.noobysmp.entities.bosses;
 
+import com.google.common.collect.ImmutableMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,11 +12,10 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.google.common.collect.ImmutableMap;
-
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -33,6 +34,14 @@ import us.teaminceptus.noobysmp.util.Items;
 @SpawnCost({"redstone_block:16", "redstone_dust:8"})
 @Icon(Material.REDSTONE_BLOCK)
 @DisplayName(value = "Redstone Golem", cc = ChatColor.RED)
+@Drop(drop = "redstone_chestplate", chance = 20)
+@Drop(drop = "redstone_leggings", chance = 30)
+@Drop(drop = "redstone_helmet", chance = 50)
+@Drop(drop = "redsone_boots", chance = 60)
+@Drop(drop = "redstone_block", amount = "16-48")
+@Drop(drop = "redstone_bow", chance = 25)
+@Drop(drop = "redstone_axe", chance = 25)
+@Drop(drop = "redstone_crossbow", chance = 10)
 public class RedstoneGolem extends SMPBoss<IronGolem> {
     
     @CancelChance(35)

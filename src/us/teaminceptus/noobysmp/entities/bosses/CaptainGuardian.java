@@ -15,6 +15,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -30,6 +31,10 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @HP(40000)
 @Icon(Material.SEA_LANTERN)
 @DisplayName(value = "Captain Guardian", cc = ChatColor.AQUA)
+@Drop(drop = "guardian_trident", chance = 20)
+@Drop(drop = "sponge", amount = "12-24")
+@Drop(drop = "sea_lantern", amount = "32-64")
+@Drop(drop = "cod", amount = "24-48")
 public class CaptainGuardian extends SMPBoss<ElderGuardian> {
 	
     @Experience(50)
@@ -57,7 +62,12 @@ public class CaptainGuardian extends SMPBoss<ElderGuardian> {
         if (entity.getTarget() == null) return;
         if (!(entity.getTarget() instanceof Player target)) return;
         EnderCrystal superLazer = (EnderCrystal) entity.getPassengers().stream().filter(en -> en instanceof EnderCrystal c && c.getPersistentDataContainer().has(new NamespacedKey(plugin, "bosscrystal"), PersistentDataType.STRING)).toList().get(0);
-         
+        
+        if (entity.isDead()) {
+            superLazer.remove();
+            return;
+        }
+
         superLazer.setBeamTarget(target.getLocation());
         if (target.getEquipment().getHelmet() != null && SMPMaterial.getByItem(target.getEquipment().getHelmet()) == SMPMaterial.AQUATIC_CROWN) return;
         else target.damage(r.nextInt(2) + 1, superLazer);

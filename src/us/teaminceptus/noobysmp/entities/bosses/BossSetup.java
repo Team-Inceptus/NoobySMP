@@ -1,6 +1,7 @@
 package us.teaminceptus.noobysmp.entities.bosses;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -88,6 +89,23 @@ public interface BossSetup {
 
         int value() default 5;
 
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    @Repeatable(Drops.class)
+    public static @interface Drop {
+
+        String drop();
+        String amount() default "1";
+        int chance() default 100;
+
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    public static @interface Drops {
+        Drop[] value();
     }
     
     

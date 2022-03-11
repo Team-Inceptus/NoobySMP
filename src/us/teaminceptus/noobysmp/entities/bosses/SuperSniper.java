@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -34,6 +35,7 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @HP(300)
 @Icon(Material.ARROW)
 @DisplayName(value = "Super Sniper", cc = ChatColor.GREEN)
+@Drop(drop = "emerald_bow")
 public class SuperSniper extends SMPBoss<Skeleton> {
 	
 	@Experience(10)

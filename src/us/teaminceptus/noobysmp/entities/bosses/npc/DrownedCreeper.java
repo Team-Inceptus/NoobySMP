@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -25,6 +26,7 @@ import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.MinionSpawn;
 @SpawnCost({"gunpowder:16", "seagrass:8"})
 @Icon(Material.SEAGRASS)
 @DisplayName(value = "Drowned Creeper", cc = ChatColor.GREEN)
+@Drop(drop = "tnt", amount = "8-24", chance = 50)
 public class DrownedCreeper extends NPCBoss {
     
     @Experience(10)

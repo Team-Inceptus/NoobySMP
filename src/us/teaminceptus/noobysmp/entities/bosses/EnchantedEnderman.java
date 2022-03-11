@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -32,6 +33,10 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @SpawnCost("ender_pearl:16")
 @Icon(Material.ENDER_PEARL)
 @DisplayName(value = "Enchanted Enderman", cc = ChatColor.LIGHT_PURPLE)
+@Drop(drop = "end_core", amount = "16-24")
+@Drop(drop = "enchanted_pearl", amount = "8-16", chance = 50)
+@Drop(drop = "enchanted_ender_eye", chance = 10)
+@Drop(drop = "ocassus_bow_1", chance = 10)
 public class EnchantedEnderman extends SMPBoss<Enderman> {
     
     @CancelChance(20)
@@ -40,7 +45,7 @@ public class EnchantedEnderman extends SMPBoss<Enderman> {
     public EnchantedEnderman(Location loc) {
         super(Enderman.class, loc, 1000, "Enchanted Enderman", 
         ImmutableMap.<ItemStack, Integer>builder()
-        .put(SMPMaterial.END_CORE.getItem(r.nextInt(4) + 4), 100)
+        .put(SMPMaterial.END_CORE.getItem(r.nextInt(8) + 16), 100)
         .put(SMPMaterial.ENCHANTED_PEARL.getItem(r.nextInt(8) + 8), 50)
         .put(SMPMaterial.ENCHANTED_ENDER_EYE.getItem(r.nextInt(2) + 2), 10)
         .put(AbilityItem.OCASSUS_BOW_1.getItem(), 10)

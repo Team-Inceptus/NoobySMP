@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -28,6 +29,8 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @SpawnCost("emerald:8")
 @Icon(Material.BOW)
 @DisplayName(value = "Magician", cc = ChatColor.RED)
+@Drop(drop = "magic_dust")
+@Drop(drop = "gunpowder", amount = "16-48")
 public class Magician extends SMPBoss<Illusioner> {
     
     @Experience(40)

@@ -20,6 +20,7 @@ import org.bukkit.potion.PotionEffectType;
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -37,6 +38,8 @@ import us.teaminceptus.noobysmp.materials.AbilityItem;
 @SpawnCost({"shulker_shell:16", "blaze_rod:32", "ruby:8"})
 @Icon(Material.BLUE_SHULKER_BOX)
 @DisplayName(value = "Shulker Wizard", cc = ChatColor.BLUE)
+@Drop(drop = "bullet_wand", chance = 20)
+@Drop(drop = "shulker_shell", amount = "16-32")
 public class ShulkerWizard extends NPCBoss {
     
     @Experience(300)

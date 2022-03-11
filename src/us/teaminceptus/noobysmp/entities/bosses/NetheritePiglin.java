@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -28,6 +29,11 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @HP(350)
 @Icon(Material.NETHERITE_INGOT)
 @DisplayName(value = "Netherite Piglin", cc = ChatColor.GRAY)
+@Drop(drop = "netherite_ingot")
+@Drop(drop = "netherite_helmet")
+@Drop(drop = "netherite_boots")
+@Drop(drop = "super_netherite_chestplate", chance = 10)
+@Drop(drop = "super_netherite_leggings", chance = 20)
 public class NetheritePiglin extends SMPBoss<Piglin> {
 	
 	@Experience(15)
@@ -37,6 +43,8 @@ public class NetheritePiglin extends SMPBoss<Piglin> {
 	public NetheritePiglin(Location loc) {
 		super(Piglin.class, loc, 350, "Netherite Piglin", ImmutableMap.<ItemStack, Integer>builder()
 				.put(new ItemStack(Material.NETHERITE_INGOT), 100)
+				.put(SMPMaterial.SUPER_NETHERITE_CHESTPLATE.getItem(), 10)
+				.put(SMPMaterial.SUPER_NETHERITE_LEGGINGS.getItem(), 20)
 				.build(), attributes(350));
 		
 		entity.setImmuneToZombification(true);
@@ -44,10 +52,10 @@ public class NetheritePiglin extends SMPBoss<Piglin> {
 		entity.getEquipment().setHelmetDropChance(1F);
 		
 		entity.getEquipment().setChestplate(SMPMaterial.SUPER_NETHERITE_CHESTPLATE.getItem());
-		entity.getEquipment().setChestplateDropChance(0.005F);
+		entity.getEquipment().setChestplateDropChance(0F);
 		
 		entity.getEquipment().setLeggings(SMPMaterial.SUPER_NETHERITE_LEGGINGS.getItem());
-		entity.getEquipment().setLeggingsDropChance(0.05F);
+		entity.getEquipment().setLeggingsDropChance(0F);
 		
 		entity.getEquipment().setBoots(new ItemStack(Material.NETHERITE_BOOTS));
 		entity.getEquipment().setBootsDropChance(1F);

@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Description;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Experience;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.HP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
@@ -33,6 +34,7 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 @HP(15500)
 @Icon(Material.NAUTILUS_SHELL)
 @DisplayName(value = "Drowned Prince", cc = ChatColor.DARK_AQUA)
+@Drop(drop = "aquatic_core", amount = "4-16")
 public class DrownedPrince extends SMPBoss<Drowned> {
     
     @CancelChance(10)
