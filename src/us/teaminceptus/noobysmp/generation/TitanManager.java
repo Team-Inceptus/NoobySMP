@@ -2,18 +2,27 @@ package us.teaminceptus.noobysmp.generation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.ChunkSnapshot;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import net.minecraft.world.level.block.state.BlockState;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
+import us.teaminceptus.noobysmp.util.SMPUtil;
 
 public class TitanManager implements Listener {
 
@@ -24,6 +33,48 @@ public class TitanManager implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
+	public static final Map<Material, SMPMaterial> REPLACE_DATA = ImmutableMap.<Material, SMPMaterial>builder()
+	.put(Material.STONE, SMPMaterial.TITAN_STONE)
+	.put(Material.DEEPSLATE, SMPMaterial.TITAN_DEEPSLATE)
+	.build();
+
+	public static final Map<ChatColor, SMPMaterial> MATTER_DROPS = ImmutableMap.<ChatColor, SMPMaterial>builder()
+	.put(ChatColor.GREEN, SMPMaterial.GREEN_MATTER)
+	.put(ChatColor.DARK_GREEN, SMPMaterial.GREEN_MATTER)
+
+	.put(ChatColor.GRAY, SMPMaterial.GRAY_MATTER)
+	.put(ChatColor.DARK_GRAY, SMPMaterial.GRAY_MATTER)
+
+	.put(ChatColor.GOLD, SMPMaterial.YELLOW_MATTER)
+	.put(ChatColor.YELLOW, SMPMaterial.YELLOW_MATTER)
+
+	.put(ChatColor.BLUE, SMPMaterial.BLUE_MATTER)
+	.put(ChatColor.DARK_BLUE, SMPMaterial.BLUE_MATTER)
+	.put(ChatColor.AQUA, SMPMaterial.BLUE_MATTER)
+	.put(ChatColor.DARK_AQUA, SMPMaterial.BLUE_MATTER)
+
+	.put(ChatColor.BLACK, SMPMaterial.BLACK_MATTER)
+	.build();
+
+	/**
+	 * Will return {@link TitanManager#REPLACE_DATA} if it contains, else will use NMS to calculate the colored matter.
+	 * @param m Material to get
+	 * @return SMPMaterial replaceable
+	 */
+	public static final SMPMaterial getReplaceable(Block b) {
+		if (REPLACE_DATA.containsKey(b.getType())) {
+			return REPLACE_DATA.get(b.getType());
+		}
+
+		BlockState nmsState = ((CraftBlock) b).getNMS();
+		Color color = Color.fromRGB(nmsState.getBlock().defaultMaterialColor().col);
+
+		ChatColor nearestColor = SMPUtil.fromRGB(color.getRed(), color.getGreen(), color.getBlue());
+		if (MATTER_DROPS.containsKey(nearestColor)) return MATTER_DROPS.get(nearestColor);
+		
+		return SMPMaterial.GRAY_MATTER;
+	}
+
 	/**
 	 * Used for async updates in setting chunks 
 	 *

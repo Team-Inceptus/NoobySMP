@@ -1,11 +1,13 @@
 package us.teaminceptus.noobysmp.leveling;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -49,9 +51,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
@@ -577,7 +576,7 @@ public class LevelingManager implements Listener {
                 if (nearbyEntities.size() < 1) continue;;
                 Map<Double, Entity> nearestEntities = new HashMap<>();
                 for (Entity en : nearbyEntities) nearestEntities.put(en.getLocation().distanceSquared(projectile.getLocation()), en);
-                Entity target = (nearestEntities.keySet().size() < 1 || Collections.min(nearestEntities.keySet()) == null ? nearbyEntities.get(0) : nearestEntities.get(Collections.min(nearestEntities.keySet())));
+                Entity target = (nearestEntities.keySet().size() < 1 || java.util.Collections.min(nearestEntities.keySet()) == null ? nearbyEntities.get(0) : nearestEntities.get(java.util.Collections.min(nearestEntities.keySet())));
                 if (target.getLocation().distanceSquared(p.getLocation()) >= 100) continue;
                 if (target.getWorld().rayTraceEntities(p.getLocation(), p.getLocation().getDirection(), 10, en -> en instanceof LivingEntity ltarget && !(en instanceof ArmorStand) && !(ltarget.getUniqueId().equals(p.getUniqueId()))) == null) continue;
                 new BukkitRunnable() {

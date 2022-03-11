@@ -2,6 +2,9 @@ package us.teaminceptus.noobysmp.generation;
 
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+import com.jeff_media.customblockdata.CustomBlockData;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -14,9 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import com.google.common.collect.ImmutableMap;
-import com.jeff_media.customblockdata.CustomBlockData;
-
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
@@ -24,14 +24,20 @@ import us.teaminceptus.noobysmp.materials.SMPMaterial;
 public class BlockManager implements Listener {
 	
 	protected SMP plugin;
-	private NamespacedKey typeKey;
+	private static NamespacedKey typeKey;
 	
 	public BlockManager(SMP plugin) {
 		this.plugin = plugin;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
-		this.typeKey =new NamespacedKey(plugin, "type");
+		typeKey = new NamespacedKey(plugin, "type");
 	}
+
+	public static record ReplaceData(Material replace, int chance) {};
 	
+	public static void setType(Block b, SMPMaterial m) {
+		m.setBlock(b);
+	}
+
 	@EventHandler
 	public void onPlace(BlockPlaceEvent e) {
 		Block b = e.getBlock();
@@ -67,15 +73,35 @@ public class BlockManager implements Listener {
 		}
 	}
 	
-	public static final Map<Material, SMPMaterial> REPLACEABLES = ImmutableMap.<Material, SMPMaterial>builder()
-			.put(Material.END_STONE, SMPMaterial.ENDERITE_ORE)
-			.put(Material.DIAMOND_ORE, SMPMaterial.RUBY_ORE)
-			.put(Material.DEEPSLATE_DIAMOND_ORE, SMPMaterial.DEEPSLATE_RUBY_ORE)
+	public static final Map<SMPMaterial, ReplaceData> REPLACEABLES = ImmutableMap.<SMPMaterial, ReplaceData>builder()
+			.put(SMPMaterial.RUBY_ORE, new ReplaceData(Material.DIAMOND_ORE, 50))
+			.put(SMPMaterial.DEEPSLATE_RUBY_ORE, new ReplaceData(Material.DEEPSLATE_DIAMOND_ORE, 50))
+			.put(SMPMaterial.ENDERITE_ORE, new ReplaceData(Material.END_STONE, 5))
 			.build();
 	
 	public static final Map<Material, SMPMaterial> TITAN_REPLACEABLES = ImmutableMap.<Material, SMPMaterial>builder()
+			.put(Material.OAK_LOG, SMPMaterial.HARDENED_OAK_LOG)
+			.put(Material.SPRUCE_LOG, SMPMaterial.HARDENED_SPRUCE_LOG)
+			.put(Material.ACACIA_LOG, SMPMaterial.HARDENED_ACACIA_LOG)
+			.put(Material.JUNGLE_LOG, SMPMaterial.HARDENED_JUNGLE_LOG)
+			.put(Material.DARK_OAK_LOG, SMPMaterial.HARDENED_DARK_OAK_LOG)
+			.put(Material.BIRCH_LOG, SMPMaterial.HARDENED_BIRCH_LOG)		
+
 			.put(Material.COAL_ORE, SMPMaterial.BEDROCK_ORE)
 			.put(Material.DEEPSLATE_COAL_ORE, SMPMaterial.DEEPSLATE_BEDROCK_ORE)
+			.put(Material.COPPER_ORE, SMPMaterial.AMBER_ORE)
+			.put(Material.DEEPSLATE_COPPER_ORE, SMPMaterial.DEEPSLATE_AMBER_ORE)
+			.put(Material.IRON_ORE, SMPMaterial.APATITE_ORE)
+			.put(Material.DEEPSLATE_IRON_ORE, SMPMaterial.DEEPSLATE_APATITE_ORE)
+			.put(Material.LAPIS_ORE, SMPMaterial.JADE_ORE)
+			.put(Material.DEEPSLATE_LAPIS_ORE, SMPMaterial.DEEPSLATE_JADE_ORE)
+			.put(Material.GOLD_ORE, SMPMaterial.TOPAZ_ORE)
+			.put(Material.DEEPSLATE_GOLD_ORE, SMPMaterial.DEEPSLATE_TOPAZ_ORE)
+			.put(Material.DIAMOND_ORE, SMPMaterial.SAPPHIRE_ORE)
+			.put(Material.DEEPSLATE_DIAMOND_ORE, SMPMaterial.DEEPSLATE_SAPPHIRE_ORE)
+			.put(Material.EMERALD_ORE, SMPMaterial.QARDITE_ORE)
+			.put(Material.DEEPSLATE_EMERALD_ORE, SMPMaterial.DEEPSLATE_QARDITE_ORE)
+
 			.build();
 	
 }
