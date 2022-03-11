@@ -180,8 +180,12 @@ public class Items implements Listener {
 	
 	public static interface Tags {
 		
-		ItemStack TOO_MANY_TAGS = itemBuilder(Material.BARRIER).setName(ChatColor.RED + "You have too Many Tags!").build();
-		
+		ItemStack TOO_MANY_TAGS = errorItem("You have too Many Tags!");
+		ItemStack NOT_COMPATIBLE = errorItem("This tag is not compatible with this item.");
+	}
+
+	public static final ItemStack errorItem(String message) {
+		return itemBuilder(Material.BARRIER).setName(ChatColor.RED + message).build();
 	}
 	
 	public static final ItemStack[] NON_COLLECTIBLES = {
@@ -192,7 +196,8 @@ public class Items implements Listener {
 		Inventory.NEXT_ARROW,
 		Inventory.BACK_HEAD,
 		Inventory.FORWARD_HEAD,
-		Tags.TOO_MANY_TAGS
+		Tags.TOO_MANY_TAGS,
+		Tags.NOT_COMPATIBLE
 	};
 	
 }
