@@ -169,6 +169,14 @@ public enum AbilityItem implements Queryable {
 		this.item = item;
 	}
 
+	public static final AbilityItem matchEnum(String name) {
+		try {
+			return AbilityItem.valueOf(name.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+	
 	@Override
 	public QueryID queryId() {
 		return new QueryID("smpability", name().toLowerCase());
@@ -177,13 +185,14 @@ public enum AbilityItem implements Queryable {
 	public ItemStack genInfo() {
 		ItemStack info = Queryable.super.genInfo();
 		ItemMeta meta = info.getItemMeta();
-		List<String> lore = new ArrayList<>(meta.getLore());
+		List<String> lore = (meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>());
 		if (SMPTag.getByOrigin(this) != null) {
 			SMPTag<?> tag = SMPTag.getByOrigin(this);
 			lore.add(" ");
 			lore.add(ChatColor.YELLOW + "Attached Tag: " + ChatColor.GOLD + tag.getName());
 			lore.add(ChatColor.YELLOW + "Applies To: " + ChatColor.GOLD + tag.getTarget().name().substring(0, 1) + tag.getTarget().name().toLowerCase().substring(1));
 		}
+		meta.setLore(lore);
 		info.setItemMeta(meta);
 		return info;
 	}

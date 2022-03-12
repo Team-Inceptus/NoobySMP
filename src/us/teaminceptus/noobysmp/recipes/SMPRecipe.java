@@ -1,5 +1,11 @@
 package us.teaminceptus.noobysmp.recipes;
 
+import static us.teaminceptus.noobysmp.recipes.RecipeManager.AXE;
+import static us.teaminceptus.noobysmp.recipes.RecipeManager.AXE_2;
+import static us.teaminceptus.noobysmp.recipes.RecipeManager.HOE;
+import static us.teaminceptus.noobysmp.recipes.RecipeManager.HOE_2;
+import static us.teaminceptus.noobysmp.recipes.RecipeManager.vanillaShape;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
+import us.teaminceptus.noobysmp.util.Items;
 
 public class SMPRecipe {
 
@@ -29,11 +36,21 @@ public class SMPRecipe {
 	
 	private final Recipe recipe;
 	private final boolean eventUsed;
-
-	public SMPRecipe(ItemStack result, String recipeMap, Map<Character, ItemStack> ingredients) {
+	private final ItemStack result;
+	private NamespacedKey key = null;
+	
+	private Map<Character, ?> ingredients;
+	private String recipeMap;
+	
+	{
 		recipes.add(this);
-
-		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this))), result);
+	}
+	
+	public SMPRecipe(ItemStack result, String recipeMap, Map<Character, ItemStack> ingredients) {
+		NamespacedKey key = new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this)));
+		this.key = key;
+		
+		ShapedRecipe recipe = new ShapedRecipe(key, result);
 
 		recipe.shape(recipeMap.split("_"));
 		
@@ -41,15 +58,17 @@ public class SMPRecipe {
 			recipe.setIngredient(c, new ExactChoice(ingredients.get(c)));
 		}
 		
-		boolean added = Bukkit.addRecipe(recipe);
+		if (recipeMap.equals(HOE)) new SMPRecipe(result, HOE_2, vanillaShape(ingredients.get('I'), HOE_2));
+		if (recipeMap.equals(AXE)) new SMPRecipe(result, AXE_2, vanillaShape(ingredients.get('I'), AXE_2));
+		
+		this.ingredients = ingredients;
+		this.recipeMap = recipeMap;
+		
+		Bukkit.addRecipe(recipe);
 		this.recipe = recipe;
 		this.eventUsed = false;
 		
-		if (added) {
-			JavaPlugin.getPlugin(SMP.class).getLogger().info("Successfully added recipe " + recipe.getKey().getKey());
-		} else {
-			JavaPlugin.getPlugin(SMP.class).getLogger().info("Adding recipe " + recipe.getKey().getKey() + " failed.");
-		}
+		this.result = result;
 	}
 
 	public SMPRecipe(SMPMaterial result, String recipeMap, Map<Character, ItemStack> ingredients) {
@@ -61,25 +80,31 @@ public class SMPRecipe {
 	}
 
 	public SMPRecipe(ItemStack result, String recipeMap, HashMap<Character, Material> ingredients) {
-		recipes.add(this);
-
-		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this))), result);
-
+		NamespacedKey key = new NamespacedKey(JavaPlugin.getPlugin(SMP.class), "recipe" + Integer.toString(recipes.indexOf(this)));
+		ShapedRecipe recipe = new ShapedRecipe(key, result);
+		
+		this.key = key;
+		
+		if (recipeMap.equals(HOE)) new SMPRecipe(result, HOE_2, vanillaShape(ingredients.get('I'), HOE_2));
+		if (recipeMap.equals(AXE)) new SMPRecipe(result, AXE_2, vanillaShape(ingredients.get('I'), AXE_2));
+		
 		recipe.shape(recipeMap.split("_"));
 
 		for (char c : ingredients.keySet()) {
 			recipe.setIngredient(c, new MaterialChoice(ingredients.get(c)));
 		}
+		
+		this.ingredients = ingredients;
+		this.recipeMap = recipeMap;
+		this.result = result;
 
-		boolean added = Bukkit.addRecipe(recipe);
+		Bukkit.addRecipe(recipe);
 		this.recipe = recipe;
 		this.eventUsed = false;
-		
-		if (added) {
-			JavaPlugin.getPlugin(SMP.class).getLogger().info("Successfully added recipe " + recipe.getKey().getKey());
-		} else {
-			JavaPlugin.getPlugin(SMP.class).getLogger().info("Adding recipe " + recipe.getKey().getKey() + " failed.");
-		}
+	}
+	
+	public final Map<Character, ?> getIngredients() {
+		return this.ingredients;
 	}
 
 	public SMPRecipe(SMPMaterial result, String recipeMap, HashMap<Character, Material> ingredients) {
@@ -87,7 +112,7 @@ public class SMPRecipe {
 	}
 
 	public SMPRecipe(ItemStack input, ItemStack result, float exp, int cookTime) {
-		recipes.add(this);
+		this.result = result;
 		this.recipe = null;
 		this.eventUsed = true;
 
@@ -97,7 +122,7 @@ public class SMPRecipe {
 	}
 
 	public SMPRecipe(ItemStack input, ItemStack addition, ItemStack result) {
-		recipes.add(this);
+		this.result = result;
 		this.recipe = null;
 		this.eventUsed = true;
 
@@ -107,7 +132,7 @@ public class SMPRecipe {
 	}
 	
 	public SMPRecipe(ItemStack input, ItemStack combination, ItemStack result, float exp) {
-		recipes.add(this);
+		this.result = result;
 		this.recipe = null;
 		this.eventUsed = true;
 		
@@ -115,7 +140,32 @@ public class SMPRecipe {
 		
 		anvilRecipes.put(identifier, new AnvilData(input, combination, result, exp));
 	}
+	
+	public static List<SMPRecipe> getByResult(ItemStack item) {
+		List<SMPRecipe> recipes = new ArrayList<>();
+		
+		for (SMPRecipe r : getRecipes()) {
+			if (r.key != null) {
+				Recipe rec = Bukkit.getRecipe(r.key);
+				if (Items.compareLocalization(item, rec.getResult())) recipes.add(r);
+			} else {
+				if (getCookRecipes().containsKey(Items.getLocalization(r.result))) recipes.add(r);
+				if (getSmithingRecipes().containsKey(Items.getLocalization(r.result))) recipes.add(r);
+				if (getAnvilRecipes().containsKey(Items.getLocalization(r.result))) recipes.add(r);
+			}
+		}
+		
+		return recipes;
+	}
+	
+	public final boolean isCraftingRecipe() {
+		return !this.eventUsed;
+	}
 
+	public final String getRecipeMap() {
+		return this.recipeMap;
+	}
+	
 	public final Recipe getRecipe() {
 		return this.recipe;
 	}
@@ -138,6 +188,14 @@ public class SMPRecipe {
 	
 	public static final List<SMPRecipe> getEventRecipes() {
 		return getRecipes().stream().filter(r -> r.eventUsed).toList();
+	}
+	
+	/**
+	 * Can be {@link SMPMaterial}, {@link AbilityItem}, or {@link ItemStack}.
+	 * @return Object representation of this item
+	 */
+	public final Object getResult() {
+		return this.result;
 	}
 
 	public static class FurnaceData {

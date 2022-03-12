@@ -441,7 +441,7 @@ public class RecipeManager implements Listener {
 		
 		List<SMPRecipe> recipes = SMPRecipe.getByResult(item);
 
-		for (SMPRecipe r : recipes) {
+		for (SMPRecipe r : recipes) {	
 			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
 			
 			inv.setItem(13, Items.Inventory.GUI_PANE);
