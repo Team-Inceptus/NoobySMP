@@ -3,9 +3,6 @@ package us.teaminceptus.noobysmp.materials;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-import com.jeff_media.customblockdata.CustomBlockData;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -25,8 +22,11 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.google.common.collect.ImmutableMap;
+
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.SMPMaterial.CleanOutput.MaterialOutput;
+import us.teaminceptus.noobysmp.util.BlockPDC;
 import us.teaminceptus.noobysmp.util.Items;
 import us.teaminceptus.noobysmp.util.Queryable;
 import us.teaminceptus.noobysmp.util.SMPColor;
@@ -348,6 +348,10 @@ public enum SMPMaterial implements Queryable {
 	MAGIC_TOPAZ_JADE_SWORD(79, Material.DIAMOND_SWORD, "Magic Topaz-Jade Sword", genAttack(142, 15, 1), genTool(100, 0)),
 	;
 	
+	{
+		Queryable.register(this);
+	}
+	
 	private static int idCounter = 0;
 	
 	public static final Map<SMPMaterial, SMPMaterial> ORE_DROPS = ImmutableMap.<SMPMaterial, SMPMaterial>builder()
@@ -368,6 +372,14 @@ public enum SMPMaterial implements Queryable {
 	private int customModelId;
 
 	private final ChatColor cc;
+	
+	public static final SMPMaterial matchEnum(String name) {
+		try {
+			return SMPMaterial.valueOf(name.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
 	
 	public final SMPMaterial getOreDrops() throws IllegalArgumentException {
 		if (!(ORE_DROPS.containsKey(this))) throw new IllegalArgumentException(this.name() + " is not included in ORE_DROPS");
@@ -390,7 +402,7 @@ public enum SMPMaterial implements Queryable {
 		Block b = loc.getWorld().getBlockAt(loc);
 		b.setType(this.item.getType());
 		
-		PersistentDataContainer c = new CustomBlockData(b, plugin);
+		PersistentDataContainer c = new BlockPDC(b);
 		
 		c.set(new NamespacedKey(plugin, "type"), PersistentDataType.STRING, this.localization);
 	}

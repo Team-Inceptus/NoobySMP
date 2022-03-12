@@ -2,9 +2,6 @@ package us.teaminceptus.noobysmp.generation;
 
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-import com.jeff_media.customblockdata.CustomBlockData;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -17,9 +14,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import com.google.common.collect.ImmutableMap;
+
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
+import us.teaminceptus.noobysmp.util.BlockPDC;
 
 public class BlockManager implements Listener {
 	
@@ -50,14 +50,14 @@ public class BlockManager implements Listener {
 			return;
 		}
 		
-		PersistentDataContainer c = new CustomBlockData(b, plugin);
+		PersistentDataContainer c = new BlockPDC(b);
 		c.set(typeKey, PersistentDataType.STRING, id);
 	}
 	
 	@EventHandler
 	public void onBreak(BlockBreakEvent e) {
 		final Block b = e.getBlock();
-		PersistentDataContainer c = new CustomBlockData(b, plugin);
+		PersistentDataContainer c = new BlockPDC(b);
 		if (!(c.has(typeKey, PersistentDataType.STRING))) return;
 		
 		String type = c.get(typeKey, PersistentDataType.STRING);

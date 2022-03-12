@@ -50,7 +50,7 @@ public class GetRecipe implements TabExecutor {
 		
 		} else {
 			try {
-				SMPMaterial m = SMPMaterial.getByLocalization(args[1].toLowerCase());
+				SMPMaterial m = SMPMaterial.matchEnum(args[0].toLowerCase());
 				
 				if (m != null) {
 					List<Inventory> invs = RecipeManager.getRecipeMenus(m.getItem());
@@ -58,7 +58,7 @@ public class GetRecipe implements TabExecutor {
 					return true;
 				}
 				
-				AbilityItem aM = AbilityItem.getByLocalization(args[1].toLowerCase());
+				AbilityItem aM = AbilityItem.matchEnum(args[0].toLowerCase());
 				
 				if (aM != null) {
 					List<Inventory> invs = RecipeManager.getRecipeMenus(aM.getItem());
@@ -68,7 +68,12 @@ public class GetRecipe implements TabExecutor {
 				
 				p.sendMessage(ChatColor.RED + "This item does not exist. If this is an error, contact GamerCoder215.");
 				return true;
-			} catch (Exception e) {
+			} 
+			catch (IndexOutOfBoundsException e) {
+				p.sendMessage(ChatColor.RED + "No recipes were found for this item.");
+				return false;
+			}
+			catch (Exception e) {
 				p.sendMessage(ChatColor.RED + "There was an error: " + e.getMessage());
 				return false;
 			}

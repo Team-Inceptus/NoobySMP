@@ -1,11 +1,13 @@
 package us.teaminceptus.noobysmp.recipes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -17,11 +19,9 @@ import org.bukkit.event.inventory.PrepareSmithingEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.SmithingInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import net.md_5.bungee.api.ChatColor;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
@@ -75,9 +75,6 @@ public class RecipeManager implements Listener {
 	public static final HashMap<Character, ItemStack> vanillaShape(ItemStack item, String smap) {
 		HashMap<Character, ItemStack> map = new HashMap<>();
 		
-		if (smap.equals(HOE)) new SMPRecipe(item, HOE_2, vanillaShape(item, HOE_2));
-		if (smap.equals(AXE)) new SMPRecipe(item, AXE_2, vanillaShape(item, AXE_2));
-		
 		map.put('I', item);
 		if (smap.contains("S")) map.put('S', new ItemStack(Material.STICK));
 		if (smap.contains("R")) map.put('R', new ItemStack(Material.STRING));
@@ -87,9 +84,6 @@ public class RecipeManager implements Listener {
 
 	public static final HashMap<Character, Material> vanillaShape(Material mat, String smap) {
 		HashMap<Character, Material> map = new HashMap<>();
-		
-		if (smap.equals(HOE)) new SMPRecipe(new ItemStack(mat), HOE_2, vanillaShape(mat, HOE_2));
-		if (smap.equals(AXE)) new SMPRecipe(new ItemStack(mat), AXE_2, vanillaShape(mat, AXE_2));
 		
 		map.put('I', mat);
 		if (smap.contains("S")) map.put('S', Material.STICK);
@@ -122,14 +116,14 @@ public class RecipeManager implements Listener {
 		return Map.of('I', item, 'E', SMPMaterial.CHARGED_ESSENCE.getItem());
 	}
 	
-	private static final String ENRICHMENT = "III_IEI_III";
+	public static final String ENRICHMENT = "III_IEI_III";
 	
 	private void createAbilityRecipes() {
 		plugin.getLogger().info("Loading Ability Recipes...");
 		
 		// Crafting Recipes
 		new SMPRecipe(AbilityItem.INFINIBALL, "FFF_FTF_FFF", Map.of('F', new ItemStack(Material.FIRE_CHARGE), 'T', new ItemStack(Material.TNT)));
-		new SMPRecipe(AbilityItem.INFINITNT, "I I_TTT_I I", Map.of('F', AbilityItem.INFINIBALL.getItem(), 'T', new ItemStack(Material.TNT)));
+		new SMPRecipe(AbilityItem.INFINITNT, "I I_TTT_I I", Map.of('I', AbilityItem.INFINIBALL.getItem(), 'T', new ItemStack(Material.TNT)));
 		
 		new SMPRecipe(SMPMaterial.UNCHARGED_ESSENCE, BLOCK_9, vanillaShape(Material.NETHER_STAR, BLOCK_9));
 		
@@ -426,117 +420,158 @@ public class RecipeManager implements Listener {
 		createRecipes();
 		plugin.getLogger().info("Successfully loaded " + Integer.toString(SMPRecipe.getRecipes().size()) + " custom recipes for NoobySMP. Loading other event recipes...");
 		Bukkit.getPluginManager().registerEvents(this, plugin);
-		plugin.getLogger().info("Successfully loaded events!");
+		plugin.getLogger().info("Successfully loaded recipe events!");
 	}
 	
-	public static class RecipeHolder extends CancelHolder {};
+	public static class RecipeHolder extends CancelHolder {
+		
+		public int index;
+		
+		private RecipeHolder(int index) {
+			this.index = index;
+		}
+		
+	};
 
 	public static List<Inventory> getRecipeMenus(ItemStack item) {
-		List<Recipe> recipes = Bukkit.getRecipesFor(item);
 		List<Inventory> inventories = new ArrayList<>();
 		
 		String invName = "Recipe - " + (item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name().substring(0, 1) + item.getType().name().toLowerCase().substring(1));
+		int index = 0;
 		
-		for (Recipe r : recipes) {
-			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder());
+		List<SMPRecipe> recipes = SMPRecipe.getByResult(item);
 
-			if (r instanceof ShapedRecipe sh) {
-				Map<Integer, ItemStack> ingredients = new HashMap<>();
-
-				int index = 0;
-				for (String s : sh.getShape()) {
-					for (char c : s.toCharArray()) {
-						ItemStack it = (sh.getIngredientMap().get(c) == null ? new ItemStack(Material.AIR) : sh.getIngredientMap().get(c));
-						ingredients.put(index, it);
-						index++;
-					}
-				}
+		for (SMPRecipe r : recipes) {
+			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
 			
+			inv.setItem(13, Items.Inventory.GUI_PANE);
+			inv.setItem(22, Items.Inventory.GUI_PANE);
+			inv.setItem(31, Items.Inventory.GUI_PANE);
+			
+			if (r.isCraftingRecipe()) {
+				Map<Character, ?> ingredientsmap = r.getIngredients();
+				
+				List<ItemStack> ingredients = new ArrayList<>();
+				
+				String chars = r.getRecipeMap().replace("_", "").replace(" ", "A");
+				
+				for (int i = chars.length(); i < 9; i++) {
+					chars += "A";
+				}
+				
+				for (char c : chars.toCharArray()) {
+					if (Character.toString(c).equals("A")) {
+						ingredients.add(new ItemStack(Material.AIR));
+						continue;
+					}
+					
+					Object obj = ingredientsmap.get(c);
+					
+					if (obj instanceof ItemStack i) ingredients.add(i);
+					else if (obj instanceof Material m) ingredients.add(new ItemStack(m));
+				}
+				
 				inv.setItem(10, ingredients.get(0));
 				inv.setItem(11, ingredients.get(1));
 				inv.setItem(12, ingredients.get(2));
-
+	
 				inv.setItem(19, ingredients.get(3));
 				inv.setItem(20, ingredients.get(4));
 				inv.setItem(21, ingredients.get(5));
-
-				inv.setItem(30, ingredients.get(6));
-				inv.setItem(31, ingredients.get(7));
-				inv.setItem(32, ingredients.get(8));
+	
+				inv.setItem(28, ingredients.get(6));
+				inv.setItem(29, ingredients.get(7));
+				inv.setItem(30, ingredients.get(8));
 				
-				inv.setItem(22, new ItemStack(Material.CRAFTING_TABLE));
-				inv.setItem(23, item);
-
+				inv.setItem(23, new ItemStack(Material.CRAFTING_TABLE));
+				inv.setItem(24, item);
+				
 				inventories.add(inv);
+				index++;
+			} else {
+				for (FurnaceData d : SMPRecipe.getCookRecipes().values()) {
+					if (!(Items.compareLocalization(item, d.getResult()))) continue;
+					
+					inv.setItem(10, Items.Inventory.GUI_PANE);
+					inv.setItem(11, Items.Inventory.GUI_PANE);
+					inv.setItem(12, Items.Inventory.GUI_PANE);
+					inv.setItem(19, Items.Inventory.GUI_PANE);
+					inv.setItem(21, Items.Inventory.GUI_PANE);
+					inv.setItem(28, Items.Inventory.GUI_PANE);
+					inv.setItem(29, Items.Inventory.GUI_PANE);
+					inv.setItem(30, Items.Inventory.GUI_PANE);
+					
+					inv.setItem(20, d.getInput());
+					
+					inv.setItem(23, new ItemStack(Material.FURNACE));
+					inv.setItem(24, item);
+					
+					ItemStack cookInfo = new ItemStack(Material.COAL);
+					ItemMeta meta = cookInfo.getItemMeta();
+					meta.setDisplayName(ChatColor.YELLOW + "Cook Time: " + (d.getCookTime() / 20) + "s");
+					meta.setLore(Collections.singletonList(ChatColor.AQUA + "XP Received: " + d.getExp()));
+					cookInfo.setItemMeta(meta);
+					
+					inv.setItem(32, cookInfo);
+					
+					inventories.add(inv);
+					index++;
+				}
+				
+				for (AnvilData d : SMPRecipe.getAnvilRecipes().values()) {
+					if (!(Items.compareLocalization(item, d.getResult()))) continue;
+					
+					inv.setItem(10, Items.Inventory.GUI_PANE);
+					inv.setItem(11, Items.Inventory.GUI_PANE);
+					inv.setItem(12, Items.Inventory.GUI_PANE);
+					inv.setItem(19, Items.Inventory.GUI_PANE);
+					inv.setItem(21, Items.Inventory.GUI_PANE);
+					inv.setItem(28, Items.Inventory.GUI_PANE);
+					inv.setItem(29, Items.Inventory.GUI_PANE);
+					inv.setItem(30, Items.Inventory.GUI_PANE);
+					
+					inv.setItem(20, d.getInput());
+					inv.setItem(22, d.getCombination());
+					
+					inv.setItem(23, new ItemStack(Material.ANVIL));
+					inv.setItem(24, item);
+					
+					ItemStack anvilInfo = new ItemStack(Material.IRON_AXE);
+					ItemMeta meta = anvilInfo.getItemMeta();
+					meta.setDisplayName(ChatColor.AQUA + "XP Received: " + d.getExp());
+					anvilInfo.setItemMeta(meta);
+					
+					inv.setItem(32, anvilInfo);
+					
+					inventories.add(inv);
+					index++;
+				}
+				
+				for (SmithingData d : SMPRecipe.getSmithingRecipes().values()) {
+					if (!(Items.compareLocalization(item, d.getResult()))) continue;
+					
+					inv.setItem(10, Items.Inventory.GUI_PANE);
+					inv.setItem(11, Items.Inventory.GUI_PANE);
+					inv.setItem(12, Items.Inventory.GUI_PANE);
+					inv.setItem(19, Items.Inventory.GUI_PANE);
+					inv.setItem(21, Items.Inventory.GUI_PANE);
+					inv.setItem(28, Items.Inventory.GUI_PANE);
+					inv.setItem(29, Items.Inventory.GUI_PANE);
+					inv.setItem(30, Items.Inventory.GUI_PANE);
+					
+					inv.setItem(20, d.getInput());
+					inv.setItem(22, d.getAddition());
+					
+					inv.setItem(23, new ItemStack(Material.SMITHING_TABLE));
+					inv.setItem(24, item);
+					
+					inventories.add(inv);
+					index++;
+				}
 			}
 		}
-		
-		for (AnvilData data : SMPRecipe.getAnvilRecipes().values()) {
-			if (!(data.getInput().isSimilar(item))) continue;
-			
-			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder());
-			
-			inv.setItem(10, Items.Inventory.GUI_PANE);
-			inv.setItem(11, Items.Inventory.GUI_PANE);
-			inv.setItem(12, Items.Inventory.GUI_PANE);
-			inv.setItem(20, Items.Inventory.GUI_PANE);
-			inv.setItem(28, Items.Inventory.GUI_PANE);
-			inv.setItem(29, Items.Inventory.GUI_PANE);
-			inv.setItem(30, Items.Inventory.GUI_PANE);
-			
-			inv.setItem(19, data.getInput());
-			inv.setItem(21, data.getCombination());
-			
-			inv.setItem(22, new ItemStack(Material.ANVIL));
-			inv.setItem(23, item);
-			
-			inventories.add(inv);
-		}
-		
-		for (SmithingData data : SMPRecipe.getSmithingRecipes().values()) {
-			if (!(data.getInput().isSimilar(item))) continue;
-			
-			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder());
-			
-			inv.setItem(10, Items.Inventory.GUI_PANE);
-			inv.setItem(11, Items.Inventory.GUI_PANE);
-			inv.setItem(12, Items.Inventory.GUI_PANE);
-			inv.setItem(20, Items.Inventory.GUI_PANE);
-			inv.setItem(28, Items.Inventory.GUI_PANE);
-			inv.setItem(29, Items.Inventory.GUI_PANE);
-			inv.setItem(30, Items.Inventory.GUI_PANE);
-			
-			inv.setItem(19, data.getInput());
-			inv.setItem(21, data.getAddition());
-			
-			inv.setItem(22, new ItemStack(Material.SMITHING_TABLE));
-			inv.setItem(23, item);
-			
-			inventories.add(inv);
-		}
-		
-		for (FurnaceData data : SMPRecipe.getCookRecipes().values()) {
-			if (!(data.getInput().isSimilar(item))) continue;
-			
-			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder());
-			
-			inv.setItem(10, Items.Inventory.GUI_PANE);
-			inv.setItem(11, Items.Inventory.GUI_PANE);
-			inv.setItem(12, Items.Inventory.GUI_PANE);
-			inv.setItem(19, Items.Inventory.GUI_PANE);
-			inv.setItem(21, Items.Inventory.GUI_PANE);
-			inv.setItem(28, Items.Inventory.GUI_PANE);
-			inv.setItem(29, Items.Inventory.GUI_PANE);
-			inv.setItem(30, Items.Inventory.GUI_PANE);
-			
-			inv.setItem(20, data.getInput());
-			
-			inv.setItem(22, new ItemStack(Material.FURNACE));
-			inv.setItem(23, item);
-			
-			inventories.add(inv);
-		}
 
+		
 		if (inventories.size() > 1) {
 			for (int i = 0; i < inventories.size() - 1; i++) {
 				Inventory inv = inventories.get(i);
@@ -577,16 +612,16 @@ public class RecipeManager implements Listener {
 		String display = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()).toLowerCase();
 		Inventory recipeInv = view.getTopInventory();
 		
-		if (!(recipeInv.getHolder() instanceof RecipeHolder)) return;
+		if (!(recipeInv.getHolder() instanceof RecipeHolder h)) return;
 		
-		ItemStack chosen = recipeInv.getItem(23);
+		ItemStack chosen = recipeInv.getItem(24);
 		if (chosen == null) return;
 		
 		// Turn Page
 		if (display.equalsIgnoreCase("next") || display.equalsIgnoreCase("back")) {
 			List<Inventory> invs = getRecipeMenus(chosen);
 			
-			int nextInvIndex = invs.indexOf(recipeInv) + (display.equalsIgnoreCase("next") ? 1 : -1);
+			int nextInvIndex = h.index + (display.equalsIgnoreCase("next") ? 1 : -1);
 			
 			Inventory nextInv = invs.get(nextInvIndex);
 			if (nextInv == null) return;
