@@ -295,14 +295,13 @@ public enum TitanBiome {
 			biome.nmsBiome = nmsbiome;
 			
 			registrywritable.register(key, nmsbiome, Lifecycle.stable());
-			
 		}
 		
 		changeRegistryLock(true);
 		plugin.getLogger().info("Registered " + Integer.toString(TitanBiome.values().length) + " Titan Biomes");
 	}
 
-	public void setBiome(Chunk c) {
+	public void setBiome(Chunk c, boolean packet) {
 		Level w = ((CraftWorld) c.getWorld()).getHandle();
 		
 		for (int x = 0; x <= 15; x++) {
@@ -312,22 +311,38 @@ public enum TitanBiome {
 				}
 			}
 		}
-		updateChunksForAll(c);
+		if (packet) updateChunksForAll(c);
+	}
+	
+	public void setBiome(Chunk c) {
+		setBiome(c, true);
 	}
 
-	public void setBiome(Location loc) {
+	public void setBiome(Location loc, boolean packet) {
 		Level w = ((CraftWorld) loc.getWorld()).getHandle();
 
 		setBiome(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), w, nmsBiome);
-		updateChunksForAll(loc.getChunk());
+		if (packet) updateChunksForAll(loc.getChunk());
+	}
+	
+	public void setBiome(Location loc) {
+		setBiome(loc, true);
 	}
 
+	public static void setBiome(Chunk c, TitanBiome biome, boolean packet) {
+		biome.setBiome(c, packet);
+	}
+	
 	public static void setBiome(Chunk c, TitanBiome biome) {
-		biome.setBiome(c);
-	}	
+		setBiome(c, biome, true);
+	}
 
+	public static void setBiome(Location loc, TitanBiome biome, boolean packet) {
+		biome.setBiome(loc, packet);
+	}
+	
 	public static void setBiome(Location loc, TitanBiome biome) {
-		biome.setBiome(loc);
+		setBiome(loc, biome, true);
 	}
 
 	private void setBiome(int x, int y, int z, Level w, net.minecraft.world.level.biome.Biome biome) {
