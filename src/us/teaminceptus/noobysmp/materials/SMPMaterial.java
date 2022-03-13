@@ -352,7 +352,7 @@ public enum SMPMaterial implements Queryable {
 		Queryable.register(this);
 	}
 	
-	private static int idCounter = 0;
+	private static int idCounter = 1;
 	
 	public static final Map<SMPMaterial, SMPMaterial> ORE_DROPS = ImmutableMap.<SMPMaterial, SMPMaterial>builder()
 			.put(SMPMaterial.RUBY_ORE, SMPMaterial.RUBY)
@@ -361,7 +361,17 @@ public enum SMPMaterial implements Queryable {
 			// Titan
 			.put(SMPMaterial.BEDROCK_ORE, SMPMaterial.BEDROCK_INGOT)
 			.put(SMPMaterial.DEEPSLATE_BEDROCK_ORE, SMPMaterial.BEDROCK_INGOT)
-			
+			.put(SMPMaterial.AMBER_ORE, SMPMaterial.AMBER)
+			.put(SMPMaterial.DEEPSLATE_AMBER_ORE, SMPMaterial.AMBER)
+			.put(SMPMaterial.APATITE_ORE, SMPMaterial.APATITE)
+			.put(SMPMaterial.DEEPSLATE_APATITE_ORE, SMPMaterial.APATITE)
+			.put(SMPMaterial.JADE_ORE, SMPMaterial.JADE)
+			.put(SMPMaterial.DEEPSLATE_JADE_ORE, SMPMaterial.JADE)
+			.put(SMPMaterial.TOPAZ_ORE, SMPMaterial.TOPAZ)
+			.put(SMPMaterial.DEEPSLATE_TOPAZ_ORE, SMPMaterial.TOPAZ)
+			.put(SMPMaterial.SAPPHIRE_ORE, SMPMaterial.SAPPHIRE)
+			.put(SMPMaterial.QARDITE_ORE, SMPMaterial.QARDITE)
+			.put(SMPMaterial.DEEPSLATE_QARDITE_ORE, SMPMaterial.QARDITE)
 			.build();
 	
 	private final String localization;
