@@ -54,6 +54,10 @@ commands:
   runtest:
     description: Run Tests for Features
     permission: smp.admin
+  fetchdata:
+    description: Fetch Data for items
+    permission: smp.admin.fetch
+    aliases: [fetchd, fdata, fd]
     
 permissions:
   smp.*:
@@ -83,6 +87,11 @@ permissions:
       smp.admin: true
   smp.admin.experience:
     description: Access to /experience
+    default: op
+    children:
+      smp.admin: true
+  smp.admin.fetch:
+    description: Access to /fetchdata
     default: op
     children:
       smp.admin: true
