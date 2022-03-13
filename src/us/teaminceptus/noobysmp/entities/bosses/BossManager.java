@@ -120,13 +120,9 @@ public class BossManager implements Listener {
         REPEATED_ATTACKS.runTaskTimer(plugin, 2, 2);
         plugin.getLogger().info("Loaded Repeated Attacks Runnable");
     }
+  
     
-	
-    public static void throwItem(Location start, double distance, ItemStack item, double damage) {
-    	throwItem(start, distance, item, damage, null);
-    }
-    
-	public static void throwItem(Location start, double distance, ItemStack item, double damage, Player p) {
+	public static void throwItem(Location start, double distance, ItemStack item, double damage) {
 		Vector direction = start.getDirection();
 		
 		ArmorStand stand = start.getWorld().spawn(start, ArmorStand.class);
@@ -141,8 +137,6 @@ public class BossManager implements Listener {
 		stand.setRightArmPose(EulerAngle.ZERO);
 		
 		double tpRange = 0.2;
-		
-		if (p != null) p.getInventory().removeItem(item);
 		
 		new BukkitRunnable() {
 			int runs = 0;
@@ -175,10 +169,6 @@ public class BossManager implements Listener {
 				if (runs >= (1 / tpRange) * distance) {
 					stand.remove();
 					cancel();
-					if (p != null) {
-						HashMap<Integer, ItemStack> leftovers = p.getInventory().addItem(item);
-						for (ItemStack l : leftovers.values()) p.getWorld().dropItemNaturally(p.getLocation(), l);
-					}
 				}
 				
 				runs++;
