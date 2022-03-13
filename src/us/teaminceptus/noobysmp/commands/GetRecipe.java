@@ -47,7 +47,9 @@ public class GetRecipe implements TabExecutor {
 				p.sendMessage(ChatColor.RED + "There are no recipes for this given item.");
 				p.sendMessage(ChatColor.AQUA + "Hint: Hold the item you want to get the recipe for, or provide a material ID.");
 			}
-		
+			
+			p.openInventory(invs.get(0));
+			return true;
 		} else {
 			try {
 				SMPMaterial m = SMPMaterial.matchEnum(args[0].toLowerCase());
@@ -78,8 +80,6 @@ public class GetRecipe implements TabExecutor {
 				return false;
 			}
 		}
-		
-		return true;
 	}
 
 	@Override
