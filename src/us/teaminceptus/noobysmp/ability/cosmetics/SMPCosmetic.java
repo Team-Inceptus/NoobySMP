@@ -2,10 +2,16 @@ package us.teaminceptus.noobysmp.ability.cosmetics;
 
 import java.util.function.Consumer;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-public enum SMPCosmetic {
+import us.teaminceptus.noobysmp.util.Queryable;
+
+public enum SMPCosmetic implements Queryable {
 	
 	
 	GRAY_AURA(5, "Gray Aura", createCircle(Particle.SMOKE_NORMAL, 3)),
@@ -48,6 +54,7 @@ public enum SMPCosmetic {
 		this.levelUnlocked = levelUnlocked;
 		this.name = name;
 		this.effects = effects;
+		Queryable.register(this);
 	}
 	
 	public static Consumer<Location> createCircle(Particle part) {
@@ -118,5 +125,20 @@ public enum SMPCosmetic {
 	
 	public void createEffect(Location loc) {
 		for (Consumer<Location> c : this.effects) c.accept(loc);
+	}
+
+	@Override
+	public ItemStack getItem() {
+		ItemStack item = new ItemStack(Material.NETHER_STAR);
+		ItemMeta meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.GREEN + this.name + " Cosmetic");
+		item.setItemMeta(meta);
+		
+		return item;
+	}
+
+	@Override
+	public QueryID queryId() {
+		return new QueryID("smpcosmetic", name().toLowerCase());
 	}
 }
