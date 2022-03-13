@@ -86,14 +86,11 @@ public enum AbilityItem implements Queryable {
 	@QueryDescription({"An upgrade that can lets swords harness", "the wither."})
 	WITHER_MELIORATE(9, Material.WITHER_ROSE, "Wither Meliorate"),
 	
-	@QueryDescription({"An upgrade that can make weapons have the", "abilities of snow."})
+	@QueryDescription({"An upgrade that can make weapons have the", "abilities of snow, when combined in an", "anvil."})
 	SNOWY_ENRICHMENT(10, Material.SNOW, "Snowy Enrichment"),
 
 	@QueryDescription({"An upgrade for the swampy ones out there."})
 	SWAMP_ENRICHMENT(10, Material.VINE, "Swamp Enrichment"),
-	
-	@QueryDescription({"A scroll that can help knock down entire", "trees, big and small."})
-	SCROLL_TIMBERING(12, Material.PAPER, "Scroll of Timbering"),
 
 	@QueryDescription({"An enrichment that harness the power of the", "sea."})
 	AQUATIC_ENRICHMENT(12, Material.HEART_OF_THE_SEA, "Aquatic Enrichment"),
@@ -108,7 +105,8 @@ public enum AbilityItem implements Queryable {
 	SOAKING_MELIORATE(21, Material.SPONGE, "Soaking Meliorate"),
 	SLIMY_MELIORATE(21, Material.SLIME_BALL, "Slimy Meliorate"),
 	SCROLL_EXPLOSION(21, Material.PAPER, "Scroll of Explosions"),
-
+	
+	@QueryDescription({"An enrichment that allows you to", "slowly float upwards when in a liquid."})
 	BUOYANT_ENRICHMENT(23, Material.PRISMARINE_SHARD, "Buoyant Enrichment"),
 
 	END_ENRICHMENT(24, Material.CHORUS_FRUIT, "End Enrichment"),
