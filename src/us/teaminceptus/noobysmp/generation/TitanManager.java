@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.event.EventHandler;
@@ -19,8 +18,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.common.collect.ImmutableMap;
+
 import net.minecraft.world.level.block.state.BlockState;
 import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.generation.biomes.TitanBiome;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 import us.teaminceptus.noobysmp.util.SMPUtil;
 
@@ -119,6 +121,8 @@ public class TitanManager implements Listener {
 		
 	}
 	
+	public static record AsyncBiomeSelection(AsyncLocation loc, TitanBiome biome) {};
+	
 	private void updateBlocks(List<AsyncLocation> selected) {
 		new BukkitRunnable() {
 			public void run() {
@@ -132,6 +136,16 @@ public class TitanManager implements Listener {
 		}.runTask(plugin);
 	}
 	
+	private void updateBiomes(List<AsyncBiomeSelection> selected) {
+		new BukkitRunnable() {
+			public void run() {
+				for (AsyncBiomeSelection s : selected) {
+					s.biome().setBiome(s.loc().toLocation(), false);
+				}
+			}
+		}.runTask(plugin);
+	}
+	
 	@EventHandler
 	public void onLoad(ChunkLoadEvent e) {
 		ChunkSnapshot snap = e.getChunk().getChunkSnapshot(true, true, true);
@@ -139,18 +153,26 @@ public class TitanManager implements Listener {
 		new BukkitRunnable() {
 			public void run() {
 				List<AsyncLocation> locs = new ArrayList<>();
+				List<AsyncBiomeSelection> biomes = new ArrayList<>();
 				for (int x = 0; x < 16; x++) {
 					for (int z = 0; z < 16; z++) {
 						for (int y = -64; y < snap.getHighestBlockYAt(x, z); y++) {
+							AsyncLocation loc = new AsyncLocation(snap.getWorldName(), x + (snap.getX() * 16), y, z + (snap.getZ() * 16));
+							
 							Material m = snap.getBlockType(x, y, z);
 							if (BlockManager.TITAN_REPLACEABLES.containsKey(m)) {
-								locs.add(new AsyncLocation(snap.getWorldName(), x + (snap.getX() * 16), y, z + (snap.getZ() * 16)));
+								locs.add(loc);
 							}
+							
+							
+							Biome b = snap.getBiome(x, y, z);
+							biomes.add(new AsyncBiomeSelection(loc, TitanBiome.getReplaceable(b)));
 						}
 					}
 				}
 				
 				updateBlocks(locs);
+				updateBiomes(biomes);
 			}
 		}.runTaskAsynchronously(plugin);
 	}
