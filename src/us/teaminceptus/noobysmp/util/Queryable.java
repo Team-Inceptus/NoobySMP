@@ -48,14 +48,18 @@ public interface Queryable extends ItemHolder, Unlockable {
 
 			String name = String.valueOf(charArr);
 
-			ItemHolder holder = (ItemHolder) this;
-
-			ItemStack item = new ItemStack(holder.getItem().getType());
+			ItemStack item = new ItemStack(this.getItem().getType());
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName(!(holder.getItem().getItemMeta().hasDisplayName()) ? ChatColor.AQUA + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() : holder.getItem().getItemMeta().getDisplayName());
+			meta.setDisplayName(!(this.getItem().getItemMeta().hasDisplayName()) ? ChatColor.AQUA + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() : this.getItem().getItemMeta().getDisplayName());
 			
 			List<String> info = new ArrayList<>();
-			info.add(ChatColor.DARK_GRAY + "ID: " + (holder.getItem().getItemMeta().hasLocalizedName() ? holder.getItem().getItemMeta().getLocalizedName().toUpperCase() : holder.getItem().getType().name()));
+			
+			final String id;
+			
+			if (this instanceof Enum<?> e) id = e.name();
+			else id = (this.getItem().getItemMeta().hasLocalizedName() ? this.getItem().getItemMeta().getLocalizedName() : this.getItem().getType().name());
+			
+			info.add(ChatColor.DARK_GRAY + "ID: " + id);
 			
 			if (this.getLevelUnlocked() > 0) {
 				info.add(ChatColor.DARK_GRAY + "Level Unlocked: " + this.getLevelUnlocked());
@@ -68,7 +72,8 @@ public interface Queryable extends ItemHolder, Unlockable {
 					info.add(ChatColor.GRAY + s);
 				}
 			}
-
+			
+			meta.setLore(info);
 			item.setItemMeta(meta);
 			return item;
 		} catch (Exception e) {
@@ -77,11 +82,11 @@ public interface Queryable extends ItemHolder, Unlockable {
 	}
 
 	default Inventory getQueryInventory() {
-		Inventory inv = Generator.genGUI(27, "Query Info - " + this.queryId().value.toUpperCase(), new CancelHolder());
+		Inventory inv = Generator.genGUI(27, "Query Information", new CancelHolder());
 
-		for (int i = 10; i < 16; i++) inv.setItem(i, Items.Inventory.GUI_PANE);
+		for (int i = 10; i < 17; i++) inv.setItem(i, Items.Inventory.GUI_PANE);
 		
-		inv.setItem(4, genInfo());
+		inv.setItem(13, genInfo());
 
 		return inv;
 	}
