@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -29,6 +27,7 @@ import us.teaminceptus.noobysmp.commands.Settings;
 import us.teaminceptus.noobysmp.commands.Trade;
 import us.teaminceptus.noobysmp.commands.admin.Catalogue;
 import us.teaminceptus.noobysmp.commands.admin.Experience;
+import us.teaminceptus.noobysmp.commands.admin.FetchData;
 import us.teaminceptus.noobysmp.commands.admin.Ranks;
 import us.teaminceptus.noobysmp.commands.admin.RunTest;
 import us.teaminceptus.noobysmp.commands.admin.SetBiome;
@@ -121,6 +120,14 @@ public class SMP extends JavaPlugin {
 				settings.set("notifications", true);
 			}
 			
+			if (!(settings.isBoolean("drop_items"))) {
+				settings.set("drop_items", true);
+			}
+			
+			if (!(settings.isBoolean("tag_abilities"))) {
+				settings.set("tag_abilities", true);
+			}
+			
 			if (!(pConfig.isConfigurationSection("information"))) {
 				pConfig.createSection("information");
 			}
@@ -158,19 +165,8 @@ public class SMP extends JavaPlugin {
 		}
 	};
 	
-	public static final BukkitRunnable UPDATE_BIOMES = new BukkitRunnable() {
-		public void run() {
-			World tW = Bukkit.getWorld("world_titan");
-			
-			for (Chunk c : tW.getLoadedChunks()) {
-				TitanBiome.WITHERED_PLAINS.setBiome(c);
-			}
-		}
-	};
-	
 	private void startTasks() {
 		UPDATE_TASK.runTaskTimer(this, 0, FILE_UPDATE_SPEED_TICKS);
-//		UPDATE_BIOMES.runTaskTimer(this, 20, 20);
 	}
 	
 	public void onEnable() {
@@ -194,6 +190,7 @@ public class SMP extends JavaPlugin {
 		new Experience(this);
 		new SetBiome(this);
 		new RunTest(this);
+		new FetchData(this);
 		
 		getLogger().info("Loading Managers...");
 		// Managers
@@ -224,8 +221,8 @@ public class SMP extends JavaPlugin {
 		}
 		
 //		WorldCreator titan = new WorldCreator("world_titan");
-////		titan.generator(new TitanChunkGenerator(this));
 //		Bukkit.createWorld(titan);
+//		new TitanManager(this);
 		
 		getLogger().info("Successfylly loaded worlds! Loading tasks...");
 		startTasks();
