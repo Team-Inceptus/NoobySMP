@@ -80,6 +80,8 @@ public class BlockManager implements Listener {
 			.build();
 	
 	public static final Map<Material, SMPMaterial> TITAN_REPLACEABLES = ImmutableMap.<Material, SMPMaterial>builder()
+			.put(Material.STONE, SMPMaterial.TITAN_STONE)
+			.put(Material.DEEPSLATE, SMPMaterial.TITAN_DEEPSLATE)
 			.put(Material.OAK_LOG, SMPMaterial.HARDENED_OAK_LOG)
 			.put(Material.SPRUCE_LOG, SMPMaterial.HARDENED_SPRUCE_LOG)
 			.put(Material.ACACIA_LOG, SMPMaterial.HARDENED_ACACIA_LOG)
