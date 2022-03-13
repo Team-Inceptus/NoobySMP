@@ -22,7 +22,8 @@ public class SMPUtil {
 	
 	// Constants
 	public static final int ANVIL_ITEM_SLOT = 0;
-	public static final int ANVIL_ADDITION_SLOT = 1; 
+	public static final int ANVIL_ADDITION_SLOT = 1;
+	public static final int ANVIL_RESULT_SLOT = 2;
 
 	private static class ColorUtil {
 
