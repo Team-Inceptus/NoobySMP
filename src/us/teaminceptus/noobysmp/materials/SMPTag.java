@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -131,13 +132,17 @@ public class SMPTag<T extends Event> {
 		PlayerConfig config = new PlayerConfig(p);
 		ItemStack target = e.getItem();
 		
-		double damage = 0;
-		
-		if (target.hasItemMeta() && target.getItemMeta().hasAttributeModifiers()) {
-			for (AttributeModifier m : target.getItemMeta().getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE)) damage += m.getAmount();
-		}
-		
-		BossManager.throwItem(p.getEyeLocation(), r.nextInt(5) + 7, target, r.nextDouble() * (damage + config.getLevel()), p);
+		new BukkitRunnable() {
+			public void run() {
+				double damage = 0;
+				
+				if (target.hasItemMeta() && target.getItemMeta().hasAttributeModifiers()) {
+					for (AttributeModifier m : target.getItemMeta().getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE)) damage += m.getAmount();
+				}
+				
+				BossManager.throwItem(p.getEyeLocation(), r.nextInt(5) + 7, target, r.nextDouble() * (damage + config.getLevel()));
+			}
+		}.runTask(JavaPlugin.getPlugin(SMP.class));
 	});
 
 	public static final SMPTag<EntityDamageByEntityEvent> ELECTRIC = new SMPTag<>(damage, "Electric", AbilityItem.SCROLL_ELECTRIC, TagTarget.SWORDS, e -> {
@@ -235,12 +240,17 @@ public class SMPTag<T extends Event> {
 	public static final SMPTag<PlayerTickEvent> SOAKING = new SMPTag<>(tick, "Soaking", AbilityItem.SOAKING_MELIORATE, TagTarget.HELMETS, e -> {
 		Player p = e.getPlayer();
 		
-		for (int x = 0; x < 2; x++) {
-			for (int y = 0; y < 2; y++) {
-				for (int z = 0; z < 2; z++) {
+		for (int x = 0; x < 3; x++) {
+			for (int y = 0; y < 3; y++) {
+				for (int z = 0; z < 3; z++) {
 					Location target = p.getLocation().add(x, y, z);
 					if (p.getWorld().getBlockAt(target).isLiquid()) {
 						target.getBlock().setType(Material.AIR);
+					}
+					
+					Location target2 = p.getLocation().add(-x, -y, -z);
+					if (p.getWorld().getBlockAt(target2).isLiquid()) {
+						target2.getBlock().setType(Material.AIR);
 					}
 				}
 			}
@@ -251,9 +261,9 @@ public class SMPTag<T extends Event> {
 
 	public static final SMPTag<PlayerTickEvent> BUOYANT = new SMPTag<>(tick, "Buoyant", AbilityItem.BUOYANT_ENRICHMENT, TagTarget.LEGGINGS, e -> {
 		Player p = e.getPlayer();
-		if (!(p.getLocation().getBlock().isLiquid())) return;
+		if (!(p.getEyeLocation().getBlock().isLiquid())) return;
 
-		p.setVelocity(p.getVelocity().setY(0.2));
+		p.setVelocity(p.getVelocity().setY(0.1));
 	});
 
 	public static final SMPTag<EntityDamageByEntityEvent> COLD = new SMPTag<>(damage, "Cold", AbilityItem.SNOWY_ENRICHMENT, TagTarget.WEAPONS, e -> {
@@ -276,61 +286,6 @@ public class SMPTag<T extends Event> {
 		BlockFace.NORTH, BlockFace.SOUTH, BlockFace.NORTH_EAST, BlockFace.NORTH_WEST,
 		BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST, BlockFace.EAST, BlockFace.WEST 
 	};
-
-	private static final Material getLeaves(Material woodType) {
-		switch (woodType) {
-			case STRIPPED_OAK_LOG:
-			case OAK_LOG:
-				return Material.OAK_LEAVES;
-			case STRIPPED_SPRUCE_LOG:
-			case SPRUCE_LOG:
-				return Material.SPRUCE_LEAVES;
-			case STRIPPED_ACACIA_LOG:
-			case ACACIA_LOG:
-				return Material.ACACIA_LEAVES;
-			case STRIPPED_BIRCH_LOG:
-			case BIRCH_LOG:
-				return Material.BIRCH_LEAVES;
-			case STRIPPED_DARK_OAK_LOG:
-			case DARK_OAK_LOG:
-				return Material.DARK_OAK_LEAVES;
-			case STRIPPED_JUNGLE_LOG:
-			case JUNGLE_LOG:
-				return Material.JUNGLE_LEAVES;
-			case STRIPPED_CRIMSON_STEM:
-			case CRIMSON_STEM:
-				return Material.NETHER_WART_BLOCK;
-			case STRIPPED_WARPED_STEM:
-			case WARPED_STEM:
-				return Material.WARPED_WART_BLOCK;
-			default: {
-				return Material.OAK_LEAVES;
-			}
-		}
-	}
-
-	private static List<Block> getTree(Block start) {
-		List<Block> list = new ArrayList<>();
-		for (BlockFace b : BlockFace.values()) {
-			if (!(b.isCartesian())) continue;
-			Material leaves = getLeaves(start.getType());
-			Block rel = start.getRelative(b);
-			if (rel.getType() == start.getType() || rel.getType() == leaves) {
-				list.add(rel);
-				list.addAll(getTree(rel));
-			}
-		}
-
-		return list;
-	}
-
-	public static final SMPTag<BlockBreakEvent> TIMBERING = new SMPTag<>(bbreak, "Timbering", AbilityItem.SCROLL_TIMBERING, TagTarget.AXES, e -> {
-		Block b = e.getBlock();
-		Player p = e.getPlayer();
-
-		List<Block> relatives = getTree(b);
-		for (Block target : relatives) target.breakNaturally(p.getEquipment().getItemInMainHand());
-	});
 
 	public static final SMPTag<BlockBreakEvent> MULTIBREAK = new SMPTag<>(bbreak, "MultiBreaking", AbilityItem.SCROLL_MULTIBREAK, TagTarget.PICKAXES, e -> {
 		Player p = e.getPlayer();
@@ -377,7 +332,12 @@ public class SMPTag<T extends Event> {
 		for (int i = 0; i < 8; i++) {
 			target.add(p.getLocation().getDirection());
 			if (!(target.getBlock().isPassable())) {
-				p.sendMessage(ChatColor.RED + "That location is obstructed!");
+				if (target.distance(p.getLocation()) < 2) {
+					new PlayerConfig(p).sendNotification(ChatColor.RED + "That location is obstructed!");
+				} else {
+					p.teleport(target, TeleportCause.PLUGIN);
+					p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 3F, 1.5F);
+				}
 				return;
 			}
 		}
@@ -437,7 +397,9 @@ public class SMPTag<T extends Event> {
 	public static final <U extends Event> List<SMPTag<U>> getByType(Class<U> type) {
 		List<SMPTag<U>> list = new ArrayList<>();
 		
-		for (SMPTag<?> tag : values()) if (tag.getTypeClass().equals(type)) list.add((SMPTag<U>) tag);
+		for (SMPTag<?> tag : values()) {
+			if (tag.getTypeClass().equals(type)) list.add((SMPTag<U>) tag);
+		}
 		
 		return list;
 	}
@@ -453,10 +415,10 @@ public class SMPTag<T extends Event> {
 		
 		if (tagCount(item) >= 3) return Items.Tags.TOO_MANY_TAGS;
 		
-		ItemStack newItem = item;
+		ItemStack newItem = item.clone();
 		ItemMeta meta = newItem.getItemMeta();
 		meta.getPersistentDataContainer().set(new NamespacedKey(plugin, tag.name.toLowerCase()), PersistentDataType.STRING, "true");
-		meta.setDisplayName(ChatColor.DARK_AQUA + " " + meta.getDisplayName());
+		meta.setDisplayName(ChatColor.DARK_AQUA + tag.getName() + " " + ChatColor.RESET + (meta.hasDisplayName() ? meta.getDisplayName() : WordUtils.capitalizeFully(item.getType().name().replace('_', ' '))));
 		newItem.setItemMeta(meta);
 		
 		return newItem;
@@ -499,6 +461,7 @@ public class SMPTag<T extends Event> {
 	
 	public static boolean hasTag(SMPTag<?> tag, ItemStack item) {
 		SMP plugin = JavaPlugin.getPlugin(SMP.class);
+		if (item == null) return false;
 		if (!(item.hasItemMeta())) return false;
 		
 		return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin, tag.name.toLowerCase()), PersistentDataType.STRING);	
