@@ -1,14 +1,12 @@
 package us.teaminceptus.noobysmp.player;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Statistic;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,57 +20,82 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Criterias;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.RenderType;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
+import net.minecraft.network.chat.TextComponent;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.commands.admin.Ranks;
 import us.teaminceptus.noobysmp.commands.admin.Ranks.RankData;
 import us.teaminceptus.noobysmp.util.PlayerConfig;
+import us.teaminceptus.noobysmp.util.events.PlayerTickEvent;
 import us.teaminceptus.noobysmp.util.inventoryholder.CancelHolder;
 
 public class ServerManager implements Listener {
 
 	protected SMP plugin;
-	public static Scoreboard pList;
-	public static Scoreboard sidebar;
+	public static Scoreboard noobysmp;
 	public static ScoreboardManager manager;
+	
+	public static final String PACK_URL = "https://github.com/Team-Inceptus/SMPPack/raw/master/SMPPack.zip";
 
 	private static void registerScoreboard() {
 		ScoreboardManager m = Bukkit.getScoreboardManager();
 		
-		Scoreboard sidebar = m.getNewScoreboard();
-		Objective side = sidebar.registerNewObjective("sidebar", "dummy",
-		ChatColor.DARK_GREEN + "NoobySMP");
+		Scoreboard noobysmp = m.getNewScoreboard();
+		Objective side = noobysmp.registerNewObjective("sidebar", "dummy",
+		ChatColor.DARK_GREEN + "----- NoobySMP -----");
 		side.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-		Scoreboard pList = m.getNewScoreboard();
-
-		Objective pO = pList.registerNewObjective("playersort", "dummy", "Player List");
-		pO.setDisplaySlot(DisplaySlot.PLAYER_LIST);
-
+		Objective health = noobysmp.registerNewObjective("hp", Criterias.HEALTH, "Health");
+		health.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+		health.setRenderType(RenderType.INTEGER);
+		
 		for (Map.Entry<String, RankData> entry : Ranks.RANK_MAP.entrySet()) {
 			String name = entry.getKey();
 			String weight = "" + entry.getValue().getWeight();
 			
-			pList.registerNewTeam(weight + name);
+			noobysmp.registerNewTeam(weight + name);
 		}
 
-		ServerManager.pList = pList;
-		ServerManager.sidebar = sidebar;
+		ServerManager.noobysmp = noobysmp;
 		manager = m;
 	}
+	
+	
+	public static final BukkitRunnable UPDATE_SCOREBOARD_TASK = new BukkitRunnable() {
+		public void run() {
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				setScoreboard(p);
+			}
+		}
+	};
+	
+	public static final BukkitRunnable PLAYER_TICK_TASK = new BukkitRunnable() {
+		public void run() {
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				Bukkit.getPluginManager().callEvent(new PlayerTickEvent(p));
+			}
+		}
+	};
 
 	public ServerManager(SMP plugin) {
 		this.plugin = plugin;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		plugin.getLogger().info("Registering Scoreboard...");
 		registerScoreboard();
-		plugin.getLogger().info("Successfully registered NoobySMP Scoreboards");
+		plugin.getLogger().info("Successfully registered NoobySMP Scoreboard! Creating Tasks...");
+		
+		UPDATE_SCOREBOARD_TASK.runTaskTimer(plugin, 20, 20);
+		PLAYER_TICK_TASK.runTaskTimer(plugin, 1, 1);
+		
+		plugin.getLogger().info("Tasks Created Successfully!");
 	}
 	
 	public static final String IP = "smp.teaminceptus.us";
@@ -88,27 +111,35 @@ public class ServerManager implements Listener {
 	private static final String formatList(Player p, String msg) {
 		return formatList(p, msg, false);
 	}
+	
+	private static void setResourcePack(Player p) {
+			((CraftPlayer) p).getHandle().sendTexturePack(PACK_URL, "6FF5086013892BAA1160128BA9295A2615D551D4", false, new TextComponent("NoobySMP has a resource pack that may help items render better. This is not required to accept. It will not override (most) existing textures."));
+	}
 
 	public static void setScoreboard(Player p) {
-		if (pList == null || manager == null || sidebar == null) registerScoreboard();
+		if (noobysmp == null || manager == null) registerScoreboard();
 
 		PlayerConfig config = new PlayerConfig(p);
 		RankData data = RankData.from(p);
 		
-		Team pTeam = pList.getTeam(data.getWeight() + config.getRank().toLowerCase());
+		Team pTeam = noobysmp.getTeam(data.getWeight() + config.getRank().toLowerCase());
 		
 		pTeam.addEntry(p.getName());
 		config.updateRank();
-
-		// Set Scores
-		Objective side = sidebar.getObjective(DisplaySlot.SIDEBAR);
 		
-		Score kills = side.getScore(ChatColor.GREEN + "Kills: " + p.getStatistic(Statistic.PLAYER_KILLS));
-		kills.setScore(0);
-
-		String date = new SimpleDateFormat("hh.mm aa").format(new Date()).toString();
-		Score time = side.getScore(ChatColor.YELLOW + date);
-		time.setScore(1);
+		// Reset Objective
+		noobysmp.getObjective(DisplaySlot.SIDEBAR).unregister();
+		
+		Objective side = noobysmp.registerNewObjective("sidebar", "dummy",
+		ChatColor.DARK_GREEN + "----- NoobySMP -----");
+		side.setDisplaySlot(DisplaySlot.SIDEBAR);
+		
+		// Set Scores
+		
+		Score rank = side.getScore(ChatColor.GREEN + "Rank: " + ChatColor.YELLOW + config.getRank().toUpperCase());
+		rank.setScore(0);
+		
+		p.setScoreboard(noobysmp);
 	}
 	
 	@EventHandler
@@ -133,14 +164,15 @@ public class ServerManager implements Listener {
 		Player p = e.getPlayer();
 		plugin.loadFiles();
 		PlayerConfig config = new PlayerConfig(p);
-
+		
+		setScoreboard(p);
+		setResourcePack(p);
+		
 		if (config.isMember()) config.updateRank();
 		else {
 			RankData data = Ranks.RANK_MAP.get(config.getRank());
 			Ranks.setRank(p, data.getChat(), data.getTab());
 		}
-
-		setScoreboard(p);
 		
 		if (p.hasPlayedBefore()) {
 			e.setJoinMessage(p.getDisplayName() + ChatColor.GREEN + ", welcome back to NoobySMP!");
@@ -167,7 +199,7 @@ public class ServerManager implements Listener {
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		InventoryView view = e.getView();
-
+		
 		if (view.getTopInventory().getHolder() instanceof CancelHolder && !(e.getClickedInventory() instanceof PlayerInventory)) e.setCancelled(true);
 	}
 
