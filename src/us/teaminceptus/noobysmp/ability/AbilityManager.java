@@ -68,7 +68,6 @@ public class AbilityManager implements Listener {
 		if (inv instanceof BeaconInventory) e.setCancelled(true);
 		if (inv instanceof StonecutterInventory) e.setCancelled(true);
 		if (inv instanceof GrindstoneInventory) e.setCancelled(true);
-		
 	}
 
 	/*
