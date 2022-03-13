@@ -436,19 +436,42 @@ public class RecipeManager implements Listener {
 	public static List<Inventory> getRecipeMenus(ItemStack item) {
 		List<Inventory> inventories = new ArrayList<>();
 		
-		String invName = "Recipe - " + (item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name().substring(0, 1) + item.getType().name().toLowerCase().substring(1));
+		if (item == null) return inventories;
+		if (!(item.hasItemMeta())) return inventories;
+		
 		int index = 0;
+		
+		String invName = "Recipe Finder - Page " + Integer.toString(index + 1);
+		
 		
 		List<SMPRecipe> recipes = SMPRecipe.getByResult(item);
 
-		for (SMPRecipe r : recipes) {	
+		for (SMPRecipe r : recipes) {
 			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
 			
 			inv.setItem(13, Items.Inventory.GUI_PANE);
+			inv.setItem(14, Items.Inventory.GUI_PANE);
+			inv.setItem(15, Items.Inventory.GUI_PANE);
+			inv.setItem(16, Items.Inventory.GUI_PANE);
 			inv.setItem(22, Items.Inventory.GUI_PANE);
+			inv.setItem(25, Items.Inventory.GUI_PANE);
 			inv.setItem(31, Items.Inventory.GUI_PANE);
+			inv.setItem(32, Items.Inventory.GUI_PANE);
+			inv.setItem(33, Items.Inventory.GUI_PANE);
+			inv.setItem(34, Items.Inventory.GUI_PANE);
 			
 			if (r.isCraftingRecipe()) {
+				if (r.getResult() instanceof ItemStack i) {
+					if (!(Items.compareLocalization(item, i))) return inventories;
+				} else {
+					if (SMPMaterial.getByItem(item) != null && r.getResult() instanceof SMPMaterial m) {
+						if (SMPMaterial.getByItem(item) != m) return inventories;
+					}
+					
+					if (AbilityItem.getByItem(item) != null && r.getResult() instanceof AbilityItem m) {
+						if (AbilityItem.getByItem(item) != m) return inventories;
+					}
+				}
 				Map<Character, ?> ingredientsmap = r.getIngredients();
 				
 				List<ItemStack> ingredients = new ArrayList<>();
@@ -488,87 +511,132 @@ public class RecipeManager implements Listener {
 				
 				inventories.add(inv);
 				index++;
-			} else {
-				for (FurnaceData d : SMPRecipe.getCookRecipes().values()) {
-					if (!(Items.compareLocalization(item, d.getResult()))) continue;
-					
-					inv.setItem(10, Items.Inventory.GUI_PANE);
-					inv.setItem(11, Items.Inventory.GUI_PANE);
-					inv.setItem(12, Items.Inventory.GUI_PANE);
-					inv.setItem(19, Items.Inventory.GUI_PANE);
-					inv.setItem(21, Items.Inventory.GUI_PANE);
-					inv.setItem(28, Items.Inventory.GUI_PANE);
-					inv.setItem(29, Items.Inventory.GUI_PANE);
-					inv.setItem(30, Items.Inventory.GUI_PANE);
-					
-					inv.setItem(20, d.getInput());
-					
-					inv.setItem(23, new ItemStack(Material.FURNACE));
-					inv.setItem(24, item);
-					
-					ItemStack cookInfo = new ItemStack(Material.COAL);
-					ItemMeta meta = cookInfo.getItemMeta();
-					meta.setDisplayName(ChatColor.YELLOW + "Cook Time: " + (d.getCookTime() / 20) + "s");
-					meta.setLore(Collections.singletonList(ChatColor.AQUA + "XP Received: " + d.getExp()));
-					cookInfo.setItemMeta(meta);
-					
-					inv.setItem(32, cookInfo);
-					
-					inventories.add(inv);
-					index++;
-				}
-				
-				for (AnvilData d : SMPRecipe.getAnvilRecipes().values()) {
-					if (!(Items.compareLocalization(item, d.getResult()))) continue;
-					
-					inv.setItem(10, Items.Inventory.GUI_PANE);
-					inv.setItem(11, Items.Inventory.GUI_PANE);
-					inv.setItem(12, Items.Inventory.GUI_PANE);
-					inv.setItem(19, Items.Inventory.GUI_PANE);
-					inv.setItem(21, Items.Inventory.GUI_PANE);
-					inv.setItem(28, Items.Inventory.GUI_PANE);
-					inv.setItem(29, Items.Inventory.GUI_PANE);
-					inv.setItem(30, Items.Inventory.GUI_PANE);
-					
-					inv.setItem(20, d.getInput());
-					inv.setItem(22, d.getCombination());
-					
-					inv.setItem(23, new ItemStack(Material.ANVIL));
-					inv.setItem(24, item);
-					
-					ItemStack anvilInfo = new ItemStack(Material.IRON_AXE);
-					ItemMeta meta = anvilInfo.getItemMeta();
-					meta.setDisplayName(ChatColor.AQUA + "XP Received: " + d.getExp());
-					anvilInfo.setItemMeta(meta);
-					
-					inv.setItem(32, anvilInfo);
-					
-					inventories.add(inv);
-					index++;
-				}
-				
-				for (SmithingData d : SMPRecipe.getSmithingRecipes().values()) {
-					if (!(Items.compareLocalization(item, d.getResult()))) continue;
-					
-					inv.setItem(10, Items.Inventory.GUI_PANE);
-					inv.setItem(11, Items.Inventory.GUI_PANE);
-					inv.setItem(12, Items.Inventory.GUI_PANE);
-					inv.setItem(19, Items.Inventory.GUI_PANE);
-					inv.setItem(21, Items.Inventory.GUI_PANE);
-					inv.setItem(28, Items.Inventory.GUI_PANE);
-					inv.setItem(29, Items.Inventory.GUI_PANE);
-					inv.setItem(30, Items.Inventory.GUI_PANE);
-					
-					inv.setItem(20, d.getInput());
-					inv.setItem(22, d.getAddition());
-					
-					inv.setItem(23, new ItemStack(Material.SMITHING_TABLE));
-					inv.setItem(24, item);
-					
-					inventories.add(inv);
-					index++;
-				}
+				invName = "Recipe Finder - Page " + Integer.toString(index + 1);
 			}
+		}
+		
+		for (FurnaceData d : SMPRecipe.getCookRecipes().values()) {
+			if (!(Items.compareLocalization(item, d.getResult()))) continue;
+			
+			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
+			
+			inv.setItem(13, Items.Inventory.GUI_PANE);
+			inv.setItem(14, Items.Inventory.GUI_PANE);
+			inv.setItem(15, Items.Inventory.GUI_PANE);
+			inv.setItem(16, Items.Inventory.GUI_PANE);
+			inv.setItem(22, Items.Inventory.GUI_PANE);
+			inv.setItem(25, Items.Inventory.GUI_PANE);
+			inv.setItem(31, Items.Inventory.GUI_PANE);
+			inv.setItem(32, Items.Inventory.GUI_PANE);
+			inv.setItem(33, Items.Inventory.GUI_PANE);
+			inv.setItem(34, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(10, Items.Inventory.GUI_PANE);
+			inv.setItem(11, Items.Inventory.GUI_PANE);
+			inv.setItem(12, Items.Inventory.GUI_PANE);
+			inv.setItem(19, Items.Inventory.GUI_PANE);
+			inv.setItem(21, Items.Inventory.GUI_PANE);
+			inv.setItem(28, Items.Inventory.GUI_PANE);
+			inv.setItem(29, Items.Inventory.GUI_PANE);
+			inv.setItem(30, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(20, d.getInput());
+			
+			inv.setItem(23, new ItemStack(Material.FURNACE));
+			inv.setItem(24, d.getResult());
+			
+			ItemStack cookInfo = new ItemStack(Material.COAL);
+			ItemMeta meta = cookInfo.getItemMeta();
+			meta.setDisplayName(ChatColor.YELLOW + "Cook Time: " + (d.getCookTime() / 20) + "s");
+			meta.setLore(Collections.singletonList(ChatColor.AQUA + "XP Received: " + d.getExp()));
+			cookInfo.setItemMeta(meta);
+			
+			inv.setItem(32, cookInfo);
+			
+			inventories.add(inv);
+			index++;
+			invName = "Recipe Finder - Page " + Integer.toString(index + 1);
+		}
+		
+
+		
+		for (AnvilData d : SMPRecipe.getAnvilRecipes().values()) {
+			if (!(Items.compareLocalization(item, d.getResult()))) continue;
+			
+			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
+			
+			inv.setItem(13, Items.Inventory.GUI_PANE);
+			inv.setItem(14, Items.Inventory.GUI_PANE);
+			inv.setItem(15, Items.Inventory.GUI_PANE);
+			inv.setItem(16, Items.Inventory.GUI_PANE);
+			inv.setItem(22, Items.Inventory.GUI_PANE);
+			inv.setItem(25, Items.Inventory.GUI_PANE);
+			inv.setItem(31, Items.Inventory.GUI_PANE);
+			inv.setItem(32, Items.Inventory.GUI_PANE);
+			inv.setItem(33, Items.Inventory.GUI_PANE);
+			inv.setItem(34, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(10, Items.Inventory.GUI_PANE);
+			inv.setItem(11, Items.Inventory.GUI_PANE);
+			inv.setItem(12, Items.Inventory.GUI_PANE);
+			inv.setItem(19, Items.Inventory.GUI_PANE);
+			inv.setItem(21, Items.Inventory.GUI_PANE);
+			inv.setItem(28, Items.Inventory.GUI_PANE);
+			inv.setItem(29, Items.Inventory.GUI_PANE);
+			inv.setItem(30, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(20, d.getInput());
+			inv.setItem(22, d.getCombination());
+			
+			inv.setItem(23, new ItemStack(Material.ANVIL));
+			inv.setItem(24, d.getResult());
+			
+			ItemStack anvilInfo = new ItemStack(Material.IRON_AXE);
+			ItemMeta meta = anvilInfo.getItemMeta();
+			meta.setDisplayName(ChatColor.AQUA + "XP Received: " + d.getExp());
+			anvilInfo.setItemMeta(meta);
+			
+			inv.setItem(32, anvilInfo);
+			
+			inventories.add(inv);
+			index++;
+			invName = "Recipe Finder - Page " + Integer.toString(index + 1);
+		}
+		
+		for (SmithingData d : SMPRecipe.getSmithingRecipes().values()) {
+			if (!(Items.compareLocalization(item, d.getResult()))) continue;
+			
+			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
+			
+			inv.setItem(13, Items.Inventory.GUI_PANE);
+			inv.setItem(14, Items.Inventory.GUI_PANE);
+			inv.setItem(15, Items.Inventory.GUI_PANE);
+			inv.setItem(16, Items.Inventory.GUI_PANE);
+			inv.setItem(22, Items.Inventory.GUI_PANE);
+			inv.setItem(25, Items.Inventory.GUI_PANE);
+			inv.setItem(31, Items.Inventory.GUI_PANE);
+			inv.setItem(32, Items.Inventory.GUI_PANE);
+			inv.setItem(33, Items.Inventory.GUI_PANE);
+			inv.setItem(34, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(10, Items.Inventory.GUI_PANE);
+			inv.setItem(11, Items.Inventory.GUI_PANE);
+			inv.setItem(12, Items.Inventory.GUI_PANE);
+			inv.setItem(19, Items.Inventory.GUI_PANE);
+			inv.setItem(21, Items.Inventory.GUI_PANE);
+			inv.setItem(28, Items.Inventory.GUI_PANE);
+			inv.setItem(29, Items.Inventory.GUI_PANE);
+			inv.setItem(30, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(20, d.getInput());
+			inv.setItem(22, d.getAddition());
+			
+			inv.setItem(23, new ItemStack(Material.SMITHING_TABLE));
+			inv.setItem(24, d.getResult());
+			
+			inventories.add(inv);
+			index++;
+			invName = "Recipe Finder - Page " + Integer.toString(index + 1);
 		}
 
 		
