@@ -10,9 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -25,6 +23,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.materials.AbilityItem;
+import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
 public class Items implements Listener {
 	
@@ -39,16 +39,6 @@ public class Items implements Listener {
 
 	public static ItemStack noName(Material m) {
 		return itemBuilder(m).setName(" ").setLocalizedName("no_name").build();
-	}
-	
-	@EventHandler
-	public void onClick(InventoryClickEvent e) {
-		if (e.isCancelled()) return;
-		
-		if (e.getCurrentItem() == null) return;
-		ItemStack item = e.getCurrentItem();
-		
-		for (ItemStack non : NON_COLLECTIBLES) if (compareLocalization(item, non)) e.setCancelled(true);
 	}
 	
 	public static final ItemStack LOCKED_ITEM = itemBuilder(Material.BARRIER).setName(ChatColor.RED + "Locked!").build();
@@ -74,6 +64,12 @@ public class Items implements Listener {
 	}
 	
 	public static final boolean compareLocalization(ItemStack first, ItemStack second) {
+		if (getLocalization(first) == null) return false;
+		if (getLocalization(second) == null) return false;
+		
+		if (SMPMaterial.getByItem(first) == SMPMaterial.getByItem(second)) return true;
+		if (AbilityItem.getByItem(first) == AbilityItem.getByItem(second)) return true;
+		
 		return getLocalization(first).equals(getLocalization(second));
 	}
 
@@ -180,7 +176,7 @@ public class Items implements Listener {
 	
 	public static interface Tags {
 		
-		ItemStack TOO_MANY_TAGS = errorItem("You have too Many Tags!");
+		ItemStack TOO_MANY_TAGS = errorItem("You have too many Tags!");
 		ItemStack NOT_COMPATIBLE = errorItem("This tag is not compatible with this item.");
 	}
 
