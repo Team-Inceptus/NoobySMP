@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -22,6 +20,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.common.collect.ImmutableList;
+
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import us.teaminceptus.noobysmp.SMP;
@@ -29,6 +29,7 @@ import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
 import us.teaminceptus.noobysmp.commands.admin.Ranks;
 import us.teaminceptus.noobysmp.leveling.LevelingManager.LevelingType;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
+import us.teaminceptus.noobysmp.recipes.SMPRecipe;
 import us.teaminceptus.noobysmp.util.inventoryholder.CancelHolder;
 
 /**
@@ -133,6 +134,15 @@ public class PlayerConfig {
 		if (p.isOnline()) {
 			Player op = p.getPlayer();
 			updateRank();
+			if (getSetting("notifications")) {
+				sendNotification(ChatColor.GOLD + "Your level has changed to level " + ChatColor.YELLOW + getLevel() + ChatColor.GOLD + "!");
+			}
+			
+			for (SMPRecipe r : SMPRecipe.getRecipes()) {
+				if (r.getKey() != null && r.getResult() instanceof Unlockable l && new PlayerConfig(p).getLevel() <= l.getLevelUnlocked()) {
+					op.discoverRecipe(r.getKey());
+				}
+			}
 			
 			if (getSetting("notifications")) {
 				op.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((add < 0 ? ChatColor.RED + "" : ChatColor.GREEN + "+") + Double.toString(Math.floor(add * 100) / 100) + " Experience"));
@@ -166,7 +176,20 @@ public class PlayerConfig {
 		if (p.isOnline()) {
 			Player op = p.getPlayer();
 			
-			if (changeRank) updateRank();
+			if (changeRank) {
+				updateRank();
+				
+				if (getSetting("notifications")) {
+					sendNotification(ChatColor.GOLD + "Your level has changed to level " + ChatColor.YELLOW + getLevel() + ChatColor.GOLD + "!");
+				}
+				
+				for (SMPRecipe r : SMPRecipe.getRecipes()) {
+					if (r.getKey() != null && r.getResult() instanceof Unlockable l && new PlayerConfig(p).getLevel() <= l.getLevelUnlocked()) {
+						op.discoverRecipe(r.getKey());
+					}
+				}
+				
+			}
 			
 			if (getSetting("notifications")) {
 				op.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((add < 0 ? ChatColor.RED + "" : ChatColor.GREEN + "+") + Double.toString(Math.floor(add * 100) / 100) + " Experience"));
