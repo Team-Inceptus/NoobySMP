@@ -36,8 +36,8 @@ public class Settings implements Listener, CommandExecutor {
 	}
 
 	public static final String NOTIFICATIONS = "Notifications";
-	public static final String DROP_ITEMS = "Drop Items";
-	public static final String TAG_ABILITIES = "Tag Abilities";
+	public static final String DROP_ITEMS = "Drop_Items";
+	public static final String TAG_ABILITIES = "Tag_Abilities";
 
 	public static final String[] SETTINGS = {
 		NOTIFICATIONS,
@@ -74,7 +74,7 @@ public class Settings implements Listener, CommandExecutor {
 			boolean on = config.getSetting(s);
 			ItemStack setting = new ItemStack(on ? Material.GREEN_CONCRETE : Material.RED_CONCRETE);
 			ItemMeta meta = setting.getItemMeta();
-			meta.setDisplayName(ChatColor.YELLOW + s + ": " + (on ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
+			meta.setDisplayName(ChatColor.YELLOW + s.replace('_', ' ') + ": " + (on ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
 			if (on) {
 				meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
 				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -101,14 +101,14 @@ public class Settings implements Listener, CommandExecutor {
 
 		PlayerConfig config = new PlayerConfig(p);
 
-		String settingName = ChatColor.stripColor(i.getItemMeta().getDisplayName()).split(" ")[0].replace(":", "");
+		String settingName = ChatColor.stripColor(i.getItemMeta().getDisplayName()).replace(' ', '_').split(":")[0];
 		config.setSetting(settingName, !config.getSetting(settingName));
 		
 		boolean setting = config.getSetting(settingName);
 		
 		ItemStack settingItem = new ItemStack(setting ? Material.GREEN_CONCRETE : Material.RED_CONCRETE);
 		ItemMeta meta = settingItem.getItemMeta();
-		meta.setDisplayName(ChatColor.YELLOW + settingName + ": " + (setting ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
+		meta.setDisplayName(ChatColor.YELLOW + settingName.replace('_', ' ') + ": " + (setting ? ChatColor.GREEN + "On" : ChatColor.RED + "Off"));
 		if (setting) {
 			meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
 			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -116,7 +116,7 @@ public class Settings implements Listener, CommandExecutor {
 		settingItem.setItemMeta(meta);
 		
 		view.setItem(e.getRawSlot(), settingItem);
-		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 3F, 0F);
+		p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 3F, (setting ? 2F : 0F));
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
