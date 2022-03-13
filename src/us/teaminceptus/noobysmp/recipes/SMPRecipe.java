@@ -106,6 +106,10 @@ public class SMPRecipe {
 	public final Map<Character, ?> getIngredients() {
 		return this.ingredients;
 	}
+	
+	public final NamespacedKey getKey() {
+		return this.key;
+	}
 
 	public SMPRecipe(SMPMaterial result, String recipeMap, HashMap<Character, Material> ingredients) {
 		this(result.getItem(), recipeMap, ingredients);
@@ -147,10 +151,25 @@ public class SMPRecipe {
 		for (SMPRecipe r : getRecipes()) {
 			if (r.key != null) {
 				Recipe rec = Bukkit.getRecipe(r.key);
-				if (Items.compareLocalization(item, rec.getResult())) recipes.add(r);
+				
+				if (AbilityItem.getByItem(item) != null) {
+					if (AbilityItem.getByItem(item) == AbilityItem.getByItem(r.result)) recipes.add(r);
+					
+					continue;
+				} else if (SMPMaterial.getByItem(item) != null) {
+					if (SMPMaterial.getByItem(item) == SMPMaterial.getByItem(r.result)) recipes.add(r);
+					
+					continue;
+				} else {
+					if (Items.compareLocalization(item, rec.getResult())) recipes.add(r);
+					
+					continue;
+				}
 			} else {
 				if (getCookRecipes().containsKey(Items.getLocalization(r.result))) recipes.add(r);
+				
 				if (getSmithingRecipes().containsKey(Items.getLocalization(r.result))) recipes.add(r);
+				
 				if (getAnvilRecipes().containsKey(Items.getLocalization(r.result))) recipes.add(r);
 			}
 		}
