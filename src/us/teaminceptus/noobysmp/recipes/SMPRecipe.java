@@ -209,11 +209,7 @@ public class SMPRecipe {
 		return getRecipes().stream().filter(r -> r.eventUsed).toList();
 	}
 	
-	/**
-	 * Can be {@link SMPMaterial}, {@link AbilityItem}, or {@link ItemStack}.
-	 * @return Object representation of this item
-	 */
-	public final Object getResult() {
+	public final ItemStack getResult() {
 		return this.result;
 	}
 

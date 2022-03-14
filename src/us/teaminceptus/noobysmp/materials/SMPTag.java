@@ -231,7 +231,7 @@ public class SMPTag<T extends Event> {
 	});
 
 	public static final SMPTag<EntityDamageEvent> SLIMY = new SMPTag<>(EntityDamageEvent.class, "Slimy", AbilityItem.SLIMY_MELIORATE, TagTarget.BOOTS, e -> {
-		if (!(e.getCause() != DamageCause.FALL)) return;
+		if (e.getCause() != DamageCause.FALL) return;
 		Player p = (Player) e.getEntity();
 		e.setCancelled(true);
 		p.setVelocity(p.getVelocity().setY(Math.min(p.getFallDistance() / 10, 2)));
@@ -269,7 +269,7 @@ public class SMPTag<T extends Event> {
 	public static final SMPTag<EntityDamageByEntityEvent> COLD = new SMPTag<>(damage, "Cold", AbilityItem.SNOWY_ENRICHMENT, TagTarget.WEAPONS, e -> {
 		if (!(e.getDamager() instanceof Player p)) return;
 		Entity en = e.getEntity();
-		en.setFreezeTicks(en.getFreezeTicks() + (20 * (r.nextInt(3) + 1)));
+		en.setFreezeTicks(en.getFreezeTicks() + (20 * (r.nextInt(5) + 5)));
 	});
 	
 	public static final SMPTag<PlayerTickEvent> AQUATIC = new SMPTag<>(tick, "Aquatic", AbilityItem.AQUATIC_ENRICHMENT, TagTarget.ARMOR, e -> {

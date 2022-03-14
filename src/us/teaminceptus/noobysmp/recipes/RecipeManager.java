@@ -10,6 +10,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,11 +20,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.SmithingInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Drop;
+import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
+import us.teaminceptus.noobysmp.entities.bosses.SMPBoss;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 import us.teaminceptus.noobysmp.recipes.SMPRecipe.AnvilData;
@@ -461,17 +468,9 @@ public class RecipeManager implements Listener {
 			inv.setItem(34, Items.Inventory.GUI_PANE);
 			
 			if (r.isCraftingRecipe()) {
-				if (r.getResult() instanceof ItemStack i) {
-					if (!(Items.compareLocalization(item, i))) return inventories;
-				} else {
-					if (SMPMaterial.getByItem(item) != null && r.getResult() instanceof SMPMaterial m) {
-						if (SMPMaterial.getByItem(item) != m) return inventories;
-					}
-					
-					if (AbilityItem.getByItem(item) != null && r.getResult() instanceof AbilityItem m) {
-						if (AbilityItem.getByItem(item) != m) return inventories;
-					}
-				}
+				if (SMPMaterial.getByItem(item) != SMPMaterial.getByItem(r.getResult())) continue;
+				if (AbilityItem.getByItem(item) != AbilityItem.getByItem(r.getResult())) continue;
+				
 				Map<Character, ?> ingredientsmap = r.getIngredients();
 				
 				List<ItemStack> ingredients = new ArrayList<>();
@@ -518,6 +517,9 @@ public class RecipeManager implements Listener {
 		for (FurnaceData d : SMPRecipe.getCookRecipes().values()) {
 			if (!(Items.compareLocalization(item, d.getResult()))) continue;
 			
+			if (SMPMaterial.getByItem(item) != SMPMaterial.getByItem(d.getResult())) continue;
+			if (AbilityItem.getByItem(item) != AbilityItem.getByItem(d.getResult())) continue;
+			
 			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
 			
 			inv.setItem(13, Items.Inventory.GUI_PANE);
@@ -563,6 +565,9 @@ public class RecipeManager implements Listener {
 		for (AnvilData d : SMPRecipe.getAnvilRecipes().values()) {
 			if (!(Items.compareLocalization(item, d.getResult()))) continue;
 			
+			if (SMPMaterial.getByItem(item) != SMPMaterial.getByItem(d.getResult())) continue;
+			if (AbilityItem.getByItem(item) != AbilityItem.getByItem(d.getResult())) continue;
+			
 			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
 			
 			inv.setItem(13, Items.Inventory.GUI_PANE);
@@ -606,6 +611,9 @@ public class RecipeManager implements Listener {
 		for (SmithingData d : SMPRecipe.getSmithingRecipes().values()) {
 			if (!(Items.compareLocalization(item, d.getResult()))) continue;
 			
+			if (SMPMaterial.getByItem(item) != SMPMaterial.getByItem(d.getResult())) continue;
+			if (AbilityItem.getByItem(item) != AbilityItem.getByItem(d.getResult())) continue;
+			
 			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
 			
 			inv.setItem(13, Items.Inventory.GUI_PANE);
@@ -637,6 +645,75 @@ public class RecipeManager implements Listener {
 			inventories.add(inv);
 			index++;
 			invName = "Recipe Finder - Page " + Integer.toString(index + 1);
+		}
+		
+		// Other
+		
+		for (SMPMaterial ore : SMPMaterial.ORE_DROPS.keySet()) {
+			if (SMPMaterial.ORE_DROPS.get(ore) != SMPMaterial.getByItem(item)) continue;
+			
+			Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
+			
+			for (int i = 10; i < 35; i++) inv.setItem(i, Items.Inventory.GUI_PANE);
+			
+			inv.setItem(21, Items.itemBuilder(Material.IRON_PICKAXE).addFlags(ItemFlag.HIDE_ATTRIBUTES).build());
+			inv.setItem(22, ore.getItem());
+			
+			inv.setItem(24, SMPMaterial.ORE_DROPS.get(ore).getItem());
+			
+			inventories.add(inv);
+			index++;
+			invName = "Recipe Finder - Page " + Integer.toString(index + 1);
+		}
+		
+		for (Class<? extends SMPBoss<? extends Mob>> bossClass : SMPBoss.CLASS_LIST) {
+			if (bossClass.isAnnotationPresent(Drop.class)) {
+				for (Drop d : bossClass.getDeclaredAnnotationsByType(Drop.class)) {
+					if (!(Items.getLocalization(item).equalsIgnoreCase(d.drop()))) continue;
+					
+					if (SMPMaterial.getByLocalization(d.drop().toLowerCase()) != null) {
+						if (SMPMaterial.getByLocalization(d.drop().toLowerCase()) != SMPMaterial.getByItem(item)) continue;
+					}
+					
+					if (AbilityItem.getByLocalization(d.drop().toLowerCase()) != null) {
+						if (AbilityItem.getByLocalization(d.drop().toLowerCase()) != AbilityItem.getByItem(item)) continue;
+					}
+					
+					if (Material.getMaterial(d.drop().toUpperCase()) != null) {
+						if (Material.getMaterial(d.drop().toUpperCase()) != item.getType()) continue;
+					}
+					
+					
+					Inventory inv = Generator.genGUI(45, invName, new RecipeHolder(index));
+					
+					for (int i = 10; i < 35; i++) inv.setItem(i, Items.Inventory.GUI_PANE);
+					
+					inv.setItem(21, Items.itemBuilder(Material.DIAMOND_SWORD).addFlags(ItemFlag.HIDE_ATTRIBUTES).build());
+					ItemStack boss = new ItemStack(bossClass.getAnnotation(Icon.class).value());
+					ItemMeta meta = boss.getItemMeta();
+					DisplayName name = bossClass.getAnnotation(DisplayName.class);
+					meta.setDisplayName(name.cc() + name.value());
+					meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+					meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+					boss.setItemMeta(meta);
+					
+					inv.setItem(22, boss);
+					
+					inv.setItem(24, item);
+					
+					ItemStack amount = new ItemStack(Material.CHEST);
+					ItemMeta ameta = amount.getItemMeta();
+					ameta.setDisplayName(ChatColor.YELLOW + "Amount: " + d.amount());
+					amount.setItemMeta(ameta);
+					
+					inv.setItem(33, amount);
+					
+					inventories.add(inv);
+					index++;
+					invName = "Recipe Finder - Page " + Integer.toString(index + 1);
+				}
+			}
+			
 		}
 
 		
@@ -685,17 +762,23 @@ public class RecipeManager implements Listener {
 		ItemStack chosen = recipeInv.getItem(24);
 		if (chosen == null) return;
 		
-		// Turn Page
-		if (display.equalsIgnoreCase("next") || display.equalsIgnoreCase("back")) {
-			List<Inventory> invs = getRecipeMenus(chosen);
+		try {
+			// Turn Page
+			if (display.equalsIgnoreCase("next") || display.equalsIgnoreCase("back")) {
+				List<Inventory> invs = getRecipeMenus(chosen);
+				
+				int nextInvIndex = h.index + (display.equalsIgnoreCase("next") ? 1 : -1);
+				
+				Inventory nextInv = invs.get(nextInvIndex);
+				if (nextInv == null) return;
+				
+				p.openInventory(nextInv);
+				p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 3F, 1F);
+			}
 			
-			int nextInvIndex = h.index + (display.equalsIgnoreCase("next") ? 1 : -1);
-			
-			Inventory nextInv = invs.get(nextInvIndex);
-			if (nextInv == null) return;
-			
-			p.openInventory(nextInv);
-			p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 3F, 1F);
+		} catch (Exception err) {
+			p.sendMessage(ChatColor.RED + "There was an unexpected error. Contact GamerCoder215");
+			return;
 		}
 	}
 
