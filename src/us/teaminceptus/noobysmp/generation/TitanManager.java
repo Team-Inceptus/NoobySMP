@@ -3,6 +3,9 @@ package us.teaminceptus.noobysmp.generation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import com.google.common.collect.ImmutableMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,9 +19,11 @@ import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.generator.BlockPopulator;
+import org.bukkit.generator.LimitedRegion;
+import org.bukkit.generator.WorldInfo;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.world.level.block.state.BlockState;
 import us.teaminceptus.noobysmp.SMP;
@@ -34,11 +39,6 @@ public class TitanManager implements Listener {
 		this.plugin = plugin;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
-	
-	public static final Map<Material, SMPMaterial> REPLACE_DATA = ImmutableMap.<Material, SMPMaterial>builder()
-	.put(Material.STONE, SMPMaterial.TITAN_STONE)
-	.put(Material.DEEPSLATE, SMPMaterial.TITAN_DEEPSLATE)
-	.build();
 
 	public static final Map<ChatColor, SMPMaterial> MATTER_DROPS = ImmutableMap.<ChatColor, SMPMaterial>builder()
 	.put(ChatColor.GREEN, SMPMaterial.GREEN_MATTER)
@@ -58,14 +58,34 @@ public class TitanManager implements Listener {
 	.put(ChatColor.BLACK, SMPMaterial.BLACK_MATTER)
 	.build();
 
+	@EventHandler
+	public void onInit(WorldInitEvent e) {
+		if (!(e.getWorld().getName().equalsIgnoreCase("world_titan"))) return;
+
+		e.getWorld().getPopulators().add(new TitanBiomePopulator());
+	}
+
+	public static class TitanBiomePopulator extends BlockPopulator {
+
+		@Override
+		public void populate(WorldInfo info, Random r, int x, int z, LimitedRegion region) {
+			for (int y = info.getMinHeight(); y < info.getMaxHeight(); y++) {
+				TitanBiome replaceable = TitanBiome.getReplaceable(region.getBiome(x, y, z));
+
+				replaceable.setBiome(new Location(Bukkit.getWorld(info.getName()), x, y, z), false);
+			}
+		}
+
+	}
+
 	/**
 	 * Will return {@link TitanManager#REPLACE_DATA} if it contains, else will use NMS to calculate the colored matter.
 	 * @param m Material to get
 	 * @return SMPMaterial replaceable
 	 */
 	public static final SMPMaterial getReplaceable(Block b) {
-		if (REPLACE_DATA.containsKey(b.getType())) {
-			return REPLACE_DATA.get(b.getType());
+		if (BlockManager.TITAN_REPLACEABLES.containsKey(b.getType())) {
+			return BlockManager.TITAN_REPLACEABLES.get(b.getType());
 		}
 
 		BlockState nmsState = ((CraftBlock) b).getNMS();
@@ -158,10 +178,11 @@ public class TitanManager implements Listener {
 					for (int z = 0; z < 16; z++) {
 						for (int y = -64; y < snap.getHighestBlockYAt(x, z); y++) {
 							AsyncLocation loc = new AsyncLocation(snap.getWorldName(), x + (snap.getX() * 16), y, z + (snap.getZ() * 16));
-							
-							Material m = snap.getBlockType(x, y, z);
-							if (BlockManager.TITAN_REPLACEABLES.containsKey(m)) {
-								locs.add(loc);
+							if (e.isNewChunk()) {
+								Material m = snap.getBlockType(x, y, z);
+								if (BlockManager.TITAN_REPLACEABLES.containsKey(m)) {
+									locs.add(loc);
+								}
 							}
 							
 							

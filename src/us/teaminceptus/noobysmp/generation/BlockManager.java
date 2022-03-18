@@ -1,11 +1,16 @@
 package us.teaminceptus.noobysmp.generation;
 
 import java.util.Map;
+import java.util.Random;
+
+import com.google.common.collect.ImmutableMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -13,8 +18,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-
-import com.google.common.collect.ImmutableMap;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
@@ -32,7 +35,11 @@ public class BlockManager implements Listener {
 		typeKey = new NamespacedKey(plugin, "type");
 	}
 
-	public static record ReplaceData(Material replace, int chance) {};
+	public static record ReplaceData(SMPMaterial replace, int intScale, int chance) {
+		public ReplaceData(SMPMaterial replace, int chance) {
+			this(replace, 100, chance);
+		}
+	};
 	
 	public static void setType(Block b, SMPMaterial m) {
 		m.setBlock(b);
@@ -57,9 +64,28 @@ public class BlockManager implements Listener {
 	@EventHandler
 	public void onBreak(BlockBreakEvent e) {
 		final Block b = e.getBlock();
+		Player p = e.getPlayer();
 		PersistentDataContainer c = new BlockPDC(b);
 		if (!(c.has(typeKey, PersistentDataType.STRING))) return;
-		
+
+		if (b.getWorld().getName().equalsIgnoreCase("world_titan")) {
+			e.setDropItems(false);
+			b.getWorld().dropItemNaturally(b.getLocation(), TitanManager.getReplaceable(b).getItem());
+			return;
+		}
+
+
+		int fortuneMultiplier = 1;
+
+		if (p.getInventory().getItemInMainHand() != null) {
+			ItemStack item = p.getInventory().getItemInMainHand();
+
+			if (!(item.hasItemMeta())) return;
+			if (!(item.getItemMeta().hasEnchant(Enchantment.LOOT_BONUS_BLOCKS))) return;
+
+			fortuneMultiplier = 1 + r.nextInt(item.getItemMeta().getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS));
+		}
+
 		String type = c.get(typeKey, PersistentDataType.STRING);
 		
 		if (SMPMaterial.getByLocalization(type) != null) {
@@ -68,15 +94,17 @@ public class BlockManager implements Listener {
 			e.setDropItems(false);
 			
 			if (SMPMaterial.ORE_DROPS.containsKey(m)) {
-				b.getWorld().dropItemNaturally(b.getLocation(), SMPMaterial.ORE_DROPS.get(m).getItem());
+				for (int i = 0; i < fortuneMultiplier; i++) b.getWorld().dropItemNaturally(b.getLocation(), SMPMaterial.ORE_DROPS.get(m).getItem());
 			} else b.getWorld().dropItemNaturally(b.getLocation(), item);
 		}
 	}
+
+	private static Random r = new Random();
 	
-	public static final Map<SMPMaterial, ReplaceData> REPLACEABLES = ImmutableMap.<SMPMaterial, ReplaceData>builder()
-			.put(SMPMaterial.RUBY_ORE, new ReplaceData(Material.DIAMOND_ORE, 50))
-			.put(SMPMaterial.DEEPSLATE_RUBY_ORE, new ReplaceData(Material.DEEPSLATE_DIAMOND_ORE, 50))
-			.put(SMPMaterial.ENDERITE_ORE, new ReplaceData(Material.END_STONE, 5))
+	public static final Map<Material, ReplaceData> REPLACEABLES = ImmutableMap.<Material, ReplaceData>builder()
+			.put(Material.DIAMOND_ORE, new ReplaceData(SMPMaterial.RUBY_ORE, 50))
+			.put(Material.DEEPSLATE_DIAMOND_ORE, new ReplaceData(SMPMaterial.DEEPSLATE_RUBY_ORE, 50))
+			.put(Material.END_STONE, new ReplaceData(SMPMaterial.ENDERITE_ORE, 5))
 			.build();
 	
 	public static final Map<Material, SMPMaterial> TITAN_REPLACEABLES = ImmutableMap.<Material, SMPMaterial>builder()
