@@ -34,7 +34,7 @@ public class FetchData implements TabExecutor {
 		else if (args.length == 2) {
 			switch (args[0].toLowerCase()) {
 				case "persistentdata": {
-					suggestions.addAll(Arrays.asList("chunk", "item"));
+					suggestions.addAll(Arrays.asList("item"));
 					break;
 				}
 			}
@@ -68,10 +68,6 @@ public class FetchData implements TabExecutor {
 				}
 				
 				switch (args[1].toLowerCase()) {
-					case "chunk": {
-						// TODO
-						break;
-					}
 					case "item": {
 						if (p.getInventory().getItemInMainHand() == null) {
 							p.sendMessage(ChatColor.RED + "Please hold a valid item.");
