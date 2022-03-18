@@ -5,26 +5,30 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
+import us.teaminceptus.noobysmp.util.inventoryholder.CancelHolder;
 
 public class Items implements Listener {
 	
@@ -45,7 +49,25 @@ public class Items implements Listener {
 	public static final ItemStack COMING_SOON = itemBuilder(Material.BEDROCK).setName(ChatColor.DARK_PURPLE + "Coming Soon!").build();
 	public static final ItemStack NOT_ENOUGH_XP = itemBuilder(Material.BARRIER).setName(ChatColor.RED + "Not Enough Experience!").build();
 	
-	
+	@EventHandler
+	public void onClick(InventoryClickEvent e) {
+		if (e.getCurrentItem() == null) return;
+		ItemStack item = e.getCurrentItem();
+		if (!(item.hasItemMeta())) return;
+
+		for (ItemStack non : NON_COLLECTIBLES) if (item.isSimilar(non)) e.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onMove(InventoryMoveItemEvent e) {
+		if (e.getItem() == null) return;
+		ItemStack item = e.getItem();
+		if (!(item.hasItemMeta())) return;
+
+		for (ItemStack non : NON_COLLECTIBLES) if (item.isSimilar(non)) e.setCancelled(true);
+		if (e.getDestination().getHolder() instanceof CancelHolder) e.setCancelled(true);
+	}
+
 	public static final ItemStack fromNBT(String nbtStr) {
 		try {
 			CompoundTag nbt =  TagParser.parseTag(nbtStr);
@@ -74,20 +96,20 @@ public class Items implements Listener {
 	}
 
 	public static ItemStack getHead(String texture) {
-	  ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-	  SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-	  GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-	  gameProfile.getProperties().put("textures", new Property("textures", texture));
-	  try {
-	    Method method = skullMeta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
-	    method.setAccessible(true);
-	    method.invoke(skullMeta, gameProfile);
-	  } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
-	    ex.printStackTrace();
-	  }
+		ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
+		GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+		gameProfile.getProperties().put("textures", new Property("textures", texture));
+		try {
+	    	Method method = skullMeta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
+	    	method.setAccessible(true);
+			method.invoke(skullMeta, gameProfile);
+		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+			ex.printStackTrace();
+		}
 	
-	  itemStack.setItemMeta(skullMeta);
-	  return itemStack;
+	  	itemStack.setItemMeta(skullMeta);
+		return itemStack;
 	}
 	
 	public static class Builder {
@@ -99,7 +121,7 @@ public class Items implements Listener {
 		}
 		
 		Builder(ItemStack starter) {
-			this.item = starter;
+			this.item = starter.clone();
 		}
 		
 		public Builder setName(String display) {
@@ -107,7 +129,7 @@ public class Items implements Listener {
 			meta.setDisplayName(display);
 			String localizedName = ChatColor.stripColor(display).toLowerCase().replace(' ', '_');
 			
-			for (Character c : REMOVE_STRS.toCharArray()) localizedName.replace(c.toString(), "");
+				for (Character c : REMOVE_STRS.toCharArray()) localizedName.replace(c.toString(), "");
 			
 			meta.setLocalizedName(localizedName);
 			item.setItemMeta(meta);
