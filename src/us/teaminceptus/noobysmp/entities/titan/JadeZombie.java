@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import us.teaminceptus.noobysmp.entities.SMPEntity;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
-@TitanSpawnable(replace = EntityType.ZOMBIE)
+@TitanSpawnable(EntityType.ZOMBIE)
 public class JadeZombie extends SMPEntity<Zombie> {
     
     public JadeZombie(Location loc) {

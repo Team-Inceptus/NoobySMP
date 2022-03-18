@@ -1,4 +1,4 @@
-package us.teaminceptus.noobysmp.entities.titan;
+package us.teaminceptus.noobysmp.conquest;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,6 +9,8 @@ import org.bukkit.entity.EntityType;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface TitanSpawnable {
+public @interface ConquestSpawnable {
+    
     EntityType value();
+
 }

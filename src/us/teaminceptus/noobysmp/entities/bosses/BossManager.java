@@ -275,8 +275,8 @@ public class BossManager implements Listener {
                 final String amount;
 
                 if (am.contains("-")) {
-                    amount = "x" + am.split("-")[0] + " - x" + am.split("-")[1];
-                } else amount = am;
+                    amount = " x" + am.split("-")[0] + " - x" + am.split("-")[1];
+                } else amount = " x" + am;
 
                 if (SMPMaterial.getByLocalization(d.drop().toLowerCase()) != null) {
                     SMPMaterial m = SMPMaterial.getByLocalization(d.drop().toLowerCase());

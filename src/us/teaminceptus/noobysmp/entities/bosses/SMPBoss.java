@@ -58,6 +58,10 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 	.add(EnchantedEnderman.class)
 	.add(Graphenefish.class)
 	.add(CaptainGuardian.class)
+	.add(Axeman.class)
+	.add(DiamondShulker.class)
+	.add(GhostPrincess.class)
+	.add(Magician.class)
 	.build();
 
 	public SMPBoss(Class<T> clazz, Location loc, double maxHealth, String name, Map<ItemStack, Integer> drops, Map<Attribute, Double> attributes) {

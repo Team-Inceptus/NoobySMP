@@ -3,20 +3,20 @@ package us.teaminceptus.noobysmp.entities.titan;
 import com.google.common.collect.ImmutableList;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Enderman;
+import org.bukkit.entity.Chicken;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import us.teaminceptus.noobysmp.entities.SMPEntity;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 
-@TitanSpawnable(EntityType.ENDERMAN)
-public class Titanmen extends SMPEntity<Enderman> {
+@TitanSpawnable(EntityType.CHICKEN)
+public class TopazChicken extends SMPEntity<Chicken> {
     
-    public Titanmen(Location loc) {
-        super(Enderman.class, loc, 300, "Titanmen",
+    public TopazChicken(Location loc) {
+        super(Chicken.class, loc, 225, "Topaz Chicken",
         ImmutableList.<ItemStack>builder()
-        .add(SMPMaterial.ENCHANTED_PEARL.getItem(r.nextInt(3) + 1))
+        .add(SMPMaterial.TOPAZ.getItem(r.nextInt(2) + 1))
         .build());
     }
 

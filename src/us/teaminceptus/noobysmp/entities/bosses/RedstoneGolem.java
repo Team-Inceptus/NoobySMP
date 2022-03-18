@@ -3,9 +3,11 @@ package us.teaminceptus.noobysmp.entities.bosses;
 import com.google.common.collect.ImmutableMap;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Husk;
 import org.bukkit.entity.IronGolem;
@@ -64,7 +66,7 @@ public class RedstoneGolem extends SMPBoss<IronGolem> {
 
     @Repeated(1)
     public void aura() {
-        SMPCosmetic.createCircle(Particle.REDSTONE).accept(entity.getEyeLocation().add(0, 0.5, 0));
+        SMPCosmetic.createCircle(Particle.REDSTONE, new DustOptions(Color.RED, 1)).accept(entity.getEyeLocation().add(0, 0.5, 0));
     }
 
     @Defensive(chance = 50)
