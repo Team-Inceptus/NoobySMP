@@ -60,16 +60,23 @@ public enum SMPCosmetic implements Queryable {
 	public static Consumer<Location> createCircle(Particle part) {
 		return createCircle(part, 1);
 	}
+
+	public static <T> Consumer<Location> createCircle(Particle part, T data) {
+		return createCircle(part, 1, data);
+	}
 	
 	public static Consumer<Location> createCircle(Particle part, double radius) {
+		return createCircle(part, radius, null);
+	}
+
+	public static <T> Consumer<Location> createCircle(Particle part, double radius, T data) {
 		return (loc -> {
 			int points = 90;
 			for (int i = 0; i < points; i++) {
 				double angle = 2 * Math.PI * i / points;
 				loc.add(radius * Math.sin(angle), 0, radius * Math.cos(angle));
-				loc.getWorld().spawnParticle(part, loc, 1, 0, 0, 0, 0);
+				loc.getWorld().spawnParticle(part, loc, 1, 0, 0, 0, 0, data);
 				loc.subtract(radius * Math.sin(angle), 0, radius * Math.cos(angle));
-				
 			}
 		});
 	}
