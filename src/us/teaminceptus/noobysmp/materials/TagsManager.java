@@ -1,7 +1,6 @@
 package us.teaminceptus.noobysmp.materials;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -38,6 +37,7 @@ public class TagsManager implements Listener {
 	@EventHandler
 	public void onAnvil(PrepareAnvilEvent e) {
 		AnvilInventory inv = e.getInventory();
+		if (!(e.getViewers().get(0) instanceof Player p)) return;
 		if (inv.getItem(SMPUtil.ANVIL_ITEM_SLOT) == null) return;
 		if (inv.getItem(SMPUtil.ANVIL_ADDITION_SLOT) == null) return;
 		ItemStack item = inv.getItem(SMPUtil.ANVIL_ITEM_SLOT);
@@ -54,7 +54,9 @@ public class TagsManager implements Listener {
 			return;
 		}
 
-		if (SMPTag.getTags(item).size() >= 3) {
+		PlayerConfig config = new PlayerConfig(p);
+
+		if (SMPTag.getTags(item).size() >= config.getTagLimit()) {
 			e.setResult(Items.Tags.TOO_MANY_TAGS);
 			return;
 		}
@@ -64,12 +66,8 @@ public class TagsManager implements Listener {
 		new BukkitRunnable() {
 			public void run() {
 				inv.setRepairCost(Math.min(Math.max(aitem.getLevelUnlocked(), 1), 35));
-				for (HumanEntity he : e.getViewers()) {
-					if (he instanceof Player p) {
-						p.setWindowProperty(Property.REPAIR_COST, Math.min(Math.max(aitem.getLevelUnlocked(), 1), 35));
-						p.updateInventory();
-					}
-				}
+				p.setWindowProperty(Property.REPAIR_COST, Math.min(Math.max(aitem.getLevelUnlocked(), 1), 35));
+				p.updateInventory();
 				
 				e.setResult(newItem);
 				inv.setItem(2, newItem);

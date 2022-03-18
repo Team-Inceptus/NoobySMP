@@ -108,7 +108,8 @@ public enum SMPMaterial implements Queryable {
 	AMETHYST_LEGGINGS(4, Material.LEATHER_LEGGINGS, "Amethyst Leggings", genArmor(8, 1, 0.5), genTool(4, 0), rgb("6909a0")),
 	AMETHYST_BOOTS(4, Material.LEATHER_BOOTS, "Amethyst Boots", genArmor(5, 1, 0.5), genTool(4, 0), rgb("6909a0")),
 	
-	// Level 5 - 14
+	// Level 5 - 15
+
 	SMALL_EXPERIENCE_BAG(5, "Small Experience Bag", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmQxMGFkODhjOTZjZmFmM2Q3Y2I4ZmViODlkZTQ2ZTIxMzg4MmEyZjFlYjRiMjIyODg0YzZlNWRkMjY0ZjE3NyJ9fX0="),
 	UNCHARGED_ESSENCE(5, Material.GRAY_DYE, "Uncharged Essence"),
 	CHARGED_ESSENCE(5, Material.WHITE_DYE, "Charged Essence"),
@@ -135,6 +136,8 @@ public enum SMPMaterial implements Queryable {
 	
 	EMERALD_CROSSBOW(10, Material.CROSSBOW, "Emerald Crossbow", genCrossbow(10, 3, true)),
 	
+	RAW_SCROLL(11, Material.PAPER, "Raw Scroll", glint()),
+
 	REDSTONE_HELMET(12, Material.LEATHER_HELMET, "Redstone Helmet", genArmor(25, 6, 4), genTool(12, 0), Color.RED),
 	REDSTONE_CHESTPLATE(12, Material.LEATHER_CHESTPLATE, "Redstone Chestplate", genArmor(40, 6, 4), genTool(12, 0), Color.RED),
 	REDSTONE_LEGGINGS(12, Material.LEATHER_LEGGINGS, "Redstone Leggings", genArmor(35, 6, 4), genTool(12, 0), Color.RED),
@@ -303,8 +306,6 @@ public enum SMPMaterial implements Queryable {
 	ENCHANTED_ENDER_EYE(0, Material.ENDER_EYE, "Enchanted Eye of Ender", glint()),
 
 	AQUATIC_CROWN(0, Material.LEATHER_HELMET, "Aquatic Crown", genArmor(25, 20, 3), genTool(15, 0), Color.AQUA),
-	
-	UPGRADER(0, "", ""), // TODO Upgrader Head
 
 	REDSTONE_CROSSBOW(0, Material.CROSSBOW, "Redstone Crossbow", genCrossbow(55, 4, true), genTool(30, 0)),
 	POWERED_CHESTPLATE(0, Material.LEATHER_CHESTPLATE, "Powered Chestplate", genArmor(10, 7, 0.5), genTool(7, 0)),
@@ -328,14 +329,32 @@ public enum SMPMaterial implements Queryable {
 
 	MAGIC_RUBY_SWORD(9, Material.DIAMOND_SWORD, "Magic Ruby Sword", genAttack(55, 12, 1), genTool(100, 0)),
 
+	ELECTRICIY_ROD(12, Material.LIGHTNING_ROD, "Electricity Rod", glint()),
+	SPONGE_DUST(12, Material.YELLOW_DYE, "Sponge Dust", glint()),
+
+	SUPER_SLIMEBALL(14, Material.SLIME_BALL, "Super Slimeball", glint()),
+
 	REPAIRED_WITHERING_BOOTS(17, Material.LEATHER_BOOTS, "Repaired Withering Boots", genArmor(61, 39, 11), genTool(41, 0)),
 	CHARGED_NETHER_CORE(17, "Charged Nether Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDQyNTMyNzVlMWI3NzU3MTMwYTJkNjM3ZDA3ZjUyMmZjYzY2ODZkYzgwNDM0NmYwZTcxNjY4ZDVjZTZkNTg5MSJ9fX0="),
 	
+	TRINITE_SHARD(18, Material.AMETHYST_SHARD, "Trinite Shard", glint()),
+
+	DRILL(20, Material.NETHERITE_PICKAXE, "Drill", genTool(100, 35)),
+
 	MAGIC_ENDERITE_SWORD(21, Material.NETHERITE_SWORD, "Magic Enderite Sword", genAttack(71, 15, 1), genTool(100, 0)),
 	CHARGED_END_CORE(21, "Charged End Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODEyNTFkODE0YmRlYThmYzQ4ODFhZWI2ZTdkMWY0OGEyZWRmOWNkYmE5YWI0ZTNmYTdmNzM1OWM1YjkyIn19fQ=="),
 	
-	IMPROVED_WITHERING_BOOTS(32, Material.LEATHER_BOOTS, "Improved Withering Boots", genArmor(93, 55, 26), genTool(77, 0)),
+	FLOTATION_MOLD(23, Material.LIGHT_BLUE_DYE, "Flotation Mold", glint()),
 	
+	TRINITE_BLOCK(24, Material.IRON_BLOCK, "Trinite Block", glint()),
+	
+	COMPRESSED_TRINITE_BLOCK(27, Material.IRON_BLOCK, "Compressed Trinite Block", glint()),
+
+	REINFORCED_TRINITE(30, Material.IRON_BLOCK, "Trinite Block", glint()),
+
+	IMPROVED_WITHERING_BOOTS(32, Material.LEATHER_BOOTS, "Improved Withering Boots", genArmor(93, 55, 26), genTool(77, 0)),
+	TRINITE_CHESTPLATE(32, Material.IRON_CHESTPLATE, "Trinite Chestplate", genArmor(112, 23, 1), genTool(100, 0)),
+
 	TITAN_CORE(39, "Titan Core", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWMxZmU4MzlhOTA4YTA3MWNjNjNmMjY2ZmQ2MTQyYTEwNjA3M2ZkMjY5ZWRhMTJjMzJjMjM5ZjRkYmQwMzIyZiJ9fX0="),
 	
 	MAGIC_GRAPHENE_SWORD(43, Material.STONE_SWORD, "Magic Graphene Sword", genAttack(97, 15, 1), genTool(100, 0)),
@@ -346,6 +365,8 @@ public enum SMPMaterial implements Queryable {
 	MAGIC_APATITE_SWORD(63, Material.IRON_ORE, "Magic Apatite Sword", genAttack(119, 15, 1), genTool(100, 0)),
 
 	MAGIC_TOPAZ_JADE_SWORD(79, Material.DIAMOND_SWORD, "Magic Topaz-Jade Sword", genAttack(142, 15, 1), genTool(100, 0)),
+	
+	MAGIC_TRINITE_CHESTPLATE(101, Material.IRON_CHESTPLATE, "Magic Trinite Chestplate", genArmor(147, 24, 1), genTool(100, 0)),
 	;
 	
 	{

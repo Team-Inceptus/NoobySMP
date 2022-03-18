@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import us.teaminceptus.noobysmp.ability.SMPAbility;
 import us.teaminceptus.noobysmp.util.Queryable;
 
 /**
@@ -21,9 +22,6 @@ public enum AbilityItem implements Queryable {
 	
 	@QueryDescription({"An item that can infinitely", "generate fireballs."})
 	INFINIBALL(0, Material.FIRE_CHARGE, "InfiniBall"),
-	
-	@QueryDescription({"An item that can infinitely", "place TNT."})
-	INFINITNT(3, Material.TNT, "InfiniTNT"),
 
 	@QueryDescription({"The second tier of the Ocassus Bow"})
 	OCASSUS_BOW_2(7, Material.BOW, "Ocassus Bow 2"),
@@ -46,8 +44,8 @@ public enum AbilityItem implements Queryable {
 
 	@QueryDescription({"A wand that shoots fire."})
 	FIRE_WAND(20, Material.BLAZE_ROD, "Fire Wand", true),
-	
-	@QueryDescription({"A special wand that can kill", "enderman in a certain radius."})
+
+	@QueryDescription({"A special wand that can damage", "enderman in a certain radius."})
 	ENDERITE_WAND(22, Material.END_ROD, "Enderite Wand", true),
 	// From Boss Drops
 	// Drops will ALWAYS be 0
@@ -68,7 +66,7 @@ public enum AbilityItem implements Queryable {
 	SCROLL_DRAGONS(0, Material.PAPER, "Scroll of Dragons"),
 
 	@QueryDescription({"The first weapon made for the entity kings.", "Its power and damage is one of the best."})
-	ARESCENT(0, Material.NETHERITE_SWORD, "Arescent"),
+	ARESCENT(0, Material.NETHERITE_SWORD, "Arescent", true),
 
 	// Tags - Craftables
 	@QueryDescription({"An upgrade that increases weapon strength."})
@@ -87,33 +85,49 @@ public enum AbilityItem implements Queryable {
 	WITHER_MELIORATE(9, Material.WITHER_ROSE, "Wither Meliorate"),
 	
 	@QueryDescription({"An upgrade that can make weapons have the", "abilities of snow, when combined in an", "anvil."})
-	SNOWY_ENRICHMENT(10, Material.SNOW, "Snowy Enrichment"),
+	SNOWY_ENRICHMENT(10, Material.SNOW, "Snowy Enrichment", "Brrrrr...."),
 
-	@QueryDescription({"An upgrade for the swampy ones out there."})
-	SWAMP_ENRICHMENT(10, Material.VINE, "Swamp Enrichment"),
+	@QueryDescription({"An upgrade for the swampy ones out there.", "Will slow and debuff your opponents."})
+	SWAMP_ENRICHMENT(10, Material.VINE, "Swamp Enrichment", "*Creeeak*"),
 
 	@QueryDescription({"An enrichment that harness the power of the", "sea."})
 	AQUATIC_ENRICHMENT(12, Material.HEART_OF_THE_SEA, "Aquatic Enrichment"),
 	
+	@QueryDescription({"A scroll that can make you hungry no more."})
 	SCROLL_SATURATION(15, Material.PAPER, "Scroll of Saturation"),
 
+	@QueryDescription({"Your pickaxe will be all the better with this scroll."})
 	SCROLL_MULTIBREAK(17, Material.PAPER, "Scroll of MultiBreaking"),
+
+	@QueryDescription({"Strike lightning at your opponents with this scroll."})
 	SCROLL_ELECTRIC(17, Material.PAPER, "Scroll of Electricity"),
 
+	@QueryDescription({"Mimic the conditions from the nether as you add", "this scroll to your weapon."})
 	NETHER_ENRICHMENT(18, Material.MAGMA_BLOCK, "Nether Enrichment"),
-	
+
+	@QueryDescription({"Water is no longer your enemy! This upgrade", "will cause all nearby water to disappear."})
 	SOAKING_MELIORATE(21, Material.SPONGE, "Soaking Meliorate"),
+
+	@QueryDescription({"This meliorate will allow you to bounce", "instead of being gone!"})
 	SLIMY_MELIORATE(21, Material.SLIME_BALL, "Slimy Meliorate"),
+
+	@QueryDescription({"The explosions from your bow will surley", "cause some deaths!"})
 	SCROLL_EXPLOSION(21, Material.PAPER, "Scroll of Explosions"),
 	
 	@QueryDescription({"An enrichment that allows you to", "slowly float upwards when in a liquid."})
 	BUOYANT_ENRICHMENT(23, Material.PRISMARINE_SHARD, "Buoyant Enrichment"),
 
+	@QueryDescription({"An enrichment that can allow your", "weapons to teleport around."})
 	END_ENRICHMENT(24, Material.CHORUS_FRUIT, "End Enrichment"),
 	
+	@QueryDescription({"Harden your armor with this scroll!", "This upgrade has a 10% chance of cancelling", "incoming entity damage."})
 	SCROLL_HARDENING(30, Material.PAPER, "Scroll of Hardening"),
 
+	@QueryDescription({"A mysterious enrichment, with powerful", "effects."})
 	TITAN_ENRICHMENT(39, Material.NETHERITE_INGOT, "Titan Enrichment"),
+	
+	@QueryDescription({"Damage taken from poison, wither, and", "others have a 10% chance to be absorbed", "as absorption points. (Max 20)"})
+	SCROLL_ABSORBANT(52, Material.PAPER, "Scroll of Absorbing"),
 	;
 	
 	{
@@ -132,14 +146,14 @@ public enum AbilityItem implements Queryable {
 	}
 	
 	private AbilityItem(int levelUnlocked, Material mat, String name, boolean glint) {
-		this(levelUnlocked, mat, name, glint, null);
+		this(levelUnlocked, mat, name, glint, new String[0]);
 	}
 	
-	private AbilityItem(int levelUnlocked, Material mat, String name, String[] lore) {
+	private AbilityItem(int levelUnlocked, Material mat, String name, String... lore) {
 		this(levelUnlocked, mat, name, false, lore);
 	}
 	
-	private AbilityItem(int levelUnlocked, Material mat, String name, boolean glint, String[] lore) {
+	private AbilityItem(int levelUnlocked, Material mat, String name, boolean glint, String... lore) {
 		this.levelUnlocked = levelUnlocked;
 		this.name = name;
 		
@@ -189,6 +203,17 @@ public enum AbilityItem implements Queryable {
 			lore.add(" ");
 			lore.add(ChatColor.YELLOW + "Attached Tag: " + ChatColor.GOLD + tag.getName());
 			lore.add(ChatColor.YELLOW + "Applies To: " + ChatColor.GOLD + tag.getTarget().name().substring(0, 1) + tag.getTarget().name().toLowerCase().substring(1));
+		}
+
+		for (SMPAbility a : SMPAbility.values()) {
+			if (a.name().equals(this.name())) {
+				lore.add(" ");
+				lore.add(" ");
+				lore.add(ChatColor.RED + "" + ChatColor.UNDERLINE + a.getName());
+				lore.add(" ");
+				lore.add(ChatColor.YELLOW + "Cooldown: " + ChatColor.GOLD + (a.getCooldown() / 20) + "s");
+				lore.add(ChatColor.YELLOW + "Action: " + ChatColor.GOLD + SMPAbility.parseAction(a.getActions()));
+			}
 		}
 		meta.setLore(lore);
 		info.setItemMeta(meta);

@@ -37,6 +37,7 @@ import us.teaminceptus.noobysmp.recipes.SMPRecipe.FurnaceData;
 import us.teaminceptus.noobysmp.recipes.SMPRecipe.SmithingData;
 import us.teaminceptus.noobysmp.util.Generator;
 import us.teaminceptus.noobysmp.util.Items;
+import us.teaminceptus.noobysmp.util.PlayerConfig;
 import us.teaminceptus.noobysmp.util.inventoryholder.CancelHolder;
 
 public class RecipeManager implements Listener {
@@ -124,13 +125,26 @@ public class RecipeManager implements Listener {
 	}
 	
 	public static final String ENRICHMENT = "III_IEI_III";
-	
+
+	public static final Map<Character, ItemStack> meliorate(ItemStack item, SMPMaterial ore) {
+		return Map.of('O', ore.getItem(), 'I', item);
+	}
+
+	public static final String MELIORATE = "OOO_OIO_OOO";
+
+	public static final Map<Character, ItemStack> scroll(ItemStack item) {
+		return Map.of('E', SMPMaterial.ENDERITE.getItem(), 'I', item, 'R', SMPMaterial.RAW_SCROLL.getItem());
+	}
+
+	public static final String SCROLL = "EIE_IRI_EIE";
+
 	private void createAbilityRecipes() {
 		plugin.getLogger().info("Loading Ability Recipes...");
 		
 		// Crafting Recipes
+		new SMPRecipe(SMPMaterial.RAW_SCROLL, "GDG_APA_GDG", Map.of('G', SMPMaterial.GOLDEN_ENCHANT.getItem(), 'D', SMPMaterial.DIAMOND_ENCHANT.getItem(), 'A', SMPMaterial.AMETHYST_ENCHANT.getItem()));
+
 		new SMPRecipe(AbilityItem.INFINIBALL, "FFF_FTF_FFF", Map.of('F', new ItemStack(Material.FIRE_CHARGE), 'T', new ItemStack(Material.TNT)));
-		new SMPRecipe(AbilityItem.INFINITNT, "I I_TTT_I I", Map.of('I', AbilityItem.INFINIBALL.getItem(), 'T', new ItemStack(Material.TNT)));
 		
 		new SMPRecipe(SMPMaterial.UNCHARGED_ESSENCE, BLOCK_9, vanillaShape(Material.NETHER_STAR, BLOCK_9));
 		
@@ -139,14 +153,39 @@ public class RecipeManager implements Listener {
 		
 		new SMPRecipe(SMPMaterial.TITAN_CORE, "NLE_DQD_ELN", Map.of('N', SMPMaterial.CHARGED_NETHER_CORE.getItem(), 'L', SMPMaterial.LIFE_CORE.getItem(), 'D', SMPMaterial.TITAN_DEEPSLATE.getItem(), 'Q', SMPMaterial.QARDITE_BLOCK.getItem(), 'E', SMPMaterial.CHARGED_END_CORE.getItem()));
 		
+		// Scrolls & Scroll Materials
+		new SMPRecipe(SMPMaterial.ELECTRICIY_ROD, "FFF_RRR_FFF", Map.of('F', new ItemStack(Material.FLINT_AND_STEEL), 'R', new ItemStack(Material.LIGHTNING_ROD)));
+		
+		new SMPRecipe(SMPMaterial.TRINITE_SHARD, "TTT_TET_TTT", Map.of('T', new ItemStack(Material.TNT), 'E', SMPMaterial.ENDERITE.getItem()));
+		new SMPRecipe(SMPMaterial.TRINITE_BLOCK, BLOCK_4, vanillaShape(SMPMaterial.TRINITE_SHARD, BLOCK_4));
+
+		new SMPRecipe(AbilityItem.SCROLL_SATURATION, SCROLL, scroll(new ItemStack(Material.CAKE)));
+		new SMPRecipe(AbilityItem.SCROLL_MULTIBREAK, SCROLL, scroll(SMPMaterial.RUBY_PICKAXE.getItem()));
+		new SMPRecipe(AbilityItem.SCROLL_ELECTRIC, SCROLL, scroll(SMPMaterial.ELECTRICIY_ROD.getItem()));
+		new SMPRecipe(AbilityItem.SCROLL_EXPLOSION, SCROLL, scroll(SMPMaterial.TRINITE_BLOCK.getItem()));
+
+		// Enrichments & Meliorates, and their materials
+		new SMPRecipe(SMPMaterial.SPONGE_DUST, BLOCK_9, vanillaShape(Material.SPONGE, BLOCK_9));
+		new SMPRecipe(SMPMaterial.SUPER_SLIMEBALL, BLOCK_9, vanillaShape(Material.SLIME_BLOCK, BLOCK_9));
+		new SMPRecipe(SMPMaterial.FLOTATION_MOLD, RING, vanillaShape(SMPMaterial.SPONGE_DUST, RING));
+		new SMPRecipe(SMPMaterial.REINFORCED_TRINITE, "BTB_TBT_BTB", Map.of('B', SMPMaterial.COMPRESSED_BEDROCK.getItem(), 'T', SMPMaterial.COMPRESSED_TRINITE_BLOCK.getItem()));
+
+		new SMPRecipe(AbilityItem.STRENGTH_MELIORATE, MELIORATE, meliorate(new ItemStack(Material.IRON_INGOT), SMPMaterial.RUBY_BLOCK));
+		new SMPRecipe(AbilityItem.REPLENISH_MELIORATE, MELIORATE, meliorate(new ItemStack(Material.POPPY), SMPMaterial.RUBY));
+		new SMPRecipe(AbilityItem.STICKY_MELIORATE, MELIORATE, meliorate(new ItemStack(Material.HONEY_BLOCK), SMPMaterial.RUBY));
+		new SMPRecipe(AbilityItem.POISON_MELIORATE, MELIORATE, meliorate(new ItemStack(Material.POISONOUS_POTATO), SMPMaterial.RUBY));
+		new SMPRecipe(AbilityItem.WITHER_MELIORATE, MELIORATE, meliorate(new ItemStack(Material.WITHER_SKELETON_SKULL), SMPMaterial.RUBY_BLOCK));
+		new SMPRecipe(AbilityItem.SOAKING_MELIORATE, MELIORATE, meliorate(SMPMaterial.SPONGE_DUST.getItem(), SMPMaterial.RUBY_BLOCK));
+		new SMPRecipe(AbilityItem.SLIMY_MELIORATE, MELIORATE, meliorate(SMPMaterial.SUPER_SLIMEBALL.getItem(), SMPMaterial.RUBY));
+
 		new SMPRecipe(AbilityItem.SNOWY_ENRICHMENT, ENRICHMENT, enrichment(new ItemStack(Material.SNOW_BLOCK)));
 		new SMPRecipe(AbilityItem.SWAMP_ENRICHMENT, ENRICHMENT, enrichment(new ItemStack(Material.VINE)));
-		
 		new SMPRecipe(AbilityItem.AQUATIC_ENRICHMENT, ENRICHMENT, enrichment(SMPMaterial.AQUATIC_CORE.getItem()));
-		
 		new SMPRecipe(AbilityItem.NETHER_ENRICHMENT, ENRICHMENT, enrichment(SMPMaterial.CHARGED_NETHER_CORE.getItem()));
 		new SMPRecipe(AbilityItem.END_ENRICHMENT, ENRICHMENT, enrichment(SMPMaterial.CHARGED_END_CORE.getItem()));
 		new SMPRecipe(AbilityItem.TITAN_ENRICHMENT, ENRICHMENT, enrichment(SMPMaterial.TITAN_CORE.getItem()));
+		new SMPRecipe(AbilityItem.BUOYANT_ENRICHMENT, ENRICHMENT, enrichment(SMPMaterial.FLOTATION_MOLD.getItem()));
+
 		// Anvil Reicpes
 		new SMPRecipe(AbilityItem.OCASSUS_BOW_1.getItem(), SMPMaterial.END_BOW.getItem(), AbilityItem.OCASSUS_BOW_2.getItem(), 20);
 		new SMPRecipe(new ItemStack(Material.CROSSBOW), AbilityItem.OCASSUS_BOW_1.getItem(), AbilityItem.OCASSUS_CROSSBOW.getItem(), 20);
@@ -222,7 +261,7 @@ public class RecipeManager implements Listener {
 		
 		new SMPRecipe(SMPMaterial.ENCHANTED_DIAMOND, "DDD_D D_DDD", new HashMap<>(Map.of('D', Material.DIAMOND)));
 		new SMPRecipe(SMPMaterial.ENCHANTED_DIAMOND_BLOCK, BLOCK_9, vanillaShape(SMPMaterial.ENCHANTED_DIAMOND_BLOCK, BLOCK_9));
-		
+		new SMPRecipe(SMPMaterial.DIAMOND_ENCHANT, "III_IBI_III", new HashMap<>(Map.of('I', SMPMaterial.ENCHANTED_DIAMOND.getItem(), 'B', new ItemStack(Material.EXPERIENCE_BOTTLE))));
 		
 		new SMPRecipe(SMPMaterial.AMETHYST_HELMET, HELMET, vanillaShape(Material.AMETHYST_SHARD, HELMET));
 		new SMPRecipe(SMPMaterial.AMETHYST_CHESTPLATE, CHESTPLATE, vanillaShape(Material.AMETHYST_SHARD, CHESTPLATE));
@@ -242,6 +281,7 @@ public class RecipeManager implements Listener {
 		
 		new SMPRecipe(SMPMaterial.ENCHANTED_AMETHYST_SHARD, RING, vanillaShape(Material.AMETHYST_SHARD, RING));
 		new SMPRecipe(SMPMaterial.ENCHANTED_AMETHYST_BLOCK, BLOCK_4, vanillaShape(SMPMaterial.ENCHANTED_AMETHYST_SHARD, BLOCK_4));
+		new SMPRecipe(SMPMaterial.AMETHYST_ENCHANT, "III_IBI_III", new HashMap<>(Map.of('I', SMPMaterial.ENCHANTED_AMETHYST_SHARD.getItem(), 'B', new ItemStack(Material.EXPERIENCE_BOTTLE))));
 		
 		
 		new SMPRecipe(SMPMaterial.EMERALD_INGOT, RING, vanillaShape(Material.EMERALD, RING));
@@ -785,6 +825,10 @@ public class RecipeManager implements Listener {
 	@EventHandler
 	public void onSmith(PrepareSmithingEvent e) {
 		SmithingInventory inv = e.getInventory();
+		
+		if (!(e.getViewers().get(0) instanceof Player p)) return;
+		PlayerConfig config = new PlayerConfig(p);
+
 		for (SmithingData data : SMPRecipe.getSmithingRecipes().values()) {
 			ItemStack source = inv.getItem(0);
 			ItemStack add = inv.getItem(1);
@@ -792,6 +836,19 @@ public class RecipeManager implements Listener {
 			ItemStack input = (data.getInput().hasItemMeta() && data.getInput().getItemMeta().hasDisplayName() ? data.getInput() : new ItemStack(data.getInput().getType()));
 			ItemStack addition = (data.getAddition().hasItemMeta() && data.getAddition().getItemMeta().hasDisplayName() ? data.getAddition() : new ItemStack(data.getAddition().getType()));
 			if (input.isSimilar(source) && addition.isSimilar(add)) {
+				
+				for (SMPRecipe r : SMPRecipe.getByResult(data.getResult())) {
+					if (SMPMaterial.getByItem(r.getResult()) != null && SMPMaterial.getByItem(r.getResult()).getLevelUnlocked() > config.getLevel()) {
+						e.setResult(Items.LOCKED_ITEM);
+						return;
+					}
+
+					if (AbilityItem.getByItem(r.getResult()) != null && AbilityItem.getByItem(r.getResult()).getLevelUnlocked() > config.getLevel()) {
+						e.setResult(Items.LOCKED_ITEM);
+						return;
+					}
+				}
+
 				e.setResult(data.getResult());
 				break;
 			}

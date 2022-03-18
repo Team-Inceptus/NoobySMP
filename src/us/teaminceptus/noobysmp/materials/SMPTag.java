@@ -19,6 +19,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -124,8 +125,6 @@ public class SMPTag<T extends Event> {
 	private static final Class<PlayerTickEvent> tick = PlayerTickEvent.class;
 	private static final Class<BlockBreakEvent> bbreak = BlockBreakEvent.class;
 	
-	// Scrolls
-	
 	public static final SMPTag<PlayerInteractEvent> THROWABLE = new SMPTag<>(inter, "Throwable", AbilityItem.SCROLL_THROWING, TagTarget.WEAPONS, e -> {
 		if (e.getAction() != Action.RIGHT_CLICK_AIR) return;
 		Player p = e.getPlayer();
@@ -154,16 +153,19 @@ public class SMPTag<T extends Event> {
 	public static final SMPTag<EntityShootBowEvent> EXPLOSIVE = new SMPTag<>(EntityShootBowEvent.class, "Explosive", AbilityItem.SCROLL_EXPLOSION, TagTarget.BOWS, e -> {
 		Player p = (Player) e.getEntity();
 
+
 		new BukkitRunnable() {
 			public void run() {
 				if (e.getProjectile().isDead()) cancel();
+				if (e.getProjectile() instanceof AbstractArrow arr && arr.isInBlock()) cancel();
+				if (e.getProjectile().getLocation().getY() >= p.getWorld().getMaxHeight()) cancel();
 
-				e.getProjectile().getWorld().createExplosion(e.getProjectile().getLocation(), 3F, false, false, p);
+				e.getProjectile().getWorld().createExplosion(e.getProjectile().getLocation(), 3F, false, false, e.getProjectile());
 			}
 		}.runTaskTimer(JavaPlugin.getPlugin(SMP.class), 10, 10);
 	});
 
-	public static final SMPTag<EntityDamageByEntityEvent> HARDEN = new SMPTag<>(damage, "Harden", AbilityItem.SCROLL_HARDENING, TagTarget.CHESTPLATES, e -> {
+	public static final SMPTag<EntityDamageByEntityEvent> HARDEN = new SMPTag<>(damage, "Hardened", AbilityItem.SCROLL_HARDENING, TagTarget.CHESTPLATES, e -> {
 		if (!(e.getEntity() instanceof Player p)) return;
 		
 		if (r.nextInt(100) < 10) {
@@ -175,13 +177,33 @@ public class SMPTag<T extends Event> {
 			}
 		}
 	});
+
+	private static final DamageCause[] ABSORBABLES = {
+		DamageCause.WITHER, DamageCause.DRAGON_BREATH, DamageCause.POISON,
+		DamageCause.LIGHTNING, DamageCause.PROJECTILE
+	};
+
+	public static final SMPTag<EntityDamageEvent> ABSORBANT = new SMPTag<>(EntityDamageEvent.class, "Absorbant", AbilityItem.SCROLL_ABSORBANT, TagTarget.CHESTPLATES, e -> {
+		if (!(e.getEntity() instanceof Player p)) return;
+		DamageCause cause = e.getCause();
+		if (!(Arrays.asList(ABSORBABLES).contains(cause))) return;
+
+		PlayerConfig config = new PlayerConfig(p);
+
+		double absorbed = Math.min(e.getDamage() * r.nextDouble(), 20);
+		if (p.getAbsorptionAmount() >= 20) return;
+		if (r.nextInt(100) < 10) {
+			e.setCancelled(true);
+			p.setAbsorptionAmount(Math.min(p.getAbsorptionAmount() + absorbed, 20));
+			config.sendNotification(ChatColor.GREEN + "You have absorbed the damage!");
+		}
+	});
 	
 	private static final Material[] SHARP_INSTABREAK = {
 		Material.GRAVEL, Material.SAND, Material.DIRT, Material.GRASS_BLOCK, Material.COARSE_DIRT,
 		Material.PODZOL, Material.MYCELIUM
 	};
 
-	// Meliorates
 	public static final SMPTag<BlockDamageEvent> SHARP = new SMPTag<>(BlockDamageEvent.class, "Sharp", AbilityItem.SHARP_MELIORATE, TagTarget.SHOVELS, e -> {
 		Block b = e.getBlock();
 		
@@ -257,7 +279,7 @@ public class SMPTag<T extends Event> {
 		}
 	});
 
-	// Enrichments
+	
 
 	public static final SMPTag<PlayerTickEvent> BUOYANT = new SMPTag<>(tick, "Buoyant", AbilityItem.BUOYANT_ENRICHMENT, TagTarget.LEGGINGS, e -> {
 		Player p = e.getPlayer();
@@ -344,6 +366,21 @@ public class SMPTag<T extends Event> {
 		
 		p.teleport(target, TeleportCause.PLUGIN);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 3F, 1.5F);
+	});
+
+	public static final SMPTag<PlayerTickEvent> DRAGON = new SMPTag<>(tick, "Dragon", AbilityItem.SCROLL_DRAGONS, TagTarget.CHESTPLATES, e -> {
+		Player p = e.getPlayer();
+
+		p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 2, 1));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 2, 1));
+	});
+
+	public static final SMPTag<EntityDamageByEntityEvent> SWAMPY = new SMPTag<>(damage, "Swampy", AbilityItem.SWAMP_ENRICHMENT, TagTarget.WEAPONS, e -> {
+		if (!(e.getDamager() instanceof Player p)) return;
+		if (!(e.getEntity() instanceof LivingEntity en)) return;
+
+		en.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * (r.nextInt(5) + 5), r.nextInt(1)));
+		en.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * (r.nextInt(5) + 5), r.nextInt(1)));
 	});
 	
 	
