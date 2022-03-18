@@ -7,10 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -19,8 +23,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.google.common.collect.ImmutableList;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -200,6 +202,72 @@ public class PlayerConfig {
 	public void addExperience(double exp) {
 		setExperience(getExperience() + exp);
 	}
+
+	/**
+	 * Will return -1 if the player has a level above 100
+	 */
+	public int getTagLimit() {
+		if (getLevel() >= 100) return -1;
+
+		return 3 + (int) (Math.floor(getLevel() / 10));
+	}
+
+	public boolean isAFK() {
+		return pConfig.getBoolean("afk");
+	}
+
+	public void setAFK(boolean afk) {
+		pConfig.set("afk", afk);
+		saveFile();
+	}
+
+	public void toggleAFK() {
+		if (isAFK()) setAFK(false);
+		else setAFK(true);
+	}
+
+	public void updateAllAttributes() {
+		for (Attribute a : Attribute.values()) setAttribute(a);
+	}
+
+	public void setAttribute(Attribute a) {
+		if (!(p.isOnline())) return;
+
+		p.getPlayer().getAttribute(a).setBaseValue(Math.min(getAttribute(a), Integer.MAX_VALUE));
+	}
+
+	public double getAttribute(Attribute a) {
+		switch (a) {
+			case GENERIC_ARMOR: {
+				return Math.min(( getLevel() + getFletchingLevel() ) / 5, 500);
+			}
+			case GENERIC_ARMOR_TOUGHNESS: {
+				return ( getLevel() + getFarmingLevel() ) / 7;
+			}
+			case GENERIC_ATTACK_DAMAGE: {
+				return Math.min( Math.max((getLevel() + 2) / 8, 1), 500);
+			}
+			case GENERIC_ATTACK_SPEED: {
+				return Math.min( Math.max(( getLevel() + 1) / 10, 4), 20);
+			}
+			case GENERIC_MOVEMENT_SPEED: {
+				return Math.min(  Math.max((getLevel() + 5) / 15, 0.1), 2);
+			}
+			case GENERIC_MAX_HEALTH: {
+				return Math.min( (getLevel() / 5) + 20, 80);
+			}
+			case GENERIC_KNOCKBACK_RESISTANCE: {
+				if (getLevel() >= 45) return 1;
+				else return (getLevel() / 45);
+			}
+			case GENERIC_LUCK: {
+				return getFarmingLevel();
+			}
+			default: {
+				return 0;
+			}
+		}
+	}
 	
 	private PlayerConfig config = this;
 	
@@ -266,6 +334,36 @@ public class PlayerConfig {
 
 	public void setRank(String value) {
 		pConfig.set("rank", value);
+		saveFile();
+
+		if (p.isOnline()) {
+			new BukkitRunnable() {
+				public void run() {
+					p.getPlayer().updateCommands();
+				}
+			}.runTask(JavaPlugin.getPlugin(SMP.class));
+		}
+	}
+
+	public boolean isMuted() {
+		return pConfig.getBoolean("muted");
+	}
+
+	/**
+	 * Will return Overworld Spawn Location if not set
+	 * @return Home Location
+	 */
+	public Location getHome() {
+		return pConfig.getLocation("home");
+	}
+
+	public void setHome(Location home) {
+		pConfig.set("home", home);
+		saveFile();
+	}
+
+	public void setMuted(boolean muted) {
+		pConfig.set("muted", muted);
 		saveFile();
 	}
 	
