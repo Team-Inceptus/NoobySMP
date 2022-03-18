@@ -1,15 +1,20 @@
 package us.teaminceptus.noobysmp.ability;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -37,15 +42,67 @@ public enum SMPAbility {
 		p.playSound(p, Sound.ITEM_FIRECHARGE_USE, 3F, 1F);
 	}),
 	
-	BULLET_WAND("Bullet Wand", RIGHT_CLICK(), 40, AbilityItem.BULLET_WAND, p -> {
+	BULLET_WAND("Bullets", RIGHT_CLICK(), 40, AbilityItem.BULLET_WAND, p -> {
 		ShulkerBullet b = p.getWorld().spawn(p.getLocation(), ShulkerBullet.class);
 
 		Entity target = p.getNearbyEntities(15, 15, 15).stream().filter(e -> e instanceof LivingEntity en && !(e.getUniqueId().equals(p.getUniqueId()))).toList().get(0);
 		if (target != null) b.setTarget(target);
-		else b.setTarget(null);
+		else {
+			b.setTarget(null);
+			b.teleport(b.getLocation().setDirection(p.getLocation().getDirection()));
+		}
 	}),
-	
+
+	EARTHQUAKE_WAND_1("Earthquake", RIGHT_CLICK(), 20, AbilityItem.EARTHQUAKE_WAND_1, p -> {
+		for (Entity en : p.getNearbyEntities(3, 0, 3).stream().filter(e -> e instanceof LivingEntity && !(e.getUniqueId().equals(p.getUniqueId()))).toList()) 
+		((LivingEntity) en).damage(r().nextInt(5) + 5);
+	}),
+
+	EARTHQUAKE_WAND_2("Earthquake", RIGHT_CLICK(), 20, AbilityItem.EARTHQUAKE_WAND_2, p -> {
+		for (Entity en : p.getNearbyEntities(3, 0, 3).stream().filter(e -> e instanceof LivingEntity && !(e.getUniqueId().equals(p.getUniqueId()))).toList()) 
+		((LivingEntity) en).damage(r().nextInt(10) + 5);
+	}),
+
+	EARTHQUAKE_WAND_3("Earthquake", RIGHT_CLICK(), 15, AbilityItem.EARTHQUAKE_WAND_3, p -> {
+		for (Entity en : p.getNearbyEntities(4, 0, 4).stream().filter(e -> e instanceof LivingEntity && !(e.getUniqueId().equals(p.getUniqueId()))).toList()) 
+		((LivingEntity) en).damage(r().nextInt(10) + 5);
+	}),
+
+	EARTHQUAKE_WAND_4("Earthquake", RIGHT_CLICK(), 20, AbilityItem.EARTHQUAKE_WAND_4, p -> {
+		for (Entity en : p.getNearbyEntities(4, 0, 4).stream().filter(e -> e instanceof LivingEntity && !(e.getUniqueId().equals(p.getUniqueId()))).toList()) 
+		((LivingEntity) en).damage(r().nextInt(10) + 10);
+	}),
+
+	EARTHQUAKE_WAND_5("Earthquake", RIGHT_CLICK(), 20, AbilityItem.EARTHQUAKE_WAND_5, p -> {
+		for (Entity en : p.getNearbyEntities(4, 0, 4).stream().filter(e -> e instanceof LivingEntity && !(e.getUniqueId().equals(p.getUniqueId()))).toList()) 
+		((LivingEntity) en).damage(r().nextInt(15) + 10);
+	}),
+
+	EARTHQUAKE_WAND_6("Earthquake", RIGHT_CLICK(), 20, AbilityItem.EARTHQUAKE_WAND_6, p -> {
+		for (Entity en : p.getNearbyEntities(5, 0, 5).stream().filter(e -> e instanceof LivingEntity && !(e.getUniqueId().equals(p.getUniqueId()))).toList()) 
+		((LivingEntity) en).damage(r().nextInt(15) + 15);
+	}),
+
+	FIRE_WAND("Fire Shoot", RIGHT_CLICK(), 20, AbilityItem.FIRE_WAND, p -> {
+		p.playSound(p, Sound.ITEM_FIRECHARGE_USE, 3F, 1F);
+		for (double i = 0.5; i < 5; i += 0.5) {
+			Location target = p.getLocation().add(p.getLocation().getDirection().multiply(1 + i));
+			
+			p.getWorld().spawnParticle(Particle.FLAME, target, 2);
+			p.getWorld().getNearbyEntities(target, 1, 1, 1).forEach(e -> e.setFireTicks(20 * (r().nextInt(10) + 2 + (int) Math.floor(new PlayerConfig(p).getLevel() / 3))));	
+		}
+	}),
+
+	ENDERITE_WAND("Enderman Killer", LEFT_CLICK(), 0, AbilityItem.ENDERITE_WAND, p -> {
+		double damage = r().nextDouble() * (new PlayerConfig(p).getLevel() + 10);
+		double radius = new PlayerConfig(p).getLevel() < 25 ? 1 : 2;
+
+		for (Entity enderman : p.getNearbyEntities(radius, 1, radius).stream().filter(en -> en instanceof Enderman).toList()) ((Enderman) enderman).damage(damage, p);
+	}),
+
 	;
+
+	private static Random r() { return new Random(); };
 	
 //	private static final Action[] combineLists(Action[]... mats) {
 //		List<Action> matsL = new ArrayList<>();
@@ -58,9 +115,9 @@ public enum SMPAbility {
 //	}
 	
 	private static final Action[] RIGHT_CLICK() { return new Action[] {Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK}; }
-//	private static final Action[] LEFT_CLICK() { return new Action[] {Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK}; }
+	private static final Action[] LEFT_CLICK() { return new Action[] {Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK }; }
 	// private static final Action[] CLICK() { return combineLists(LEFT_CLICK(), RIGHT_CLICK()); }
-	
+
 	private final String name;
 	private final Action[] actions;
 	private final long cooldown;
@@ -91,6 +148,16 @@ public enum SMPAbility {
 		this.cooldown = cooldown;
 	}
 
+	public static String parseAction(Action[] action) {
+		List<Action> actions = Arrays.asList(action);
+
+		if (actions.contains(Action.RIGHT_CLICK_AIR) && actions.contains(Action.RIGHT_CLICK_BLOCK)) {
+			return "Right Click";
+		} else if (actions.contains(Action.LEFT_CLICK_AIR) && actions.contains(Action.LEFT_CLICK_BLOCK)) {
+			return "Left Click";
+		} else return "Unknown";
+	}
+
 	static {
 		for (SMPAbility a : values()) cooldowns.put(a, new ArrayList<>());
 	}
@@ -105,6 +172,10 @@ public enum SMPAbility {
 	
 	public final String getName() {
 		return this.name;
+	}
+
+	public final long getCooldown() {
+		return this.cooldown;
 	}
 	
 	public final Action[] getActions() {

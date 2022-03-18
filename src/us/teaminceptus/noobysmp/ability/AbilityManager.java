@@ -1,9 +1,13 @@
 package us.teaminceptus.noobysmp.ability;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -11,6 +15,8 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockDamageAbortEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -33,6 +39,7 @@ import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 import us.teaminceptus.noobysmp.util.Items;
 import us.teaminceptus.noobysmp.util.Messages;
+import us.teaminceptus.noobysmp.util.PlayerConfig;
 
 public class AbilityManager implements Listener {
 
@@ -112,9 +119,53 @@ public class AbilityManager implements Listener {
 			}
 		} catch (NullPointerException err) {
 			// do nothing
+		}	
+	}
+
+	private static Map<Block, Integer> BEDROCK_DAMAGE = new HashMap<>();
+
+	@EventHandler
+	public void onDamage(BlockDamageEvent e) {
+		Player p = e.getPlayer();
+		PlayerConfig config = new PlayerConfig(p);
+		if (e.getItemInHand() == null) return;
+		ItemStack item = e.getItemInHand();
+		if (!(item.hasItemMeta())) return;
+		Block b = e.getBlock();
+		if (!(b.getType() == Material.BEDROCK)) return;
+		if (SMPMaterial.getByItem(item) == null) return;
+		if (SMPMaterial.getByItem(item) != SMPMaterial.DRILL) return;
+
+		if (BEDROCK_DAMAGE.get(b) == null) BEDROCK_DAMAGE.put(b, 0);
+		else {
+			BEDROCK_DAMAGE.put(b, BEDROCK_DAMAGE.get(b) + 1 + Math.min((int) Math.floor((config.getLevel() - 20) / 5), 9));
+		}
+
+		if (BEDROCK_DAMAGE.get(b) >= 10) {
+			b.breakNaturally();
+			BEDROCK_DAMAGE.remove(b);
 		}
 	}
 
+	@EventHandler
+	public void onDamageAbort(BlockDamageAbortEvent e) {
+		if (e.getItemInHand() == null) return;
+		ItemStack item = e.getItemInHand();
+		if (!(item.hasItemMeta())) return;
+		Block b = e.getBlock();
+		if (!(b.getType() == Material.BEDROCK)) return;
+		
+		if (SMPMaterial.getByItem(item) == null) return;
+		if (SMPMaterial.getByItem(item) != SMPMaterial.DRILL) return;
+
+		if (BEDROCK_DAMAGE.get(b) >= 10) {
+			b.breakNaturally();
+			BEDROCK_DAMAGE.remove(b);
+		}
+
+		if (BEDROCK_DAMAGE.get(b) != null) BEDROCK_DAMAGE.remove(b);
+	}
+	
 	/*
 	 * Used for Armor (Consumer)
 	 */
