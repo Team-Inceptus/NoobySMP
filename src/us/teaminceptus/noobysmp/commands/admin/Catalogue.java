@@ -1,10 +1,12 @@
 package us.teaminceptus.noobysmp.commands.admin;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -12,6 +14,8 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.entities.SMPEntity;
+import us.teaminceptus.noobysmp.entities.bosses.SMPBoss;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 import us.teaminceptus.noobysmp.util.Messages;
@@ -31,13 +35,17 @@ public class Catalogue implements TabExecutor {
 		
 		switch (args.length) {
 			case 1: {
-				suggestions.addAll(Arrays.asList("item"));
+				suggestions.addAll(Arrays.asList("item", "entity"));
 				return suggestions;
 			}
 			case 2: {
 				if (args[0].equalsIgnoreCase("item")) {
 					for (SMPMaterial m : SMPMaterial.values()) suggestions.add("smpmaterial:" + m.getLocalization());
 					for (AbilityItem m : AbilityItem.values()) suggestions.add("smpability:" + m.getLocalization());
+				} else if (args[0].equalsIgnoreCase("entity")) {
+					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.CLASS_LIST) suggestions.add("entity:" + clazz.getName().toLowerCase());
+					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.TITAN_CLASS_LIST) suggestions.add("titan:" + clazz.getName().toLowerCase());
+					for (Class<? extends SMPBoss<?>> clazz : SMPBoss.CLASS_LIST) suggestions.add("boss:" + clazz.getName().toLowerCase());
 				}
 				
 				return suggestions;
@@ -81,6 +89,41 @@ public class Catalogue implements TabExecutor {
 					p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 3F, 1F);
 				}
 				
+				break;
+			}
+			case "entity": {
+				if (args.length < 2) {
+					p.sendMessage(ChatColor.RED + "Please provide a valid entity.");
+					return false;
+				}
+
+				String id = args[1].toLowerCase().replace("titan:", "").replace("entity:", "").replace("boss:", "");
+
+				try {
+					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.CLASS_LIST) if (clazz.getName().equalsIgnoreCase(id)) {
+						Constructor<?> constr = clazz.getConstructor(Location.class);
+						constr.newInstance(p.getLocation());
+						p.playSound(p, Sound.ENTITY_WITHER_SPAWN, 3F, 1F);
+						return true;
+					}
+
+					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.TITAN_CLASS_LIST) if (clazz.getName().equalsIgnoreCase(id)) {
+						Constructor<?> constr = clazz.getConstructor(Location.class);
+						constr.newInstance(p.getLocation());
+						p.playSound(p, Sound.ENTITY_WITHER_SPAWN, 3F, 1F);
+						return true;
+					}
+
+					for (Class<? extends SMPBoss<?>> clazz : SMPBoss.CLASS_LIST) if (clazz.getName().equalsIgnoreCase(id)) {
+						Constructor<?> constr = clazz.getConstructor(Location.class);
+						constr.newInstance(p.getLocation());
+						p.playSound(p, Sound.ENTITY_WITHER_SPAWN, 3F, 1F);
+						return true;
+					}
+				} catch (Exception e) {
+					p.sendMessage(ChatColor.RED + "There was an error: " + e.getMessage());
+					return false;
+				}
 				break;
 			}
 		}

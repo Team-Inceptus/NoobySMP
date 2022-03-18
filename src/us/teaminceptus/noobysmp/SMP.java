@@ -10,11 +10,11 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import net.minecraft.world.entity.EquipmentSlot;
 import us.teaminceptus.noobysmp.ability.AbilityManager;
 import us.teaminceptus.noobysmp.ability.cosmetics.Cosmetics;
 import us.teaminceptus.noobysmp.commands.Bosses;
@@ -24,20 +24,28 @@ import us.teaminceptus.noobysmp.commands.PlayerInfo;
 import us.teaminceptus.noobysmp.commands.Progress;
 import us.teaminceptus.noobysmp.commands.Query;
 import us.teaminceptus.noobysmp.commands.Settings;
+import us.teaminceptus.noobysmp.commands.TPRequests;
 import us.teaminceptus.noobysmp.commands.Trade;
+import us.teaminceptus.noobysmp.commands.admin.Ban;
 import us.teaminceptus.noobysmp.commands.admin.Catalogue;
+import us.teaminceptus.noobysmp.commands.admin.Ecsee;
 import us.teaminceptus.noobysmp.commands.admin.Experience;
 import us.teaminceptus.noobysmp.commands.admin.FetchData;
+import us.teaminceptus.noobysmp.commands.admin.Invsee;
 import us.teaminceptus.noobysmp.commands.admin.Ranks;
 import us.teaminceptus.noobysmp.commands.admin.RunTest;
 import us.teaminceptus.noobysmp.commands.admin.SetBiome;
+import us.teaminceptus.noobysmp.commands.admin.Suspend;
+import us.teaminceptus.noobysmp.commands.admin.Tags;
 import us.teaminceptus.noobysmp.conquest.ConquestManager;
 import us.teaminceptus.noobysmp.entities.EntityManager;
 import us.teaminceptus.noobysmp.entities.bosses.BossManager;
 import us.teaminceptus.noobysmp.entities.bosses.npc.NPCManager;
 import us.teaminceptus.noobysmp.generation.BlockManager;
 import us.teaminceptus.noobysmp.generation.ItemManager;
+import us.teaminceptus.noobysmp.generation.WorldManager;
 import us.teaminceptus.noobysmp.generation.biomes.TitanBiome;
+import us.teaminceptus.noobysmp.generation.structures.StructureManager;
 import us.teaminceptus.noobysmp.leveling.LevelingManager;
 import us.teaminceptus.noobysmp.leveling.trades.TradeCommandManager;
 import us.teaminceptus.noobysmp.leveling.trades.TradesManager;
@@ -46,6 +54,7 @@ import us.teaminceptus.noobysmp.player.ServerManager;
 import us.teaminceptus.noobysmp.recipes.RecipeManager;
 import us.teaminceptus.noobysmp.util.Items;
 import us.teaminceptus.noobysmp.util.PlayerConfig;
+import us.teaminceptus.noobysmp.util.ServerConfig;
 
 public class SMP extends JavaPlugin {
 
@@ -53,6 +62,18 @@ public class SMP extends JavaPlugin {
 	private static File playerDir;
 
 	public void loadFiles() {
+		// Server Config
+		saveDefaultConfig();
+		FileConfiguration config = getConfig();
+		
+		if (!(config.isBoolean("maintenance"))) {
+			config.set("maintenance", false);
+		}
+
+		saveConfig();
+
+		new ServerConfig(this);
+		// Player Config
 		playerDir = new File(getDataFolder(), "players");
 
 		if (!(playerDir.exists())) playerDir.mkdir();
@@ -86,8 +107,19 @@ public class SMP extends JavaPlugin {
 			if (!(pConfig.isList("friends"))) {
 				pConfig.set("friends", new ArrayList<OfflinePlayer>());
 			}
-			
 
+			if (!(pConfig.isBoolean("muted"))) {
+				pConfig.set("muted", false);
+			}
+
+			if (!(pConfig.isBoolean("afk"))) {
+				pConfig.set("afk", false);
+			}
+
+			if (!(pConfig.isLocation("home"))) {
+				pConfig.set("home", Bukkit.getWorld("world").getSpawnLocation());
+			}
+			
 			if (!(pConfig.isConfigurationSection("statistics"))) {
 				pConfig.createSection("statistics");
 			}
@@ -184,6 +216,7 @@ public class SMP extends JavaPlugin {
 		new Trade(this);
 		new Query(this);
 		new GetRecipe(this);
+		new TPRequests(this);
 		// Admin Commands
 		new Ranks(this);
 		new Catalogue(this);
@@ -191,6 +224,11 @@ public class SMP extends JavaPlugin {
 		new SetBiome(this);
 		new RunTest(this);
 		new FetchData(this);
+		new Tags(this);
+		new Ban(this);
+		new Suspend(this);
+		new Invsee(this);
+		new Ecsee(this);
 		
 		getLogger().info("Loading Managers...");
 		// Managers
@@ -212,6 +250,10 @@ public class SMP extends JavaPlugin {
 		new TradesManager(this);
 		new TradeCommandManager(this);
 		
+		getLogger().info("Loading World Managers...");
+		new WorldManager(this);
+		new StructureManager(this);
+
 		getLogger().info("Successfully loaded Classes! Loading external worlds...");
 		try {
 			TitanBiome.registerBiomes();

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -62,7 +63,10 @@ public class Help implements CommandExecutor {
 			new TextComponent("For bug reporting / technical difficulties, please contact a member of Team Inceptus on Discord.")
 		});
 		
+		meta.setPages(new ArrayList<>());
 		meta.spigot().setPages(pages);
+		meta.setTitle(ChatColor.GREEN + "NoobySMP Help Book");
+		meta.setAuthor("GamerCoder215");
 		book.setItemMeta(meta);
 		
 		return book;
@@ -72,6 +76,7 @@ public class Help implements CommandExecutor {
 		if (!(sender instanceof Player p)) return false;
 		
 		p.openBook(getHelpBook());
+		p.playSound(p, Sound.ITEM_BOOK_PAGE_TURN, 3F, 1F);
 		return true;
 	}
 	

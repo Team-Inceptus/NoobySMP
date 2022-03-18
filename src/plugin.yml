@@ -38,19 +38,68 @@ commands:
   getrecipe:
     description: Fetch a recipe for an item
     aliases: [getr, fetchrecipe, fetchr, grecipe, frecipe]
+  menu:
+    description: Open the Player Menu
+    aliases: [playermenu, pmenu, pm]
+  tpa:
+    description: Request a teleport to a player
+    aliases: [tpr, tprequest, teleportrequest]
+  tpaccept:
+    description: Accept a teleport request
+    aliases: [tpacc, teleportaccept, teleacc]
+  tpdeny:
+    description: Deny a teleport request
+    aliases: [tpd, teleportdeny, teleportd]
+  craft:
+    description: Open a crafting table
+    aliases: [workbench, wkbench]
+  enderchest:
+    description: Open your enderchest
+    aliases: [ec, ender, echest]
+  home:
+    description: Teleport to your set home, or spawn location
+    aliases: [tphome, teleporthome, hm]
+  sethome:
+    description: Set your home location to teleport back to
+    aliases: [seth, shome]
+  hub:
+    description: Teleport to the world's spawn location
+    aliases: [tpspawn, spawn]
+  flyspeed:
+    description: Manage your fly speed
+    aliases: [fspeed, fs, flys]
+  bed:
+    description: Teleport to your bed or spawnpoint
+    aliases: [spawn, bd, tpbed, tpspawn]
+  compass:
+    description: Teleport to a location your lodestone compass points to
+    aliases: [tpcompass, tpcomp, comp]
+  etable:
+    description: Open an Enchanting Table
+    aliases: [encht, et, enchantingtable]
+  dailytrades:
+    descirption: Fixed trades menu that will have random trades every 10 minutes
+    aliases: [dtrades, dt, mctrades, trademenu, smptrades]
+  afk:
+    description: Toggle AFK Status, prevents player from moving
+    alias: awayfromkeyboard
   # Admin
   catalogue:
     description: Open up the SMP Catalogue for fetching stuff.
     alias: catal
+    permission: smp.admin.catalogue
   setrank:
     description: Set another player's rank.
     alias: setr
+    permission: smp.admin.setrank
   experience:
     description: Experience managing for Admins
     alias: exp 
+    permission: smp.admin.experience
   setbiome:
     description: Manage Biomes in current area
     aliases: [setcustombiome, setb, setcustomb, setcbiome]
+    permission: smp.admin.catalogue
   runtest:
     description: Run Tests for Features
     permission: smp.admin
@@ -58,7 +107,30 @@ commands:
     description: Fetch Data for items
     permission: smp.admin.fetch
     aliases: [fetchd, fdata, fd]
-    
+  tags:
+    description: Tags Management
+    permission: smp.admin.tags
+    aliases: [smptags, stags, smpt]
+  suspend:
+    description: Temporarily Ban a Player
+    permission: smp.admin.suspend
+    aliases: [tempban, tban, susp]
+  ban:
+    description: Ban a player
+    permission: smp.admin.ban
+    aliases: [bn, banhammer]
+  invsee:
+    description: See inside another player's inventory
+    permission: smp.admin.invsee
+    aliases: [inventorysee, invs, isee]
+  enderchestsee:
+    description: See inside another player's ender chest
+    permission: smp.admin.ecsee
+    aliases: [ecsee, ecs, enderchests, ecs]
+  mute:
+    description: Mute a player
+    permission: smp.admin.mute
+    alias: silence
 permissions:
   smp.*:
     description: All NoobySMP Permissions
@@ -92,6 +164,31 @@ permissions:
       smp.admin: true
   smp.admin.fetch:
     description: Access to /fetchdata
+    default: op
+    children:
+      smp.admin: true
+  smp.admin.tags:
+    description: Access to /tags
+    default: op
+    children:
+      smp.admin: true
+  smp.admin.suspend:
+    description: Access to /suspend
+    default: op
+    children:
+      smp.admin: true
+  smp.admin.ban:
+    description: Access to /ban
+    default: op
+    children:
+      smp.admin: true
+  smp.admin.invsee:
+    description: Access to /invsee and /ecsee
+    default: op
+    children:
+      smp.admin: true
+  smp.admin.mute:
+    description: Access to /mute
     default: op
     children:
       smp.admin: true

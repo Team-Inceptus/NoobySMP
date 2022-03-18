@@ -58,7 +58,7 @@ public class Settings implements Listener, CommandExecutor {
 	public void onDrop(PlayerDropItemEvent e) {
 		Player p = e.getPlayer();
 		PlayerConfig config = new PlayerConfig(p);
-		if (config.getSetting(DROP_ITEMS)) {
+		if (!(config.getSetting(DROP_ITEMS))) {
 			p.sendMessage(ChatColor.RED + "You currently have the setting " + ChatColor.GOLD + "Drop Items" + ChatColor.RED + " turned off. Turn it back on to drop items.");
 			e.setCancelled(true);
 		}
