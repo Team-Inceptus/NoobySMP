@@ -43,9 +43,9 @@ public class Catalogue implements TabExecutor {
 					for (SMPMaterial m : SMPMaterial.values()) suggestions.add("smpmaterial:" + m.getLocalization());
 					for (AbilityItem m : AbilityItem.values()) suggestions.add("smpability:" + m.getLocalization());
 				} else if (args[0].equalsIgnoreCase("entity")) {
-					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.CLASS_LIST) suggestions.add("entity:" + clazz.getName().toLowerCase());
-					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.TITAN_CLASS_LIST) suggestions.add("titan:" + clazz.getName().toLowerCase());
-					for (Class<? extends SMPBoss<?>> clazz : SMPBoss.CLASS_LIST) suggestions.add("boss:" + clazz.getName().toLowerCase());
+					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.CLASS_LIST) suggestions.add("entity:" + clazz.getSimpleName().toLowerCase());
+					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.TITAN_CLASS_LIST) suggestions.add("titan:" + clazz.getSimpleName().toLowerCase());
+					for (Class<? extends SMPBoss<?>> clazz : SMPBoss.CLASS_LIST) suggestions.add("boss:" + clazz.getSimpleName().toLowerCase());
 				}
 				
 				return suggestions;
@@ -100,21 +100,21 @@ public class Catalogue implements TabExecutor {
 				String id = args[1].toLowerCase().replace("titan:", "").replace("entity:", "").replace("boss:", "");
 
 				try {
-					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.CLASS_LIST) if (clazz.getName().equalsIgnoreCase(id)) {
+					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.CLASS_LIST) if (clazz.getSimpleName().equalsIgnoreCase(id)) {
 						Constructor<?> constr = clazz.getConstructor(Location.class);
 						constr.newInstance(p.getLocation());
 						p.playSound(p, Sound.ENTITY_WITHER_SPAWN, 3F, 1F);
 						return true;
 					}
 
-					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.TITAN_CLASS_LIST) if (clazz.getName().equalsIgnoreCase(id)) {
+					for (Class<? extends SMPEntity<?>> clazz : SMPEntity.TITAN_CLASS_LIST) if (clazz.getSimpleName().equalsIgnoreCase(id)) {
 						Constructor<?> constr = clazz.getConstructor(Location.class);
 						constr.newInstance(p.getLocation());
 						p.playSound(p, Sound.ENTITY_WITHER_SPAWN, 3F, 1F);
 						return true;
 					}
 
-					for (Class<? extends SMPBoss<?>> clazz : SMPBoss.CLASS_LIST) if (clazz.getName().equalsIgnoreCase(id)) {
+					for (Class<? extends SMPBoss<?>> clazz : SMPBoss.CLASS_LIST) if (clazz.getSimpleName().equalsIgnoreCase(id)) {
 						Constructor<?> constr = clazz.getConstructor(Location.class);
 						constr.newInstance(p.getLocation());
 						p.playSound(p, Sound.ENTITY_WITHER_SPAWN, 3F, 1F);
