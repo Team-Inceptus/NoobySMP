@@ -71,7 +71,7 @@ public enum SMPCosmetic implements Queryable {
 
 	public static <T> Consumer<Location> createCircle(Particle part, double radius, T data) {
 		return (loc -> {
-			int points = 90;
+			int points = 10;
 			for (int i = 0; i < points; i++) {
 				double angle = 2 * Math.PI * i / points;
 				loc.add(radius * Math.sin(angle), 0, radius * Math.cos(angle));
