@@ -33,19 +33,18 @@ public class Ranks implements TabExecutor, Listener {
 			"minecraft.autocraft",
 			"minecraft.command.help",
 			"smp.user",
-			"minecraft.command.me",
-			"minecraft.command.say",
 			"minecraft.command.msg"
 		),
 		TRIALMOD(
 			USER,
 			"smp.admin.fetch",
 			"minecraft.command.effect",
-			"minecraft.command.tp",
+			"minecraft.command.teleport",
 			"minecraft.command.gamemode",
 			"minecraft.command.playsound",
 			"minecraft.command.spawnpoint",
-			"minecraft.command.tellraw"
+			"minecraft.command.tellraw",
+			"minecraft.command.me"
 		),
 		JRMOD(
 			TRIALMOD,
@@ -95,7 +94,11 @@ public class Ranks implements TabExecutor, Listener {
 		}
 
 		public static void removeAll(Player p) {
+			if (p.isOp()) p.setOp(false);
+			
 			for (PermissionAttachmentInfo a : p.getEffectivePermissions()) {
+				if (a.getAttachment() == null) continue;
+				
 				for (String s : a.getAttachment().getPermissions().keySet()) {
 					a.getAttachment().setPermission(s, false);
 				}
@@ -111,17 +114,20 @@ public class Ranks implements TabExecutor, Listener {
 		 */
 		public PermissionAttachment applyTo(Player p) {
 			SMP plugin = JavaPlugin.getPlugin(SMP.class);
-			removeAll(p);
 
 			if (this.permissions == null && this.op) {
 				p.setOp(true);
 				return null;
 			}
+			
+			removeAll(p);
 
 			PermissionAttachment attachment = p.addAttachment(plugin);
 			
 			for (String perm : permissions) attachment.setPermission(perm, true);
-
+			
+			p.updateCommands();
+			
 			return attachment;
 		}
 
