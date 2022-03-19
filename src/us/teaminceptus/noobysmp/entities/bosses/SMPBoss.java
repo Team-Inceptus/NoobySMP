@@ -1,5 +1,6 @@
 package us.teaminceptus.noobysmp.entities.bosses;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,8 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -30,9 +33,11 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
+import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.SMPEntity;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.Icon;
+import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Repeated;
 
 public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 	
@@ -63,7 +68,28 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 	.add(GhostPrincess.class)
 	.add(Magician.class)
 	.build();
-
+	
+	{
+		Class<?> clazz = this.getClass();
+		
+		for (Method m : clazz.getMethods()) {
+			if (m.isAnnotationPresent(Repeated.class)) {
+				Repeated r = m.getAnnotation(Repeated.class);
+				new BukkitRunnable() {
+					public void run() {
+						if (entity.isDead()) cancel();
+						try {
+							m.invoke(this);
+						} catch (Exception e) {
+							JavaPlugin.getPlugin(SMP.class).getLogger().warning("Error executing ability for " + clazz.getName());
+							e.printStackTrace();
+						}
+					}
+				}.runTaskTimer(plugin, r.value(), r.value());
+			}
+		}
+	}
+	
 	public SMPBoss(Class<T> clazz, Location loc, double maxHealth, String name, Map<ItemStack, Integer> drops, Map<Attribute, Double> attributes) {
 		this(clazz, loc, maxHealth, name, drops, attributes, null);
 	}
@@ -81,6 +107,9 @@ public abstract class SMPBoss<T extends Mob> extends SMPEntity<T> {
 		for (Attribute a : attributes.keySet()) {
 			en.getAttribute(a).setBaseValue(attributes.get(a));
 		}
+		
+		en.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+		en.setHealth(maxHealth);
 		
 		if (goals != null) {
 			net.minecraft.world.entity.Mob mob = (net.minecraft.world.entity.Mob) ((CraftEntity) this.getEntity()).getHandle();
