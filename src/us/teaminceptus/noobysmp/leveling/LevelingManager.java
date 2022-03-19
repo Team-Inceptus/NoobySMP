@@ -396,13 +396,13 @@ public class LevelingManager implements Listener {
         if (!(e.getEntity() instanceof LivingEntity en)) return;
 
         if (en.getHealth() - e.getFinalDamage() > 0) return;
-
+        
         PlayerConfig config = new PlayerConfig(p);
 
         if (en instanceof Player target) {
             config.addExperience(target.getTotalExperience() / r.nextInt(10) + 10);
         } else {
-            config.addExperience(en.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() / r.nextInt(10) + 10);
+            config.addExperience(en.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() / ((double) r.nextInt(10) + 10D));
         }
     }
 
