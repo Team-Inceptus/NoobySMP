@@ -38,11 +38,13 @@ public class Settings implements Listener, CommandExecutor {
 	public static final String NOTIFICATIONS = "Notifications";
 	public static final String DROP_ITEMS = "Drop_Items";
 	public static final String TAG_ABILITIES = "Tag_Abilities";
+	public static final String SPEED = "Speed";
 
 	public static final String[] SETTINGS = {
 		NOTIFICATIONS,
 		DROP_ITEMS,
-		TAG_ABILITIES
+		TAG_ABILITIES,
+		SPEED
 	};
 	
 	public static class SettingsHolder implements InventoryHolder {
