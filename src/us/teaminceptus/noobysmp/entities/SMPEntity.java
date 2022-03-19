@@ -15,7 +15,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import us.teaminceptus.noobysmp.SMP;
+import us.teaminceptus.noobysmp.entities.titan.AmberSkeleton;
 import us.teaminceptus.noobysmp.entities.titan.JadeZombie;
+import us.teaminceptus.noobysmp.entities.titan.QarditeWitch;
+import us.teaminceptus.noobysmp.entities.titan.RubyPig;
+import us.teaminceptus.noobysmp.entities.titan.Titanmen;
+import us.teaminceptus.noobysmp.entities.titan.TopazChicken;
 
 public abstract class SMPEntity<T extends LivingEntity> {
 	
@@ -38,6 +43,11 @@ public abstract class SMPEntity<T extends LivingEntity> {
 	
 	public static List<Class<? extends SMPEntity<?>>> TITAN_CLASS_LIST = ImmutableList.<Class<? extends SMPEntity<?>>>builder()
 			.add(JadeZombie.class)
+			.add(AmberSkeleton.class)
+			.add(TopazChicken.class)
+			.add(Titanmen.class)
+			.add(RubyPig.class)
+			.add(QarditeWitch.class)
 			.build();
 	
 	protected final static Random r = new Random();
