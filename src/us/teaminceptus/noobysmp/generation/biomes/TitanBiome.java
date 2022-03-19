@@ -94,7 +94,6 @@ public enum TitanBiome {
 
 	private net.minecraft.world.level.biome.Biome nmsBiome;
 	private ResourceKey<net.minecraft.world.level.biome.Biome> resourceKey;
-	private Holder<net.minecraft.world.level.biome.Biome> holder;
 
 	private TitanBiome(String name, boolean snow, String waterColor, String fogColor, String skyColor, String grassColor, String foliageColor) {
 		this.name = name;
@@ -114,10 +113,6 @@ public enum TitanBiome {
 		}
 		
 		return TitanBiome.WITHERED_PLAINS;
-	}
-
-	public final Holder<net.minecraft.world.level.biome.Biome> getHolder() {
-		return this.holder;
 	}
 	
 	public static final Map<TitanBiome, Biome[]> REPLACEABLES = ImmutableMap.<TitanBiome, Biome[]>builder()
@@ -235,8 +230,6 @@ public enum TitanBiome {
 
 	// Registry & Setting Methods
 	
-	public static WritableRegistry<net.minecraft.world.level.biome.Biome> registrywritable = (WritableRegistry<net.minecraft.world.level.biome.Biome>) ((CraftServer) Bukkit.getServer()).getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
-
 	public static void changeRegistryLock(boolean isLocked) {
 		DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
         MappedRegistry<net.minecraft.world.level.biome.Biome> materials = (MappedRegistry<net.minecraft.world.level.biome.Biome>) server.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
@@ -254,6 +247,8 @@ public enum TitanBiome {
 		SMP plugin = JavaPlugin.getPlugin(SMP.class);
 		
 		changeRegistryLock(false);
+		
+		WritableRegistry<net.minecraft.world.level.biome.Biome> registrywritable = (WritableRegistry<net.minecraft.world.level.biome.Biome>) ((CraftServer) Bukkit.getServer()).getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
 		for (TitanBiome biome : values()) { 
 			ResourceKey<net.minecraft.world.level.biome.Biome> key = ResourceKey.<net.minecraft.world.level.biome.Biome>create(Registry.BIOME_REGISTRY, new ResourceLocation("noobysmp", biome.name.toLowerCase().replace(' ', '_')));
 			biome.resourceKey = key;
@@ -261,8 +256,8 @@ public enum TitanBiome {
 			ResourceKey<net.minecraft.world.level.biome.Biome> oldKey = Biomes.FOREST;
 			
 			net.minecraft.world.level.biome.Biome forestbiome = registrywritable.get(oldKey);
-			
 			if (registrywritable.containsKey(key)) continue;
+			
 			
 			BiomeBuilder builder = new net.minecraft.world.level.biome.Biome.BiomeBuilder();
 			builder.biomeCategory(BiomeCategory.NONE);
@@ -298,7 +293,6 @@ public enum TitanBiome {
 			net.minecraft.world.level.biome.Biome nmsbiome = builder.build();
 			biome.nmsBiome = nmsbiome;
 			
-			biome.holder = registrywritable.getHolderOrThrow(key);
 			registrywritable.register(key, nmsbiome, Lifecycle.stable());
 		}
 		
@@ -352,11 +346,11 @@ public enum TitanBiome {
 
 	private void setBiome(int x, int y, int z, Level w, TitanBiome tbiome) {
 		BlockPos pos = new BlockPos(x, 0, z);
-
+		
 		if (w.isLoaded(pos)) {
 			net.minecraft.world.level.chunk.LevelChunk chunk = w.getChunkAt(pos);
 			if (chunk != null) { 	
-				chunk.setBiome(x >> 2, y >> 2, z >> 2, registrywritable.getHolderOrThrow(tbiome.getResourceKey()));
+				chunk.setBiome(x >> 2, y >> 2, z >> 2, Holder.direct(tbiome.nmsBiome));
 			}
 		}
 	}
