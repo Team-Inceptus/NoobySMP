@@ -17,7 +17,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -56,7 +55,6 @@ import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.CancelChance;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Defensive;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.MinionSpawn;
 import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Offensive;
-import us.teaminceptus.noobysmp.entities.bosses.attacks.Attacks.Repeated;
 import us.teaminceptus.noobysmp.entities.bosses.npc.NPCBoss;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
@@ -73,51 +71,10 @@ public class BossManager implements Listener {
     private static final int T2_UNLOCK = 10;
     private static final int T1_UNLOCK = 5;
     protected SMP plugin;
-
-    
-    private final BukkitRunnable REPEATED_ATTACKS = new BukkitRunnable() {
-    	public void run() {
-    		for (World w : Bukkit.getWorlds()) {
-    			for (LivingEntity e : w.getEntitiesByClass(LivingEntity.class)) {
-    				if (SMPBoss.getByUUID(e.getUniqueId()) == null && NPCBoss.getByUUID(e.getUniqueId()) == null) continue;
-    				
-    				final 
-    				Class<?> bossClass;
-    				if (SMPBoss.getByUUID(e.getUniqueId()) != null) {
-    					bossClass = SMPBoss.getByUUID(e.getUniqueId()).getClass();
-    				} else if (NPCBoss.getByUUID(e.getUniqueId()) != null) {
-    					bossClass = NPCBoss.getByUUID(e.getUniqueId()).getClass();
-    				} else bossClass = null;
-    				
-    				if (bossClass == null) continue;
-    				
-    				for (Method m : bossClass.getDeclaredMethods()) {
-    					if (m.isAnnotationPresent(Repeated.class)) {
-    						Repeated r = m.getAnnotation(Repeated.class);
-    						
-    						new BukkitRunnable() {
-    							public void run() {
-    								if (e.isDead()) cancel();
-    								
-    								try {
-    									m.invoke(SMPBoss.getByUUID(e.getUniqueId()) == null ? NPCBoss.getByUUID(e.getUniqueId()) : SMPBoss.getByUUID(e.getUniqueId()));
-    								} catch (Exception err) {
-    									plugin.getLogger().info("Error executing repeated attack " + m.getName() + " in class " + bossClass.getName());
-    									err.printStackTrace();
-    								}
-    							}
-    						}.runTaskTimer(plugin, r.value(), r.value());
-    					}
-    				}
-    			}
-    		}
-    	}
-    };
     
     public BossManager(SMP plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        REPEATED_ATTACKS.runTaskTimer(plugin, 2, 2);
         plugin.getLogger().info("Loaded Repeated Attacks Runnable");
     }
   
