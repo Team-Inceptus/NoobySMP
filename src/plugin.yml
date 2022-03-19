@@ -96,10 +96,10 @@ commands:
     description: Experience managing for Admins
     alias: exp 
     permission: smp.admin.experience
-  setbiome:
-    description: Manage Biomes in current area
-    aliases: [setcustombiome, setb, setcustomb, setcbiome]
-    permission: smp.admin.catalogue
+#  setbiome:
+ #   description: Manage Biomes in current area
+  #  aliases: [setcustombiome, setb, setcustomb, setcbiome]
+   # permission: smp.admin.catalogue
   runtest:
     description: Run Tests for Features
     permission: smp.admin
