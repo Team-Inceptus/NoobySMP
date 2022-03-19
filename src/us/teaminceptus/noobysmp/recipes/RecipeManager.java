@@ -17,13 +17,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockCookEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
+import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.SmithingInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.entities.bosses.BossSetup.DisplayName;
@@ -821,6 +824,38 @@ public class RecipeManager implements Listener {
 			return;
 		}
 	}
+	
+	@EventHandler
+	public void onCraftClick(PrepareItemCraftEvent e) {
+		CraftingInventory inv = e.getInventory();
+		if (!(e.getViewers().get(0) instanceof Player p)) return;
+		PlayerConfig config = new PlayerConfig(p);
+		
+		if (inv.getResult() == null) return;
+		ItemStack item = inv.getResult();
+		
+		if (SMPMaterial.getByItem(item) != null) {
+			if (SMPMaterial.getByItem(item).getLevelUnlocked() > config.getLevel()) {
+				new BukkitRunnable() {
+					public void run() {
+						inv.setResult(null);
+					}
+				}.runTask(plugin);
+				return;
+			}
+		}
+		
+		if (AbilityItem.getByItem(item) != null) {
+			if (AbilityItem.getByItem(item).getLevelUnlocked() > config.getLevel()) {
+				new BukkitRunnable() {
+					public void run() {
+						inv.setResult(null);
+					}
+				}.runTask(plugin);
+				return;
+			}
+		}
+	}
 
 	@EventHandler
 	public void onSmith(PrepareSmithingEvent e) {
@@ -839,12 +874,12 @@ public class RecipeManager implements Listener {
 				
 				for (SMPRecipe r : SMPRecipe.getByResult(data.getResult())) {
 					if (SMPMaterial.getByItem(r.getResult()) != null && SMPMaterial.getByItem(r.getResult()).getLevelUnlocked() > config.getLevel()) {
-						e.setResult(Items.LOCKED_ITEM);
+						e.setResult(null);
 						return;
 					}
 
 					if (AbilityItem.getByItem(r.getResult()) != null && AbilityItem.getByItem(r.getResult()).getLevelUnlocked() > config.getLevel()) {
-						e.setResult(Items.LOCKED_ITEM);
+						e.setResult(null);
 						return;
 					}
 				}
