@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -24,10 +22,13 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.common.collect.ImmutableList;
+
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.ability.cosmetics.SMPCosmetic;
+import us.teaminceptus.noobysmp.commands.Settings;
 import us.teaminceptus.noobysmp.commands.admin.Ranks;
 import us.teaminceptus.noobysmp.leveling.LevelingManager.LevelingType;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
@@ -251,7 +252,11 @@ public class PlayerConfig {
 				return Math.min( Math.max(( getLevel() + 1) / 10, 4), 20);
 			}
 			case GENERIC_MOVEMENT_SPEED: {
-				return Math.min(  Math.max((getLevel() + 5) / 15, 0.1), 2);
+				if (getSetting(Settings.SPEED)) {
+					return Math.min(  Math.max((getLevel() + 5) / 15, 0.1), 0.6);
+				} else {
+					return 0.1D;
+				}
 			}
 			case GENERIC_MAX_HEALTH: {
 				return Math.min( (getLevel() / 5) + 20, 80);
