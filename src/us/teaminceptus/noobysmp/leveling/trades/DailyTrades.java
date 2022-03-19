@@ -22,6 +22,7 @@ import us.teaminceptus.noobysmp.SMP;
 import us.teaminceptus.noobysmp.materials.AbilityItem;
 import us.teaminceptus.noobysmp.materials.SMPMaterial;
 import us.teaminceptus.noobysmp.util.Messages;
+import us.teaminceptus.noobysmp.util.PlayerConfig;
 
 public class DailyTrades implements CommandExecutor {
     
@@ -136,7 +137,7 @@ public class DailyTrades implements CommandExecutor {
         }
 
         private DailyTrade(ItemStack ing1, ItemStack ing2, ItemStack result) {
-            this(ing1, ing2, result, 20);
+            this(ing1, ing2, result, Integer.MAX_VALUE);
         }
 
         private DailyTrade(ItemStack ing1, Material ing2, ItemStack result) {
@@ -204,7 +205,26 @@ public class DailyTrades implements CommandExecutor {
             return false;
         }
         
-        p.openMerchant(DAILY_TRADES, true);
+        PlayerConfig config = new PlayerConfig(p);
+        
+        Merchant newM = Bukkit.createMerchant("NoobySMP Daily Trades");
+        List<MerchantRecipe> recipes = DAILY_TRADES.getRecipes();
+        
+        List<MerchantRecipe> newRecipes = new ArrayList<>();
+        
+        for (MerchantRecipe r : recipes) {
+        	if (SMPMaterial.getByItem(r.getResult()) != null) {
+        		if (SMPMaterial.getByItem(r.getResult()).getLevelUnlocked() <= config.getLevel()) newRecipes.add(r);
+        	}
+        	
+        	if (AbilityItem.getByItem(r.getResult()) != null) {
+        		if (AbilityItem.getByItem(r.getResult()).getLevelUnlocked() <= config.getLevel()) newRecipes.add(r);
+        	}
+        }
+        
+        newM.setRecipes(newRecipes);
+        
+        p.openMerchant(newM, true);
         p.playSound(p, Sound.ENTITY_VILLAGER_TRADE, 3F, 1F);
         return false;
     }
