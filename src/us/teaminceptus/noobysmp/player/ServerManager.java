@@ -1,8 +1,6 @@
 package us.teaminceptus.noobysmp.player;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -68,7 +66,7 @@ public class ServerManager implements Listener {
 		ChatColor.BLUE + "Join our Discord: https://discord.io/thenoobygods",
 		ChatColor.DARK_AQUA + "Check out our Source Code at: https://github.com/Team-Inceptus/NoobySMP",
 		ChatColor.RED + "Subscribe to Team Inceptus: https://www.youtube.com/channel/UCKYvVHwoYgGFt6GUzPvryBg",
-		ChatColor.AQUA + "You can research recipes with /getreicpe!",
+		ChatColor.AQUA + "You can research recipes with /getrecipe!",
 		ChatColor.LIGHT_PURPLE + "Learn about different items with /query!",
 		ChatColor.DARK_PURPLE + "See your progression with /progress!"
 	};
@@ -281,16 +279,7 @@ public class ServerManager implements Listener {
 		// Set Scores
 		
 		Score rank = side.getScore(ChatColor.GREEN + "Rank: " + ChatColor.YELLOW + config.getRank().toUpperCase());
-		rank.setScore(2);
-
-		Score space1 = side.getScore(" ");
-		space1.setScore(1);
-		
-		Date time = new Date(p.getPlayerTime());
-		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm a");
-
-		Score timescore = side.getScore(ChatColor.DARK_GRAY + format.format(time));
-		timescore.setScore(0);
+		rank.setScore(0);
 
 		p.setScoreboard(noobysmp);
 	}
@@ -334,6 +323,10 @@ public class ServerManager implements Listener {
 		}
 		
 		p.setPlayerListHeaderFooter(formatList(p, TOP_PLAYER_LIST), formatList(p, BOTTOM_PLAYER_LIST));
+		
+		for (Player online : Bukkit.getOnlinePlayers()) {
+			online.setPlayerListFooter(formatList(online, BOTTOM_PLAYER_LIST));
+		}
 		
 		new BukkitRunnable() {
 			public void run() {
