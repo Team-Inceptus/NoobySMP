@@ -20,12 +20,12 @@ import us.teaminceptus.noobysmp.ability.cosmetics.Cosmetics;
 import us.teaminceptus.noobysmp.commands.Bosses;
 import us.teaminceptus.noobysmp.commands.GetRecipe;
 import us.teaminceptus.noobysmp.commands.Help;
+import us.teaminceptus.noobysmp.commands.MinorCommands;
 import us.teaminceptus.noobysmp.commands.PlayerInfo;
 import us.teaminceptus.noobysmp.commands.Progress;
 import us.teaminceptus.noobysmp.commands.Query;
 import us.teaminceptus.noobysmp.commands.Settings;
 import us.teaminceptus.noobysmp.commands.TPRequests;
-import us.teaminceptus.noobysmp.commands.Trade;
 import us.teaminceptus.noobysmp.commands.admin.Ban;
 import us.teaminceptus.noobysmp.commands.admin.Catalogue;
 import us.teaminceptus.noobysmp.commands.admin.Ecsee;
@@ -34,7 +34,6 @@ import us.teaminceptus.noobysmp.commands.admin.FetchData;
 import us.teaminceptus.noobysmp.commands.admin.Invsee;
 import us.teaminceptus.noobysmp.commands.admin.Ranks;
 import us.teaminceptus.noobysmp.commands.admin.RunTest;
-import us.teaminceptus.noobysmp.commands.admin.SetBiome;
 import us.teaminceptus.noobysmp.commands.admin.Suspend;
 import us.teaminceptus.noobysmp.commands.admin.Tags;
 import us.teaminceptus.noobysmp.conquest.ConquestManager;
@@ -46,9 +45,9 @@ import us.teaminceptus.noobysmp.generation.ItemManager;
 import us.teaminceptus.noobysmp.generation.WorldManager;
 import us.teaminceptus.noobysmp.generation.biomes.TitanBiome;
 import us.teaminceptus.noobysmp.generation.structures.StructureManager;
+import us.teaminceptus.noobysmp.inventory.PlayerMenu;
 import us.teaminceptus.noobysmp.leveling.LevelingManager;
-import us.teaminceptus.noobysmp.leveling.trades.TradeCommandManager;
-import us.teaminceptus.noobysmp.leveling.trades.TradesManager;
+import us.teaminceptus.noobysmp.leveling.trades.DailyTrades;
 import us.teaminceptus.noobysmp.materials.TagsManager;
 import us.teaminceptus.noobysmp.player.ServerManager;
 import us.teaminceptus.noobysmp.recipes.RecipeManager;
@@ -160,6 +159,10 @@ public class SMP extends JavaPlugin {
 				settings.set("tag_abilities", true);
 			}
 			
+			if (!(settings.isBoolean("speed"))) {
+				settings.set("speed", true);
+			}
+			
 			if (!(pConfig.isConfigurationSection("information"))) {
 				pConfig.createSection("information");
 			}
@@ -213,15 +216,18 @@ public class SMP extends JavaPlugin {
 		new Progress(this);
 		new Bosses(this);
 		new Cosmetics(this);
-		new Trade(this);
+//		new Trade(this);
 		new Query(this);
 		new GetRecipe(this);
 		new TPRequests(this);
+		new MinorCommands(this);
+		new DailyTrades(this);
+		new PlayerMenu(this);
 		// Admin Commands
 		new Ranks(this);
 		new Catalogue(this);
 		new Experience(this);
-		new SetBiome(this);
+//		new SetBiome(this);
 		new RunTest(this);
 		new FetchData(this);
 		new Tags(this);
@@ -247,8 +253,8 @@ public class SMP extends JavaPlugin {
 		new Items(this);
 		
 		new LevelingManager(this);
-		new TradesManager(this);
-		new TradeCommandManager(this);
+//		new TradesManager(this);
+//		new TradeCommandManager(this);
 		
 		getLogger().info("Loading World Managers...");
 		new WorldManager(this);
