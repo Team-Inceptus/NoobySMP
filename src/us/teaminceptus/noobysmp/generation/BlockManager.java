@@ -66,6 +66,7 @@ public class BlockManager implements Listener {
 		final Block b = e.getBlock();
 		Player p = e.getPlayer();
 		PersistentDataContainer c = new BlockPDC(b);
+		
 		if (!(c.has(typeKey, PersistentDataType.STRING))) return;
 
 		if (b.getWorld().getName().equalsIgnoreCase("world_titan")) {
@@ -80,9 +81,8 @@ public class BlockManager implements Listener {
 		if (p.getInventory().getItemInMainHand() != null) {
 			ItemStack item = p.getInventory().getItemInMainHand();
 
-			if (!(item.hasItemMeta())) return;
-			if (!(item.getItemMeta().hasEnchant(Enchantment.LOOT_BONUS_BLOCKS))) return;
-
+			
+			if (item.hasItemMeta() && item.getItemMeta().hasEnchant(Enchantment.LOOT_BONUS_BLOCKS))
 			fortuneMultiplier = 1 + r.nextInt(item.getItemMeta().getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS));
 		}
 
