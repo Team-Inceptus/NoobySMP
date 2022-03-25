@@ -10,7 +10,7 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import us.teaminceptus.noobysmp.SMP;
@@ -42,8 +42,7 @@ public class WorldManager implements Listener {
     private static Random r = new Random();
 
     @EventHandler
-    public void onLoad(ChunkLoadEvent e) {
-        if (!(e.isNewChunk())) return;
+    public void onLoad(ChunkPopulateEvent e) {
         Chunk c = e.getChunk();
         if (c.getWorld().getName().equalsIgnoreCase("world_titan")) return;
 
