@@ -242,6 +242,7 @@ public class RecipeManager implements Listener {
 		
 		new SMPRecipe(SMPMaterial.TINY_EXPERIENCE_BAG, "BBB_BEB_BBB", new HashMap<>(Map.of('B', Material.BUNDLE, 'E', Material.EXPERIENCE_BOTTLE)));
 		// Level 1
+		new SMPRecipe(SMPMaterial.ENDERITE, BLOCK_9, vanillaShape(SMPMaterial.ENDER_FRAGMENT, BLOCK_9));
 		new SMPRecipe(SMPMaterial.ENDERITE_HELMET, HELMET, vanillaShape(SMPMaterial.ENDERITE, HELMET));
 		new SMPRecipe(SMPMaterial.ENDERITE_CHESTPLATE, CHESTPLATE, vanillaShape(SMPMaterial.ENDERITE, CHESTPLATE));
 		new SMPRecipe(SMPMaterial.ENDERITE_LEGGINGS, LEGGINGS, vanillaShape(SMPMaterial.ENDERITE, LEGGINGS));
