@@ -80,6 +80,7 @@ public class PlayerMenu implements CommandExecutor, Listener {
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		if (!(e.getWhoClicked() instanceof Player p)) return;
+		if (e.getClickedInventory() == null) return;
 		if (!(e.getClickedInventory().getHolder() instanceof MenuHolder)) return;
 		if (e.getCurrentItem() == null) return;
 		ItemStack item = e.getCurrentItem();
