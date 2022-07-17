@@ -3,20 +3,15 @@
 > TheNoobyGodsSMP Version 2.0
 
 ## What is NoobySMP?
-NoobySMP is a Minecraft Server developed by Team Inceptus for TheNoobyGods. It is currently in high development, and is currently released at `smp.teaminceptus.us`.
+NoobySMP is a Minecraft Server developed by Team Inceptus.
 
 ## Why was it created?
 At the beginning of the TheNoobyGods, they held a SMP. This SMP did alright, but it eventually spun into madness and died. It is curently still up, but will be taken down after beta is finished and ready for testing release.
 
 NoobySMP is TheNoobyGodsSMP Second Coming, or Version 2.
 
-## Who created NoobySMP?
-The Main developer of NoobySMP is GamerCoder215, the founder of TheNoobyGods and Team Inceptus. He is assisted by their wonderful builds and developers, including amanaran1 (XHellMaster), Dank_Circle, JustTooSmart, ForeverFlames, FlyinFishGuy, and more.
-
-Team Inceptus, as a whole, is the development behind many projects. You can find many Spigot Plugins on our GitHub and Spigot Page, and the Discord Bot that powers our [discord server](https://discord.io/thenoobygods).
-
 ## How is NoobySMP?
-As said earlier, the server is currently in development. You can view public pre-releases on our [releases](https://github.com/Team-Inceptus/NoobySMP/releases) page. Screenshots of previous features can be found below.
+As said earlier, the server is currently in development. You can view public builds on our [releases](https://github.com/Team-Inceptus/NoobySMP/releases) page. Screenshots of previous features can be found below.
 ![2022-03-12_17 32 47](https://user-images.githubusercontent.com/54124162/158071187-8d23fa3c-f7f6-42cd-82d5-c409329034c3.png)
 ![2022-03-11_20 16 39](https://user-images.githubusercontent.com/54124162/158071204-60b7fb9f-a72e-4b70-90e0-67ebe02f96a3.png)
 ![2022-03-11_17 56 03](https://user-images.githubusercontent.com/54124162/158071210-6e2c646f-8768-4ae0-95eb-63e78c1edd21.png)
