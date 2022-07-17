@@ -1,9 +1,3 @@
-.classpath
-.project
-.replit
+.idea/
+dependency-reduced-pom.xml
 target/
-.settings/
-.breakpoints
-/bin/
-.vscode
-build.sh
