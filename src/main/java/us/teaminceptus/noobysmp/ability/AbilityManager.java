@@ -1,9 +1,6 @@
 package us.teaminceptus.noobysmp.ability;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -117,7 +114,7 @@ public class AbilityManager implements Listener {
 					mob.damage(multiplier * (100 * r.nextDouble()), p);
 				}
 			}
-		} catch (NullPointerException err) {
+		} catch (NullPointerException | IndexOutOfBoundsException err) {
 			// do nothing
 		}	
 	}
