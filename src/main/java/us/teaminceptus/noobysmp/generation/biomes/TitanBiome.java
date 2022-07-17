@@ -233,7 +233,7 @@ public enum TitanBiome {
 		DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
         MappedRegistry<net.minecraft.world.level.biome.Biome> materials = (MappedRegistry<net.minecraft.world.level.biome.Biome>) server.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
         try {
-	        Field isFrozen = materials.getClass().getDeclaredField("bL");
+	        Field isFrozen = materials.getClass().getDeclaredField("ca");
 	        isFrozen.setAccessible(true);
 	        isFrozen.set(materials, isLocked);  
         } catch (Exception e) {
